@@ -1,0 +1,5 @@
+package com.mosstest.client;
+
+public abstract class GenericTool {
+
+}

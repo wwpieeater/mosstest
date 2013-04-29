@@ -1,13 +1,14 @@
 package com.mosstest.servercore;
 
-import com.sleepycat.persist.model.Entity;
-import com.sleepycat.persist.model.PrimaryKey;
-
-@Entity
 public class MapChunk {
-	@PrimaryKey
-	private long chunkId;
-	private String chunkLightStorage;
-	private boolean hasHeavies;
+
+	public MapChunk(long chunkId, String chunkLightStorage, boolean heavy) {
+		// TODO Auto-generated constructor stub
+	}
 	
+	public MapChunkPacked pack(){
+		//TODO
+		return new MapChunkPacked();
+	};
+
 }

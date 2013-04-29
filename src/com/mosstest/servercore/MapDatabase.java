@@ -7,7 +7,6 @@ import com.sleepycat.je.EnvironmentFailureException;
 import com.sleepycat.je.EnvironmentNotFoundException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 
 public class MapDatabase {
 	private Environment env;
