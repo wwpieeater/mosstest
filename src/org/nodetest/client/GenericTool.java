@@ -1,4 +1,4 @@
-package com.mosstest.common;
+package org.nodetest.client;
 
 public abstract class GenericTool {
 

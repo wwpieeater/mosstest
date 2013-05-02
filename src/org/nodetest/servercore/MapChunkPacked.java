@@ -1,4 +1,4 @@
-package com.mosstest.servercore;
+package org.nodetest.servercore;
 
 import com.sleepycat.persist.model.Entity;
 import com.sleepycat.persist.model.PrimaryKey;

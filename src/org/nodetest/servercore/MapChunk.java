@@ -1,4 +1,4 @@
-package com.mosstest.servercore;
+package org.nodetest.servercore;
 
 public class MapChunk {
 

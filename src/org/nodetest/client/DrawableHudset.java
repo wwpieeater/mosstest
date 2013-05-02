@@ -1,4 +1,4 @@
-package com.mosstest.client;
+package org.nodetest.client;
 
 public class DrawableHudset {
 

@@ -1,4 +1,4 @@
-package com.mosstest.clilaunch;
+package org.nodetest.clilaunch;
 import org.apache.commons.cli.Options;
 
 

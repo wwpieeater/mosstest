@@ -1,6 +1,6 @@
-package com.mosstest.client;
+package org.nodetest.client;
 
-import com.mosstest.common.GenericNode;
+import org.nodetest.common.GenericNode;
 
 public class DrawableWorld {
 

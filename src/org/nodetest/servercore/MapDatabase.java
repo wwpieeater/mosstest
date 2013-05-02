@@ -1,4 +1,4 @@
-package com.mosstest.servercore;
+package org.nodetest.servercore;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
