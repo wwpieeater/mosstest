@@ -1,7 +1,7 @@
 package org.nodetest.common;
 
 public class NodeInstance {
-	GenericNode nodeType;
+	MapNode nodeType;
 	int xpos;
 	int ypos;
 	int zpos;

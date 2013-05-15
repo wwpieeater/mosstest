@@ -1,5 +1,5 @@
 package org.nodetest.client;
 
-public class Mesh {
+public class GameMesh {
 
 }
