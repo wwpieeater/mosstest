@@ -19,3 +19,10 @@ Main
 		Logging
 		UserMgmt
 		Ban/anti-attack
+	Maintenance
+		DBManager
+		DeadlockWatchdog-This shall be simple and never rely on blocked methods
+	DB
+		DatabaseAccessors
+	LoadBalancer
+		LBCommunicator
