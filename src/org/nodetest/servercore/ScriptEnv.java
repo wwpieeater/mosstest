@@ -1,4 +1,4 @@
-package org.nodetest.common;
+package org.nodetest.servercore;
 
 import java.util.HashMap;
 
@@ -6,9 +6,6 @@ import javax.script.Invocable;
 
 import org.mozilla.javascript.*;
 
-import org.nodetest.servercore.Entity;
-import org.nodetest.servercore.GameMap;
-import org.nodetest.servercore.GameWorld;
 
 public class ScriptEnv {
 

@@ -1,4 +1,4 @@
-package org.nodetest.common;
+package org.nodetest.servercore;
 
 public interface NodeParams {
 

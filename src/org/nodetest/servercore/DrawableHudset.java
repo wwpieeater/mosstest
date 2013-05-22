@@ -1,4 +1,4 @@
-package org.nodetest.client;
+package org.nodetest.servercore;
 
 public class DrawableHudset {
 

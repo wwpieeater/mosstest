@@ -1,7 +1,5 @@
-package org.nodetest.common;
+package org.nodetest.servercore;
 
-import org.nodetest.client.DrawableWorld;
-import org.nodetest.client.GenericTexture;
 
 public class MapNode {
 	protected long nodeId;

@@ -1,7 +1,5 @@
-package org.nodetest.client;
+package org.nodetest.servercore;
 
-import org.nodetest.common.MapNode;
-import org.nodetest.common.Position;
 
 public class DrawableWorld {
 

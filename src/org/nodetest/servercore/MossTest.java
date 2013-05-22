@@ -1,4 +1,4 @@
-package org.nodetest.clilaunch;
+package org.nodetest.servercore;
 import org.apache.commons.cli.Options;
 
 

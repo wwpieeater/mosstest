@@ -1,4 +1,4 @@
-package org.nodetest.common;
+package org.nodetest.servercore;
 
 public class NodeInstance {
 	MapNode nodeType;

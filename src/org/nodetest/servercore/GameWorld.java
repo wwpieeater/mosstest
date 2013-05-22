@@ -2,8 +2,6 @@ package org.nodetest.servercore;
 
 import java.util.HashMap;
 
-import org.nodetest.common.Player;
-import org.nodetest.common.ScriptEnv;
 
 
 public class GameWorld {
