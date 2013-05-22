@@ -1,0 +1,21 @@
+Main
+  Net
+		inBandUDP
+		OutOFBandUDP
+		TCPNet
+	MapManager
+		Mapgen(Pool?)
+		MapLookup(Pool?)
+	Player
+		PEvents(Pool?)
+			BlockChange
+			Movement
+	Entities
+		EntActions
+		EntPathfindingAI
+	Scripting
+		ScriptMgr
+	Administrator
+		Logging
+		UserMgmt
+		Ban/anti-attack
