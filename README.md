@@ -1,4 +1,4 @@
 mosstest
 ========
 
-Open-source Minetest clone
+Open-source Minetest clone. More details coming.
