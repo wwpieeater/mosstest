@@ -34,16 +34,19 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 					int samples = EventProcessor.samples;
 					Thread[] threads = new Thread[maxEventThreads];
 					int currentThreads = 0;
-					for (int i = 0; i < initialEventThreads; i++) {
+					for (int i = 0; i<initialEventThreads; i++) {
 						System.out.println("foo");
-						new Thread(EventProcessor.eventProcessorGroup, new Runnable() {
+						threads[currentThreads]=new Thread(EventProcessor.eventProcessorGroup, new Runnable() {
 
 							public void run() {
 								System.out.println("Worker thread starteds");
 								processEvents();
 							}
 
-						}).run();
+						});
+						threads[currentThreads].start();
+						
+						System.out.println("PostRun");
 						currentThreads++;
 
 					}
