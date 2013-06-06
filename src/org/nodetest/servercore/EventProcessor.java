@@ -79,6 +79,22 @@ public class EventProcessor {
 			}, "EventProcessorManager");
 
 	static void processEvents() {
-
+		//GIANT TODO
+		boolean run=true; //Not synchronized as only used internally
+		while(run){try {
+			MossEvent myEvent=eventQueue.take();
+			if(myEvent instanceof MossStopEvent){
+				run=false;
+				
+			}
+			//Otherwise do some cool scripting stuff!
+		} catch (InterruptedException e) {
+			
+		}
+		}
+		
+	}
+	static{
+		manager.start();
 	}
 }
