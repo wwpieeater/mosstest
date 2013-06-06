@@ -11,7 +11,7 @@ public class EventProcessor {
 			"maxEventThreads", 8);
 	private static final int initialEventThreads = EngineSettings.getInt(
 			"initialEventThreads", 8);
-	private static ThreadGroup eventProcessorGroup = new ThreadGroup(
+static ThreadGroup eventProcessorGroup = new ThreadGroup(
 			"EventProcessor");
 	private static AtomicBoolean runManager = new AtomicBoolean(true);
 	protected static final int sampleInterval = EngineSettings.getInt(
@@ -25,6 +25,7 @@ public class EventProcessor {
 	private static Thread manager = new Thread(eventProcessorGroup,
 			new Runnable() {
 				public void run() {
+					System.out.println("manager thread started");
 					int ticks = 0;
 					int ticksBusy = 0;
 					int sampleInterval = EventProcessor.sampleInterval;
@@ -34,9 +35,10 @@ public class EventProcessor {
 					Thread[] threads = new Thread[maxEventThreads];
 					int currentThreads = 0;
 					for (int i = 0; i < initialEventThreads; i++) {
-						new Thread(eventProcessorGroup, new Runnable() {
+						new Thread(EventProcessor.eventProcessorGroup, new Runnable() {
 
 							public void run() {
+								System.out.println("Worker thread starteds");
 								processEvents();
 							}
 
