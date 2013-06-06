@@ -2,11 +2,17 @@ package org.nodetest.servercore;
 
 public class MapChunk {
 
-	
-	
+	private int[][][] nodes=new int[16][16][16];
+	long x,y,z;
 	public MapChunk(long x, long y, long z, String chunkLightStorage,
 			String heavy) {
-		// TODO Auto-generated constructor stub
+	this.x=x;
+	this.y=y;
+	this.z=z;
+	for(int i=0; i<4096; i++){
+		int thisNode=chunkLightStorage.charAt(4*i)<<24+chunkLightStorage.charAt(4*i+1)<<16+chunkLightStorage.charAt(4*i+2)<<8+chunkLightStorage.charAt(4*i+3);
+		nodes[(i/256)][(i/16)%16][i%16]=thisNode;
+	}
 	}
 
 	public MapChunkPacked pack(){

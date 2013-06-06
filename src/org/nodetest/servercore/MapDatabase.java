@@ -20,15 +20,19 @@ import com.db4o.query.Query;
 import java.util.UUID;
 
 public class MapDatabase {
-ObjectContainer mapDb;
+static ObjectContainer mapDb;
+static ObjectContainer nodeDb;
+static ObjectContainer entityDb;
+static ObjectContainer banDb;
 	public MapDatabase(String name, boolean create) throws MapDatabaseException, MossWorldLoadException {
 		if(!name.matches("^[A-Z[a-z[0-9[ ]]]]+$")){
 			throw new MossWorldLoadException("World name contains invalid characters");
 		}
 		
 		try {
-			//mapDb=Db4oEmbedded.openFile("worlds/"+name+"mapdb.db4o");
-			mapDb=Db4oEmbedded.openFile("testDb6.db");
+			mapDb=Db4oEmbedded.openFile("worlds/"+name+"mapdb");
+			entityDb=Db4oEmbedded.openFile("worlds/"+name+"entities");
+			banDb=Db4oEmbedded.openFile("worlds/"+name+"nodes");
 		} catch (Db4oIOException | DatabaseFileLockedException
 				| IncompatibleFileFormatException | OldFormatException
 				| DatabaseReadOnlyException e) {
@@ -71,6 +75,7 @@ ObjectContainer mapDb;
 	 * @throws MapDatabaseException 
 	 */
 	public static void main(String[] args) throws MapDatabaseException, MossWorldLoadException {
+		//TESTING ONLY
 		MapDatabase ourDb=new MapDatabase("test2", true);
 		for(int i=1; i<=320; i++){
 			//ourDb.add(new MapChunkPacked(i, i, i, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
@@ -98,9 +103,14 @@ ed++;
 
 	}
 
-	private void add(MapChunkPacked mapChunkPacked) {
+	private void addMapChunk(MapChunkPacked mapChunkPacked) {
 		mapDb.store(mapChunkPacked);
 		
 	}
+	private void addMapChunk(MapChunk mapChunk) {
+		mapDb.store(mapChunk.pack());
+		
+	}
+
 
 }

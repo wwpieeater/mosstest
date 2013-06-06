@@ -2,13 +2,17 @@ package org.nodetest.servercore;
 
 
 public class MapNode {
-	protected long nodeId;
+	protected int nodeId=0;
 	public MapNode(NodeParams nodeparams, GenericTexture textureSpace,
 			String nodeName, String userFacingName, boolean isLiquid,
 			int lightEmission) {
 		this.nodeparams = nodeparams;
 		this.textureSpace = textureSpace;
 		this.nodeName = nodeName;
+		for (int i = 0; i < nodeName.length(); i++)
+		{
+		    nodeId = 31*nodeId + nodeName.charAt(i);
+		}
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
