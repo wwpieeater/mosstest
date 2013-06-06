@@ -1,17 +1,17 @@
 package org.nodetest.servercore;
 
 import java.util.HashMap;
-import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.ArrayBlockingQueue;
 
 public final class ThreadManager {
 	public static class ThreadQueueManager {
-		HashMap<Script, PriorityBlockingQueue<MossScriptEvent>> scriptQueues;
-		PriorityBlockingQueue<MossNetEventIn> netInQueue;
-		PriorityBlockingQueue<MossNetEventOut> netOutQueue;
-		PriorityBlockingQueue<MossPlayerEvent> playerEvtQueue;
-		PriorityBlockingQueue<EmergeRequest> EmergeQueue;
-		PriorityBlockingQueue<MapChangeEvent> MapWriteQueue;
-		PriorityBlockingQueue<DatabaseWriteEvent> DBWriteQueue;//Underlying, slower queue for DB writes
+		ArrayBlockingQueue<MossScriptEvent> eventQueue;
+		ArrayBlockingQueue<MossNetEventIn> netInQueue;
+		ArrayBlockingQueue<MossNetEventOut> netOutQueue;
+		ArrayBlockingQueue<MossPlayerEvent> playerEvtQueue;
+		ArrayBlockingQueue<EmergeRequest> EmergeQueue;
+		ArrayBlockingQueue<MapChangeEvent> MapWriteQueue;
+		ArrayBlockingQueue<DatabaseWriteEvent> DBWriteQueue;//Underlying, slower queue for DB writes
 		
 		
 	}

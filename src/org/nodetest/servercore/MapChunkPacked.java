@@ -3,29 +3,27 @@ package org.nodetest.servercore;
 
 public class MapChunkPacked {
 
-	private long chunkId;
-	private String chunkLightStorage;
-	private boolean heavy;
-	public String getChunkLightStorage() {
-		return chunkLightStorage;
-	}
-	public void setChunkLightStorage(String chunkLightStorage) {
+	long x;
+	long y;
+	long z;
+	String chunkLightStorage;
+	String heavy;
+	
+	public MapChunkPacked(long x, long y, long z, String chunkLightStorage,
+			String heavy) {
+		this.x = x;
+		this.y = y;
+		this.z = z;
 		this.chunkLightStorage = chunkLightStorage;
+		this.heavy = heavy;
 	}
-	public long getChunkId() {
-		return chunkId;
+
+	public MapChunkPacked() {
+		// TODO Auto-generated constructor stub
 	}
-	public void setChunkId(long chunkId) {
-		this.chunkId = chunkId;
-	}
-	public boolean isHeavy() {
-		return heavy;
-	}
-	public void setHeavy(boolean hasHeavies) {
-		this.heavy = hasHeavies;
-	}
+
 	public MapChunk unpack(){
-		return new MapChunk(this.chunkId, this.chunkLightStorage, this.heavy);
+		return new MapChunk(this.x, this.y, this.z, this.chunkLightStorage, this.heavy);
 	}
 	
 }
