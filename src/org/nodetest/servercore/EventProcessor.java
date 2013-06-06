@@ -35,6 +35,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 					Thread[] threads = new Thread[maxEventThreads];
 					int currentThreads = 0;
 					for (int i = 0; i < initialEventThreads; i++) {
+						System.out.println("foo");
 						new Thread(EventProcessor.eventProcessorGroup, new Runnable() {
 
 							public void run() {
@@ -57,6 +58,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 								new Thread(eventProcessorGroup, new Runnable() {
 
 									public void run() {
+										System.out.println("Dynamically added thread");
 										processEvents();
 									}
 
@@ -65,6 +67,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) downshift / (float) samples)) {
+								System.out.println(("Stopping one thread"));
 								eventQueue.add(new MossStopEvent());
 
 							}
@@ -82,6 +85,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 
 	static void processEvents() {
 		//GIANT TODO
+		System.out.println("Worker thread entered");
 		boolean run=true; //Not synchronized as only used internally
 		while(run){try {
 			MossEvent myEvent=eventQueue.take();
@@ -96,7 +100,10 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 		}
 		
 	}
-	static{
-		manager.start();
+	static void init(){
+		manager.run();
+	}
+	public static void main(String[] args){
+		EventProcessor.init();
 	}
 }

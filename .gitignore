@@ -1,11 +1,20 @@
 *.class
 
+
 # Package Files #
-#*.jar
+#
+*.jar
+
 *.war
+
 *.ear
+
 /bin
 /lib
-/*.db
+/
+*.db
+
 .svn
 
+
+.classpath
