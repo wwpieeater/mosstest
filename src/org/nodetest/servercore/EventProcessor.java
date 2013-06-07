@@ -93,6 +93,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 		while(run){try {
 			MossEvent myEvent=eventQueue.take();
 			if(myEvent instanceof MossStopEvent){
+				System.out.println("Thread shutting down");
 				run=false;
 				
 			}
@@ -100,6 +101,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 		} catch (InterruptedException e) {
 			
 		}
+		System.out.println("Reached end of thread code");
 		}
 		
 	}
