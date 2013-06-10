@@ -3,13 +3,13 @@ package org.nodetest.servercore;
 
 public class MapChunkPacked {
 
-	long x;
-	long y;
-	long z;
+	int x;
+	int y;
+	int z;
 	String chunkLightStorage;
 	String heavy;
 	
-	public MapChunkPacked(long x, long y, long z, String chunkLightStorage,
+	public MapChunkPacked(int x, int y, int z, String chunkLightStorage,
 			String heavy) {
 		this.x = x;
 		this.y = y;

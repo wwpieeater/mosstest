@@ -1,6 +1,5 @@
 package org.nodetest.servercore;
 
-import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -11,7 +10,7 @@ public class EventProcessor {
 			"maxEventThreads", 8);
 	private static final int initialEventThreads = EngineSettings.getInt(
 			"initialEventThreads", 8);
-static ThreadGroup eventProcessorGroup = new ThreadGroup(
+	static ThreadGroup eventProcessorGroup = new ThreadGroup(
 			"EventProcessor");
 	private static AtomicBoolean runManager = new AtomicBoolean(true);
 	protected static final int sampleInterval = EngineSettings.getInt(
@@ -24,6 +23,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 			"eventQueueTuneSamples", 100);
 	private static Thread manager = new Thread(eventProcessorGroup,
 			new Runnable() {
+				@Override
 				public void run() {
 					System.out.println("manager thread started");
 					int ticks = 0;
@@ -38,6 +38,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 						System.out.println("foo");
 						threads[currentThreads]=new Thread(EventProcessor.eventProcessorGroup, new Runnable() {
 
+							@Override
 							public void run() {
 								System.out.println("Worker thread starteds");
 								processEvents();
@@ -60,6 +61,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 									&& (((float) ticksBusy / (float) ticks) > ((float) upshift / (float) samples))) {
 								new Thread(eventProcessorGroup, new Runnable() {
 
+									@Override
 									public void run() {
 										System.out.println("Dynamically added thread");
 										processEvents();
@@ -71,7 +73,7 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) downshift / (float) samples)) {
 								System.out.println(("Stopping one thread"));
-								eventQueue.add(new MossStopEvent());
+								eventQueue.add(new MossEvent(MossEvent.EvtType.EVT_THREADSTOP));
 
 							}
 							ticks = 0;
@@ -92,9 +94,8 @@ static ThreadGroup eventProcessorGroup = new ThreadGroup(
 		boolean run=true; //Not synchronized as only used internally
 		while(run){try {
 			MossEvent myEvent=eventQueue.take();
-			if(myEvent instanceof MossStopEvent){
-				System.out.println("Thread shutting down");
-				run=false;
+			{//Section for actually handling the events
+				
 				
 			}
 			//Otherwise do some cool scripting stuff!

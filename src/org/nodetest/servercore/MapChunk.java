@@ -3,8 +3,8 @@ package org.nodetest.servercore;
 public class MapChunk {
 
 	private int[][][] nodes=new int[16][16][16];
-	long x,y,z;
-	public MapChunk(long x, long y, long z, String chunkLightStorage,
+	int x,y,z;
+	public MapChunk(int x, int y, int z, String chunkLightStorage,
 			String heavy) {
 	this.x=x;
 	this.y=y;

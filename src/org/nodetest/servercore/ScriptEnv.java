@@ -38,9 +38,8 @@ public class ScriptEnv {
 
 			public boolean visibleToScripts(String className) {
 				if (className.startsWith("adapter")
-						|| className.startsWith("PluginOurname")
-						|| (allowDb && className.startsWith("DbPlugin")))// FIXME
-																			// name
+						|| className=="MossScriptEnv")
+						
 					return true;
 
 				else
