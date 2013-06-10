@@ -10,8 +10,7 @@ public class EventProcessor {
 			"maxEventThreads", 8);
 	private static final int initialEventThreads = EngineSettings.getInt(
 			"initialEventThreads", 8);
-	static ThreadGroup eventProcessorGroup = new ThreadGroup(
-			"EventProcessor");
+	static ThreadGroup eventProcessorGroup = new ThreadGroup("EventProcessor");
 	private static AtomicBoolean runManager = new AtomicBoolean(true);
 	protected static final int sampleInterval = EngineSettings.getInt(
 			"eventQueueTuneSampleInterval", 100);
@@ -34,19 +33,22 @@ public class EventProcessor {
 					int samples = EventProcessor.samples;
 					Thread[] threads = new Thread[maxEventThreads];
 					int currentThreads = 0;
-					for (int i = 0; i<initialEventThreads; i++) {
+					for (int i = 0; i < initialEventThreads; i++) {
 						System.out.println("foo");
-						threads[currentThreads]=new Thread(EventProcessor.eventProcessorGroup, new Runnable() {
+						threads[currentThreads] = new Thread(
+								EventProcessor.eventProcessorGroup,
+								new Runnable() {
 
-							@Override
-							public void run() {
-								System.out.println("Worker thread starteds");
-								processEvents();
-							}
+									@Override
+									public void run() {
+										System.out
+												.println("Worker thread starteds");
+										processEvents();
+									}
 
-						});
+								});
 						threads[currentThreads].start();
-						
+
 						System.out.println("PostRun");
 						currentThreads++;
 
@@ -63,7 +65,8 @@ public class EventProcessor {
 
 									@Override
 									public void run() {
-										System.out.println("Dynamically added thread");
+										System.out
+												.println("Dynamically added thread");
 										processEvents();
 									}
 
@@ -73,7 +76,10 @@ public class EventProcessor {
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) downshift / (float) samples)) {
 								System.out.println(("Stopping one thread"));
-								eventQueue.add(new MossEvent(MossEvent.EvtType.EVT_THREADSTOP));
+								eventQueue.add(new MossEvent(
+										MossEvent.EvtType.EVT_THREADSTOP, null,
+										0, 0, 0, null, null, null, null, null,
+										null));
 
 							}
 							ticks = 0;
@@ -82,34 +88,36 @@ public class EventProcessor {
 						try {
 							Thread.sleep(sampleInterval);
 						} catch (InterruptedException e) {
-							
+
 						}
 					}
 				};
 			}, "EventProcessorManager");
 
 	static void processEvents() {
-		//GIANT TODO
+		// GIANT TODO
 		System.out.println("Worker thread entered");
-		boolean run=true; //Not synchronized as only used internally
-		while(run){try {
-			MossEvent myEvent=eventQueue.take();
-			{//Section for actually handling the events
-				
-				
+		boolean run = true; // Not synchronized as only used internally
+		while (run) {
+			try {
+				MossEvent myEvent = eventQueue.take();
+				{// Section for actually handling the events
+
+				}
+				// Otherwise do some cool scripting stuff!
+			} catch (InterruptedException e) {
+
 			}
-			//Otherwise do some cool scripting stuff!
-		} catch (InterruptedException e) {
-			
+			System.out.println("Reached end of thread code");
 		}
-		System.out.println("Reached end of thread code");
-		}
-		
+
 	}
-	static void init(){
+
+	static void init() {
 		manager.run();
 	}
-	public static void main(String[] args){
+
+	public static void main(String[] args) {
 		EventProcessor.init();
 	}
 }
