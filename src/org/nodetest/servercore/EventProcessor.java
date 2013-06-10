@@ -11,7 +11,7 @@ public class EventProcessor {
 			"maxEventThreads", 8);
 	private static final int initialEventThreads = EngineSettings.getInt(
 			"initialEventThreads", 8);
-static ThreadGroup eventProcessorGroup = new ThreadGroup(
+	static ThreadGroup eventProcessorGroup = new ThreadGroup(
 			"EventProcessor");
 	private static AtomicBoolean runManager = new AtomicBoolean(true);
 	protected static final int sampleInterval = EngineSettings.getInt(
