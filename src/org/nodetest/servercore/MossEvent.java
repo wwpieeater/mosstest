@@ -4,7 +4,9 @@ public class MossEvent {
 	public MossEvent(EvtType type, Entity actor, long posx, long posy,
 			long posz, MapNode nodeBefore, MapNode nodeAfter,
 			Entity recvEntity, MossFormspec fspec, MossInventoryAction action,
-			String initiatingMessage) {
+			String initiatingMessage, ScriptSandboxBorderToken tok) {
+		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
+			throw new SecurityException("Attempt to access controlled resources in the script DMZ.");
 		this.type = type;
 		this.actor = actor;
 		this.posx = posx;

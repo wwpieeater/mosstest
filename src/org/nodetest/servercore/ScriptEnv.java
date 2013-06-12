@@ -6,7 +6,6 @@ import javax.script.Invocable;
 
 import org.mozilla.javascript.*;
 
-
 public class ScriptEnv {
 
 	HashMap<String, Script> scriptMap = new HashMap<>();
@@ -21,7 +20,6 @@ public class ScriptEnv {
 		this.scriptMap = scriptMap;
 		this.allowDb = allowDb;
 	}
-	
 
 	public ScriptEnv(boolean isServer, HashMap<String, Player> players,
 			GameMap map, HashMap<String, Entity> entities) {
@@ -33,23 +31,27 @@ public class ScriptEnv {
 		this.entities = entities;
 		this.players = players;
 		Context cx = Context.enter();
-		
+
 		cx.setClassShutter(new ClassShutter() {
 
 			public boolean visibleToScripts(String className) {
 				if (className.startsWith("adapter")
-						|| className=="MossScriptEnv"||className=="MossScriptEnv.MossEventHandler")
-						
+						|| className == "MossScriptEnv"
+						|| className == "MossScriptEnv.MossEventHandler"
+						|| className == "EventProcessingCompletedSignal"
+						|| className == "MossScriptException")
+
 					return true;
 
 				else
 					return false;
 			}
 		});
-		Scriptable scope=cx.initStandardObjects();
-		cx.evaluateString(scope, "function run(){print(\"foo123\");}", "foo", 1, null);
-		Invocable inv=(Invocable)cx;
-		Runnable r=inv.getInterface(Runnable.class);
+		Scriptable scope = cx.initStandardObjects();
+		cx.evaluateString(scope, "function run(){print(\"foo123\");}", "foo",
+				1, null);
+		Invocable inv = (Invocable) cx;
+		Runnable r = inv.getInterface(Runnable.class);
 		r.run();
 
 	}
@@ -93,5 +95,4 @@ public class ScriptEnv {
 		}
 	}
 
-	
 }

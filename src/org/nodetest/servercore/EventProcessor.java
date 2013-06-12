@@ -1,9 +1,11 @@
 package org.nodetest.servercore;
 
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.nodetest.servercore.MossEvent.EvtType;
+import org.nodetest.servercore.MossScriptEnv.MossEventHandler;
 
 public class EventProcessor {
 	static ArrayBlockingQueue<MossEvent> eventQueue = new ArrayBlockingQueue<>(
@@ -81,7 +83,7 @@ public class EventProcessor {
 								eventQueue.add(new MossEvent(
 										MossEvent.EvtType.EVT_THREADSTOP, null,
 										0, 0, 0, null, null, null, null, null,
-										null));
+										null, new ScriptSandboxBorderToken(84)));
 
 							}
 							ticks = 0;
@@ -105,7 +107,17 @@ public class EventProcessor {
 				MossEvent myEvent = eventQueue.take();
 				{// Section for actually handling the events
 					if (myEvent.type==EvtType.EVT_THREADSTOP) return;
+					ArrayList<MossEventHandler> evtHandlerList=MossScriptEnv.getHandlers(myEvent.type, new ScriptSandboxBorderToken(84));
+					try{
+						for (MossEventHandler ourHandler : evtHandlerList) {
+							ourHandler.processEvent(myEvent);
+						}
+						DefaultEventHandlers.processEvent(myEvent);
+					}catch (EventProcessingCompletedSignal | MossScriptException e){
+						//Event processing complete
+					}
 				}
+			
 				
 				// Otherwise do some cool scripting stuff!
 			} catch (InterruptedException e) {
