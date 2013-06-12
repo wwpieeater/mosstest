@@ -12,7 +12,7 @@ public class RenderProcessor {
 			System.out.println("Thread initiated");
 			while (run) {
 				try {
-					MossEvent myEvent = renderEventQueue.take();
+					MossGenericEvent myEvent = renderEventQueue.take();
 					if (myEvent instanceof MossRenderStopEvent) {
 						System.out.println("Thread shutting down");
 						run = false;

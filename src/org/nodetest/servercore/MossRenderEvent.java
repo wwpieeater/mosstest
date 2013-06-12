@@ -1,5 +1,7 @@
 package org.nodetest.servercore;
 
-public class MossRenderEvent extends MossEvent {
-	
+public class MossRenderEvent extends MossGenericEvent {
+	public MossRenderEvent () {
+		//Blank Constructor
+	}
 }
