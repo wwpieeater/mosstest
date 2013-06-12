@@ -28,6 +28,7 @@ public class EventProcessor {
 			new Runnable() {
 				@Override
 				public void run() {
+					
 					System.out.println("manager thread started");
 					int ticks = 0;
 					int ticksBusy = 0;
@@ -92,10 +93,10 @@ public class EventProcessor {
 						try {
 							Thread.sleep(sampleInterval);
 						} catch (InterruptedException e) {
-
+							
 						}
 					}
-				};
+				}
 			}, "EventProcessorManager");
 
 	static void processEvents() {

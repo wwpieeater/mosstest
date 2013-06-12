@@ -94,10 +94,31 @@ public class MossScriptEnv {
 		return registeredScriptEvents.get(type);
 	}
 
-	public static void sendChatMessage(Entity actor, String string) {
+	
+	public static void sendChatMessage(Player recipient, Player from, String message) {
+				
+	}
+
+	public static void sendChatAll(Player actor, String initiatingMessage) {
+				
+	}
+
+	public static void setHp(Entity actor, int i) {
+		
+		
+	}
+
+	public static void damageTool(Player actor, MapNode nodeBefore) throws AntiCheatException{
 		// TODO Auto-generated method stub
 		
 	}
+
+	public static void givePlayer(Player player, MapNode nodeBefore) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 	
 	//TODO JS functions for accessing databases, nodes, etc, etc, etc, etc, etc
 

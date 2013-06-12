@@ -17,7 +17,7 @@ public class ScriptEnv {
 	@Deprecated
 	public ScriptEnv(boolean allowDb, GameWorld game) {
 		super();
-		this.scriptMap = scriptMap;
+		//this.scriptMap = scriptMap;
 		this.allowDb = allowDb;
 	}
 
