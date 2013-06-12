@@ -1,5 +1,5 @@
 package org.nodetest.servercore;
 
-public class Player {
+public class Player extends Entity{
 
 }
