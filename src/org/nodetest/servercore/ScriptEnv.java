@@ -38,7 +38,7 @@ public class ScriptEnv {
 
 			public boolean visibleToScripts(String className) {
 				if (className.startsWith("adapter")
-						|| className=="MossScriptEnv")
+						|| className=="MossScriptEnv"||className=="MossScriptEnv.MossEventHandler")
 						
 					return true;
 
