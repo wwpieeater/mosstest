@@ -10,3 +10,5 @@
 /.classpath
 .classpath
 /nbproject/private/
+/dist/
+/build/
