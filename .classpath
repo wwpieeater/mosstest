@@ -8,20 +8,6 @@
 	<classpathentry kind="lib" path="lib/commons-cli-1.2-sources.jar"/>
 	<classpathentry kind="lib" path="lib/db4o-8.0.249.16098-all-java5.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="lib/ardor3d-animation-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-archetype-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-awt-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-collada-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-effects-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-extras-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-jogl-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-lwjgl-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-math-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-savable-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-swt-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-terrain-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-ui-0.8.jar"/>
-	<classpathentry kind="lib" path="lib/assets.jar"/>
 	<classpathentry kind="lib" path="lib/eventbus.jar"/>
 	<classpathentry kind="lib" path="lib/j-ogg-oggd.jar"/>
 	<classpathentry kind="lib" path="lib/j-ogg-vorbisd.jar"/>
@@ -45,6 +31,5 @@
 	<classpathentry kind="lib" path="lib/stack-alloc.jar"/>
 	<classpathentry kind="lib" path="lib/vecmath.jar"/>
 	<classpathentry kind="lib" path="lib/xmlpull-xpp3.jar"/>
-	<classpathentry kind="lib" path="lib/ardor3d-core-0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
