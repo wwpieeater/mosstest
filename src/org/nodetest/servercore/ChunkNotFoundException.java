@@ -9,4 +9,8 @@ public ChunkNotFoundException(long x, long y, long z) {
 	this.z = z;
 }
 
+public ChunkNotFoundException(Position pos) {
+	// TODO Auto-generated constructor stub
+}
+
 }

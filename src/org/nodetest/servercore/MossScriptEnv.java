@@ -2,7 +2,12 @@ package org.nodetest.servercore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-
+/**
+ * IMPORTANT, IMPORTANT, IMPORTANT. VERY IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
+ * SCRIPTS CAN ACCESS. MAKE ALL FIELDS AND METHODS PRIVATE UNLESS IT IS
+ * INTENDED TO FACE UNTRUSTED SCRIPTS, OR REQUIRE THAT SCRIPTS PASS AN INSTANCE OF
+ * ScriptSandboxBorderToken.
+ */
 public class MossScriptEnv {
 	public interface MossEventHandler {
 		/*
@@ -15,7 +20,7 @@ public class MossScriptEnv {
 	}
 
 	/*
-	 * IMPORTANT, IMPORTANT, IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
+	 * IMPORTANT, IMPORTANT, IMPORTANT. VERY IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
 	 * SCRIPTS CAN ACCESS. MAKE ALL FIELDS AND METHODS PRIVATE UNLESS IT IS
 	 * INTENDED TO FACE UNTRUSTED SCRIPTS.
 	 */
@@ -96,16 +101,15 @@ public class MossScriptEnv {
 
 	
 	public static void sendChatMessage(Player recipient, Player from, String message) {
-				
+				//TODO 
 	}
 
 	public static void sendChatAll(Player actor, String initiatingMessage) {
-				
+				//TODO
 	}
 
 	public static void setHp(Entity actor, int i) {
-		
-		
+		//TODO Once we have players doing stuff
 	}
 
 	public static void damageTool(Player actor, MapNode nodeBefore) throws AntiCheatException{
@@ -115,7 +119,6 @@ public class MossScriptEnv {
 
 	public static void givePlayer(Player player, MapNode nodeBefore) {
 		// TODO Auto-generated method stub
-		
 	}
 
 

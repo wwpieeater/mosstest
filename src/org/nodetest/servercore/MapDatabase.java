@@ -20,97 +20,77 @@ import com.db4o.query.Query;
 import java.util.UUID;
 
 public class MapDatabase {
-static ObjectContainer mapDb;
-static ObjectContainer nodeDb;
-static ObjectContainer entityDb;
-static ObjectContainer banDb;
-	public MapDatabase(String name, boolean create) throws MapDatabaseException, MossWorldLoadException {
-		if(!name.matches("^[A-Z[a-z[0-9[ ]]]]+$")){
-			throw new MossWorldLoadException("World name contains invalid characters");
+	private static ObjectContainer mapDb;
+	private static ObjectContainer nodeDb;
+	private static ObjectContainer entityDb;
+	private static ObjectContainer banDb;
+
+	public static void init(String name, boolean create)
+			throws MapDatabaseException, MossWorldLoadException {
+		if (!name.matches("^[A-Z[a-z[0-9[ ]]]]+$")) {
+			throw new MossWorldLoadException(
+					"World name contains invalid characters");
 		}
-		
+
 		try {
-			mapDb=Db4oEmbedded.openFile("worlds/"+name+"mapdb");
-			entityDb=Db4oEmbedded.openFile("worlds/"+name+"entities");
-			banDb=Db4oEmbedded.openFile("worlds/"+name+"nodes");
+			mapDb = Db4oEmbedded.openFile("worlds/" + name + "mapdb");
+			entityDb = Db4oEmbedded.openFile("worlds/" + name + "entities");
+			banDb = Db4oEmbedded.openFile("worlds/" + name + "nodes");
 		} catch (Db4oIOException | DatabaseFileLockedException
 				| IncompatibleFileFormatException | OldFormatException
 				| DatabaseReadOnlyException e) {
 			e.printStackTrace();
 			throw new MossWorldLoadException("Database loading failed.");
 		}
-		
-		
+
 	}
 
-	public void close() {
+	public static void close() {
 		mapDb.commit();
 		mapDb.close();
 	}
-	
-	public MapChunk getChunk(final long x, final long y, final long z) throws ChunkNotFoundException, MapDatabaseException{
-		//comment out slower crap
-		/*		List<MapChunkPacked> list = mapDb.query(new Predicate<MapChunkPacked>() {
-			public boolean match(MapChunkPacked candidate) {
-				return (candidate.x==x&&candidate.y==y&&candidate.z==z);
-			}
-		});
- 
- */
-		Query query=mapDb.query();
+
+	public static MapChunk getChunk(final Position pos, final boolean generate)
+			throws ChunkNotFoundException, MapDatabaseException {
+		// comment out slower crap
+		/*
+		 * List<MapChunkPacked> list = mapDb.query(new
+		 * Predicate<MapChunkPacked>() { public boolean match(MapChunkPacked
+		 * candidate) { return (candidate.x==x&&candidate.y==y&&candidate.z==z);
+		 * } });
+		 */
+		Query query = mapDb.query();
 		query.constrain(MapChunkPacked.class);
-		query.descend("x").constrain(new Long(x));
-		query.descend("y").constrain(new Long(y));
-		query.descend("z").constrain(new Long(z));
-		List<MapChunkPacked> list=query.execute();
-		if(list.size()==0) throw new ChunkNotFoundException(x, y, z);
-		if(list.size()>1) throw new MapDatabaseException(MapDatabaseException.SEVERITY_CORRUPT_REPARABLE, "Duplicate chunk "+x+", "+y+", "+z+".");
+		query.descend("pos").constrain(pos);
+		List<MapChunkPacked> list = query.execute();
+		if (list.size() == 0){
+			if(generate){
+				return /* Mapgen.generate(pos);*/ null;
+			}
+		}
+		if (list.size() > 1)
+			throw new MapDatabaseException(
+					MapDatabaseException.SEVERITY_CORRUPT_REPARABLE,
+					"Duplicate chunk " + pos.toString() + ".");
 		return list.get(0).unpack();
-		
+
 	}
 
 	/**
 	 * @param args
-	 * @throws MossWorldLoadException 
-	 * @throws MapDatabaseException 
+	 * @throws MossWorldLoadException
+	 * @throws MapDatabaseException
 	 */
-	public static void main(String[] args) throws MapDatabaseException, MossWorldLoadException {
-		//TESTING ONLY
-		MapDatabase ourDb=new MapDatabase("test2", true);
-		for(int i=1; i<=320; i++){
-			//ourDb.add(new MapChunkPacked(i, i, i, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
-			System.out.println(i);
-		}
-		System.out.println("begin prefetch");
-		try {
-			ourDb.getChunk(1, 1, 1);
-		} catch (ChunkNotFoundException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		System.out.println("end prefetch");
-		final long startTime = System.currentTimeMillis();
-		int ed=0;
-		for(int i=1; i<=64000; i++){
-			//System.out.println(i);
-			try {
-				ourDb.getChunk(i, i, i);
-			} catch (ChunkNotFoundException e) {
-ed++;				
-			}
-		}System.out.println("Total execution time: " + (System.currentTimeMillis() - startTime) );
-		System.out.println(ed);
 
-	}
 
-	private void addMapChunk(MapChunkPacked mapChunkPacked) {
+	static void addMapChunk(MapChunkPacked mapChunkPacked) {
 		mapDb.store(mapChunkPacked);
-		
-	}
-	private void addMapChunk(MapChunk mapChunk) {
-		mapDb.store(mapChunk.pack());
-		
+
 	}
 
+	static void addMapChunk(MapChunk mapChunk) {
+		mapDb.store(mapChunk.pack());
+
+	}
 
 }
