@@ -7,6 +7,20 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.nodetest.servercore.MossEvent.EvtType;
 import org.nodetest.servercore.MossScriptEnv.MossEventHandler;
 
+/**
+ * 
+ * @author rarkenin, hexafraction 
+ * 
+ * Blargh.
+ * 
+ *  This is a nasty thread pool. 8 threads deep by default. 
+ *  If you don't understand threading or Java well,
+ *  you may want to stick to only accessing the queue as otherwise asphyxiation,
+ *  drowning, or chlorine poisoning may occur.
+ *  Oh, and this code is so fluffy you may be bludgeoned to death by way of a
+ *  pillow if not careful.
+ * 
+ */
 public class EventProcessor {
 	static ArrayBlockingQueue<MossEvent> eventQueue = new ArrayBlockingQueue<>(
 			EngineSettings.getInt("eventQueueCapacity", 40), false);
@@ -28,7 +42,7 @@ public class EventProcessor {
 			new Runnable() {
 				@Override
 				public void run() {
-					
+
 					System.out.println("manager thread started");
 					int ticks = 0;
 					int ticksBusy = 0;
@@ -81,10 +95,20 @@ public class EventProcessor {
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) downshift / (float) samples)) {
 								System.out.println(("Stopping one thread"));
-								eventQueue.add(new MossEvent(
-										MossEvent.EvtType.EVT_THREADSTOP, null,
-										0, 0, 0, null, null, null, null, null,
-										null, new ScriptSandboxBorderToken(84)));
+								eventQueue
+										.add(new MossEvent(
+												MossEvent.EvtType.EVT_THREADSTOP,
+												null,
+												0,
+												0,
+												0,
+												null,
+												null,
+												null,
+												null,
+												null,
+												null,
+												new ScriptSandboxBorderToken(84)));
 
 							}
 							ticks = 0;
@@ -93,7 +117,7 @@ public class EventProcessor {
 						try {
 							Thread.sleep(sampleInterval);
 						} catch (InterruptedException e) {
-							
+
 						}
 					}
 				}
@@ -107,19 +131,22 @@ public class EventProcessor {
 			try {
 				MossEvent myEvent = eventQueue.take();
 				{// Section for actually handling the events
-					if (myEvent.type==EvtType.EVT_THREADSTOP) return;
-					ArrayList<MossEventHandler> evtHandlerList=MossScriptEnv.getHandlers(myEvent.type, new ScriptSandboxBorderToken(84));
-					try{
+					if (myEvent.type == EvtType.EVT_THREADSTOP)
+						return;
+					ArrayList<MossEventHandler> evtHandlerList = MossScriptEnv
+							.getHandlers(myEvent.type,
+									new ScriptSandboxBorderToken(84));
+					try {
 						for (MossEventHandler ourHandler : evtHandlerList) {
 							ourHandler.processEvent(myEvent);
 						}
 						DefaultEventHandlers.processEvent(myEvent);
-					}catch (EventProcessingCompletedSignal | MossScriptException e){
-						//Event processing complete
+					} catch (EventProcessingCompletedSignal
+							| MossScriptException e) {
+						// Event processing complete
 					}
 				}
-			
-				
+
 				// Otherwise do some cool scripting stuff!
 			} catch (InterruptedException e) {
 

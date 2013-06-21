@@ -17,6 +17,7 @@ public class NodeCache {
 			ourChunk = MapDatabase.getChunk(pos, generate);
 		}
 		return ourChunk;
+		
 	}
 	public static void setChunk(Position pos, MapChunk chunk){
 		chunkData.put(pos, chunk, 3600);
