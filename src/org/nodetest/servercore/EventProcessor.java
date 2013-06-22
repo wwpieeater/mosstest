@@ -13,10 +13,11 @@ import org.nodetest.servercore.MossScriptEnv.MossEventHandler;
  * 
  * Blargh.
  * 
- *  This is a nasty thread pool. 8 threads deep by default. 
+ *  This is a nasty thread pool. 
  *  If you don't understand threading or Java well,
  *  you may want to stick to only accessing the queue as otherwise asphyxiation,
- *  drowning, or chlorine poisoning may occur.
+ *  drowning, or chlorine poisoning may occur. 
+ *  USE ACCESS METHODS OTHER THAN THE QUEUE AT YOUR OWN RISK.
  *  Oh, and this code is so fluffy you may be bludgeoned to death by way of a
  *  pillow if not careful.
  * 
