@@ -7,8 +7,8 @@ import java.util.List;
 import be.humphreys.simplevoronoi.GraphEdge;
 
 public class VorParams {
-	HashSet<VorEdge> edges;
-	HashSet<VorPoint> pointMap;
-	List<GraphEdge> rawEdges;
-	
+	HashSet<VorEdge> edges= new HashSet<>();
+	HashSet<VorPoint> pointMap= new HashSet<>();
+	List<GraphEdge> rawEdges= new ArrayList<>();
+	ArrayList<VorPoly> polys=new ArrayList<>();
 }

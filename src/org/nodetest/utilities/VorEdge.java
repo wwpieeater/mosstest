@@ -1,5 +1,5 @@
 package org.nodetest.utilities;
-
+@Deprecated
 public class VorEdge {
 	VorPoint north;
 	VorPoint south;
@@ -14,6 +14,7 @@ public class VorEdge {
 	double tempSouthTheta;
 	boolean traversedEast;
 	boolean traversedWest;
+	public boolean lastHeadNorth;
 
 	static double thetaFacingNorth(VorEdge ed) {
 		return Math.toDegrees(Math.atan2(ed.north.x - ed.south.x, ed.north.y
@@ -23,6 +24,7 @@ public class VorEdge {
 		return Math.toDegrees(Math.atan2(ed.south.x - ed.north.x, ed.south.y
 				- ed.north.y));
 	}
+	@Deprecated
 	public VorEdge(VorPoint p1, VorPoint p2) {
 		if (p1.y == p2.y) {
 			if (p1.x == p2.x) {
@@ -42,8 +44,8 @@ public class VorEdge {
 			south = p1;
 		}
 		thetaNorth = Math.atan2(north.x - south.x, north.y - south.y);
-		north.register(this);
-		south.register(this);
+		//north.register(this);
+		//south.register(this);
 	}
 	public void addTmpNorth(VorEdge eIn, VorEdgeContact properties){
 		if(this.tempEdgeNorth==null) {this.tempEdgeNorth=eIn; this.tempNorthTheta=properties.thetaOnInput;}
@@ -51,9 +53,13 @@ public class VorEdge {
 			if((properties.thetaOnInput-properties.thetaOnThis)>(tempNorthTheta-properties.thetaOnThis)){
 				chiralNorthLeft=eIn;
 				chiralNorthRight=tempEdgeNorth;
+				System.out.println("added north");
+				VoronoiUtils.relCounter++;
 			}else{
 				chiralNorthLeft=tempEdgeNorth;
 				chiralNorthRight=eIn;
+				System.out.println("added north");
+				VoronoiUtils.relCounter++;
 			}
 		}
 	}
@@ -63,11 +69,15 @@ public class VorEdge {
 		else{
 			if((properties.thetaOnInput-properties.thetaOnThis)>(tempSouthTheta-properties.thetaOnThis)){
 				chiralSouthLeft=eIn;
-				chiralSouthRight=tempEdgeNorth;
+				chiralSouthRight=tempEdgeSouth;
+				System.out.println("added south");
+				VoronoiUtils.relCounter++;
 			}else{
-				chiralSouthLeft=tempEdgeNorth;
+				chiralSouthLeft=tempEdgeSouth;
 				chiralSouthRight=eIn;
 			}
+			System.out.println("added south");
+			VoronoiUtils.relCounter++;
 			
 		}
 	}
