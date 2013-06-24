@@ -12,6 +12,6 @@ public class VorPoly {
 		for(VorPoint pt:vertices){
 			System.out.print("{"+pt.x+","+pt.y+"},");
 		}
-		System.out.print("\b");
+		System.out.print("}]}],");
 	}
 }
