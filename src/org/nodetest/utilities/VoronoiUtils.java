@@ -250,8 +250,9 @@ public class VoronoiUtils {
 			allPoints.put(p1,p1);
 			allPoints.put(p2,p2);
 		}
-		
-System.out.println("(* entering iterator *)");
+		System.out.println("},Frame-> True]");
+System.out.println("(* entering iterator *), ");
+System.out.println("ListLinePlot[{");
 		//System.out.println(topEdge.size() + "," + rightEdge.size() + ","
 		//		+ btmEdge.size() + "," + leftEdge.size());
 		Iterator<VorPoint> topEdgeIterator = topEdge.iterator();
@@ -310,7 +311,7 @@ System.out.println("(* entering iterator *)");
 		// System.out.println("NO edge points found :/");
 		// e.printStackTrace();
 		// }
-		System.out.println("},Frame-> True]");
+		System.out.println("},{Frame-> True, Dashed} ]");
 		System.out.println(points + "," + conns);
 		for (VorPoint vorPoint : allPoints.keySet()) {
 			vorPoint.finalizeRegistration();

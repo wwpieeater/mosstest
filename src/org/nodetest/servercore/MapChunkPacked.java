@@ -1,29 +1,17 @@
 package org.nodetest.servercore;
 
-
+@Deprecated
 public class MapChunkPacked {
 
-	int x;
-	int y;
-	int z;
-	String chunkLightStorage;
-	String heavy;
+	Position pos;
+	byte[] light;
+	byte[] heavy;
 	
-	public MapChunkPacked(int x, int y, int z, String chunkLightStorage,
-			String heavy) {
-		this.x = x;
-		this.y = y;
-		this.z = z;
-		this.chunkLightStorage = chunkLightStorage;
-		this.heavy = heavy;
+	
+	public MapChunkPacked(Position pos, byte[] chunk) {
+		this.pos=pos;
+		this.light=chunk;
 	}
 
-	public MapChunkPacked() {
-		// TODO Auto-generated constructor stub
-	}
-
-	public MapChunk unpack(){
-		return new MapChunk(this.x, this.y, this.z, this.chunkLightStorage, this.heavy);
-	}
 	
 }

@@ -18,7 +18,7 @@ public class VorPoint {
 	double theta1, theta2, theta3;
 
 	public void register(VorPoint ptIn) {
-		System.out.println("{{   "+(this.x+400)+","+(this.y-400)+"},{"+(ptIn.x-400)+","+(ptIn.y+400)+"   }},");
+		System.out.println("{{   "+(this.x/*+400*/)+","+(this.y/*-400*/)+"},{"+(ptIn.x/*-40 0*/)+","+(ptIn.y+400)+"   }},");
 		if (this.points[0] == null) {
 			points[0] = ptIn;
 			return;

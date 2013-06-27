@@ -1,23 +1,33 @@
 package org.nodetest.servercore;
 
+
 public class MapChunk {
+	Position pos;
+	byte[] light;
+	byte[] heavy;
+	boolean modified;
 
-	private int[][][] nodes=new int[16][16][16];
-	int x,y,z;
-	public MapChunk(int x, int y, int z, String chunkLightStorage,
-			String heavy) {
-	this.x=x;
-	this.y=y;
-	this.z=z;
-	for(int i=0; i<4096; i++){
-		int thisNode=chunkLightStorage.charAt(4*i)<<24+chunkLightStorage.charAt(4*i+1)<<16+chunkLightStorage.charAt(4*i+2)<<8+chunkLightStorage.charAt(4*i+3);
-		nodes[(i/256)][(i/16)%16][i%16]=thisNode;
-	}
-	}
+	public MapChunk(Position pos, byte[] light) {
+		this.pos = pos;
+		this.light = light;
+		byte flags = light[0];
+	
+		/*
+		 * flags byte: 
+		 * 1=has heavies 
+		 * 2=has been modified
+		 * 4=diff compression (not implemented yet)
+		 * 8...=reserved
+		 * 
+		 */
+		if (((flags & 0x01)) != 0)
+			this.heavy = MapDatabase.getHeavy(pos);
+		this.modified = (((flags & 0x02)) != 0);
 
-	public MapChunkPacked pack(){
-		//TODO
-		return new MapChunkPacked();
-	};
+	}
+	
+	public short getNodeId(byte x, byte y, byte z){
+		return light[2*(256*x+16*y+z)+5];
+	}
 
 }
