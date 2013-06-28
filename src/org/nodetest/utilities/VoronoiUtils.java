@@ -12,8 +12,7 @@ import java.util.TreeSet;
 
 import be.humphreys.simplevoronoi.GraphEdge;
 import be.humphreys.simplevoronoi.Voronoi;
-
-public class VoronoiUtils {
+@Deprecated public class VoronoiUtils {
 	static int relCounter = 0;
 	static int hit1Ctr = 0;
 	static int collisionCtr = 0;

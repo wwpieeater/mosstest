@@ -52,7 +52,7 @@ public class MapDatabase {
 	}
 
 	public static MapChunk getChunk(final Position pos, final boolean generate)
-			throws ChunkNotFoundException, MapDatabaseException {
+			throws ChunkNotFoundException, MapDatabaseException, IOException {
 		
 		byte[] chunk=map.get(pos.toBytes());
 		return new MapChunk(pos, chunk);
