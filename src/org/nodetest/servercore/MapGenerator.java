@@ -17,6 +17,7 @@ public class MapGenerator {
 	static final int minY=-65536;
 	static final int maxY=65536;
 	static ArrayList<Coordinate> generatorPoints;
+	static ArrayList<PolygonWrapper> annotatedPolygons;  
 	static void init(long seed, int points){
 		Random rand=new Random();
 		rand.setSeed(seed);
@@ -36,16 +37,28 @@ public class MapGenerator {
 			pat1=Pattern.compile("([0-9])\\s([0-9-])").matcher(pat1).replaceAll("$1,$2");
 
 			System.out.println(pat1);
-			//System.out.println("Graphics[{Opacity[0.4], Polygon[{");
-			for (int j = 0; j < vorDiagram.getGeometryN(i).getEnvelope().getCoordinates().length; j++) {
-				//System.out.print("{"+vorDiagram.getGeometryN(i).getEnvelope().getCoordinates()[j].x+","+vorDiagram.getGeometryN(i).getEnvelope().getCoordinates()[j].y+"}");
-				//if(j < vorDiagram.getGeometryN(i).getEnvelope().getCoordinates().length-1) System.out.println(",");
-			}
-			//System.out.println("}]}],");
+			//OK, now we do some O(n^2) black magic with these. Perhaps this could be optimized?
+
 		}
 	}
 	
 	public static void main(String[] args) {
 		init(6, 4);
 	}
+
+	public static MapChunk generateChunk(Position pos) {
+		int fillNode=(pos.z)>0?NodeManager.getNode("builtin:air", false):NodeManager.getNode("default:stone", false);
+		int[][][] nodes=new int[16][16][16];
+		boolean[][][] edited=new boolean[16][16][16];
+		for (int x = 0; x < 16; x++) {
+			for (int y = 0; y < 16; y++) {
+				for (int z = 0; z < 16; z++) {
+					nodes[x][y][z]=fillNode;
+					edited[x][y][z]=false;
+				}
+			}
+		}
+		MapChunk chunk=new MapChunk(pos, nodes, edited);
+	}
+	
 }

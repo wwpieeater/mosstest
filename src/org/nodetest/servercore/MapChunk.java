@@ -1,45 +1,48 @@
 package org.nodetest.servercore;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class MapChunk {
 	Position pos;
-	short[][][] lightNodes = new short[16][16][16];
+	int[][][] lightNodes = new int[16][16][16];
 	byte[] light;
 	byte[] heavy;
-	boolean modified;
+	boolean[][][] modified=new boolean[16][16][16];
 	boolean compressed;
 
+	static final int MAPCHUNK_SERIALIZATION_VERSION=1;
+	/*
+	 * Compressed format: Short values act as follows: val&32768: 0 means take
+	 * this node literally, 1 means is repeating
+	 * 
+	 * val&16384: 0: This is repeating an unchanged node. Next short shall be
+	 * the start of a new node/run
+	 * 1: This is repeating a *changed* node. Next short value identifies node type
+	 */
 	public MapChunk(Position pos, byte[] light) throws IOException {
 		this.pos = pos;
 		this.light = light;
 		DataInputStream lightStreamIn = new DataInputStream(
 				new ByteArrayInputStream(light));
-		int flags = lightStreamIn.readUnsignedByte();
-
+		int flags = lightStreamIn.readUnsignedShort();
+		int version = lightStreamIn.readUnsignedShort();
+		if(version>MAPCHUNK_SERIALIZATION_VERSION) ExceptionHandler.registerException(new MossWorldLoadException(Messages.getString("MapChunk.BAD_SER_VER"))); //$NON-NLS-1$
 		/*
-		 * flags byte: 1=has heavies 2=has been modified 4=run-length diff
+		 * flags short: 1=has heavies 2=none yet 4=run-length diff
 		 * compression (not implemented yet) 8...=reserved
 		 */
 		if (((flags & 0x01)) != 0)
 			this.heavy = MapDatabase.getHeavy(pos);
-		this.modified = (((flags & 0x02)) != 0);
 		this.compressed = (((flags & 0x04)) != 0);
-		if (compressed)
-			throw new NotImplementedException();
+		if (compressed) {
+			int cursor=0;
+			short[] lightTmp= new short[16*16*16];
+			int curShort=lightStreamIn.readUnsignedShort();
+			
+			//throw new NotImplementedException();
+		}
 		for (int x = 0; x < 16; x++) {
 			for (int y = 0; y < 16; y++) {
 				for (int z = 0; z < 16; z++) {
@@ -50,7 +53,12 @@ public class MapChunk {
 
 	}
 
-	public short getNodeId(byte x, byte y, byte z) {
+	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
+		lightNodes=nodes;
+		this.modified=modified;
+	}
+
+	public int getNodeId(byte x, byte y, byte z) {
 		return lightNodes[x][y][z];
 	}
 

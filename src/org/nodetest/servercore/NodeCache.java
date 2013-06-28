@@ -1,12 +1,14 @@
 package org.nodetest.servercore;
 
+import java.io.IOException;
+
 import com.spaceprogram.kittycache.KittyCache;
 
 public class NodeCache {
 	static KittyCache<Position, MapChunk> chunkData = new KittyCache<>(
 			EngineSettings.getInt("maxCachedChunks", 256));
 
-	public static MapChunk getChunk(Position pos, boolean generate) throws ChunkNotFoundException, MapDatabaseException {
+	public static MapChunk getChunk(Position pos, boolean generate)  {
 		MapChunk ourChunk=null;
 		try {
 			ourChunk = chunkData.get(pos);

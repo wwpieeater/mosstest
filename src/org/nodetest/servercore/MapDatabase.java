@@ -52,10 +52,16 @@ public class MapDatabase {
 	}
 
 	public static MapChunk getChunk(final Position pos, final boolean generate)
-			throws ChunkNotFoundException, MapDatabaseException, IOException {
+			{
 		
 		byte[] chunk=map.get(pos.toBytes());
-		return new MapChunk(pos, chunk);
+		if(chunk==null) return MapGenerator.generateChunk(pos);
+		try {
+			return new MapChunk(pos, chunk);
+		} catch (IOException e) {
+			ExceptionHandler.registerException(e);
+			return null;
+		}
 
 	}
 

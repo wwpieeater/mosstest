@@ -2,7 +2,7 @@ package org.nodetest.servercore;
 
 
 public class MapNode {
-	protected int nodeId=0;
+	int nodeId=0;
 	public MapNode(NodeParams nodeparams, GenericTexture textureSpace,
 			String nodeName, String userFacingName, boolean isLiquid,
 			int lightEmission) {
