@@ -59,6 +59,12 @@ public class MapGenerator {
 			}
 		}
 		MapChunk chunk=new MapChunk(pos, nodes, edited);
+		return chunk;
+	}
+
+	public static void fillInChunk(int[][][] lightNodes, Position pos) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
