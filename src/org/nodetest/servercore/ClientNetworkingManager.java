@@ -36,6 +36,6 @@ public class ClientNetworkingManager {
 		bulkWriter=new BufferedWriter(new PrintWriter(bulkDataSocket.getOutputStream()));
 		bulkDataOut=new DataOutputStream(bulkDataSocket.getOutputStream());
 		bulkDataIn=new DataInputStream(bulkDataSocket.getInputStream());
-		
+		//TODO we need to get all of our back-and-forth stuff done. And use nio for that matter.
 	}
 }

@@ -16,6 +16,6 @@ public class NodeManager {
 		} else ExceptionHandler.registerException(new DuplicateNodedefException());
 	}
 	public static int getNode(String string, boolean isModified) {
-		return defNodeByName.get(string)+isModified;
+		return defNodeByName.get(string)+(isModified?32768:0);
 	}
 }

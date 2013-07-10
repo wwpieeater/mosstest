@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 
 
-public class GameWorld {
+public @Deprecated class GameWorld {
 	private MapDatabase db;
 	boolean isServer;
 	private ScriptEnv scriptenv;

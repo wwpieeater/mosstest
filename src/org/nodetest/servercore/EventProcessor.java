@@ -158,7 +158,7 @@ public class EventProcessor {
 	}
 
 	static void init() {
-		manager.run();
+		manager.start();
 	}
 
 	public static void main(String[] args) {

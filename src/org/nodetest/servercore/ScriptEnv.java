@@ -17,7 +17,7 @@ public class ScriptEnv {
 	@Deprecated
 	public ScriptEnv(boolean allowDb, GameWorld game) {
 		super();
-		//this.scriptMap = scriptMap;
+		// this.scriptMap = scriptMap;
 		this.allowDb = allowDb;
 	}
 
@@ -36,11 +36,10 @@ public class ScriptEnv {
 
 			public boolean visibleToScripts(String className) {
 				if (className.startsWith("adapter")
-						|| className == "MossScriptEnv"
-						|| className == "MossScriptEnv.MossEventHandler"
-						|| className == "EventProcessingCompletedSignal"
-						|| className == "MossScriptException")
-
+						|| className.equals("MossScriptEnv")
+						|| className.equals("MossScriptEnv.MossEventHandler")
+						|| className.equals("EventProcessingCompletedSignal")
+						|| className.equals("MossScriptException"))
 					return true;
 
 				else
