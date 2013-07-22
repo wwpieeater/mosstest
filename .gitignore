@@ -9,7 +9,9 @@
 .svn
 /.classpath
 .classpath
+.project
 /nbproject/private/
 /dist/
 /build/
 /testDBs
+/.settings
