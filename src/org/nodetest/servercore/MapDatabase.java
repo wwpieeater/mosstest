@@ -72,7 +72,7 @@ public class MapDatabase {
 	 */
 
 	static void addMapChunk(MapChunk mapChunk) {
-		map.put(mapChunk.pos.toBytes(),mapChunk.light);
+		map.put(mapChunk.pos.toBytes(),mapChunk.writeLight(true));
 
 	}
 

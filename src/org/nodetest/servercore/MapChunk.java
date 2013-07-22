@@ -1,14 +1,17 @@
 package org.nodetest.servercore;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
 
 public class MapChunk {
 	Position pos;
 	int[][][] lightNodes = new int[16][16][16];
-	byte[] light;
-	byte[] heavy;
+	private byte[] light;
+	private byte[] heavy;
 	boolean[][][] modified = new boolean[16][16][16];
 	boolean compressed;
 
@@ -36,8 +39,10 @@ public class MapChunk {
 		 * flags short: 1=has heavies 2=none yet 4=run-length diff compression
 		 * (not implemented yet) 8...=reserved
 		 */
-		if (((flags & 0x01)) != 0)
+		if (((flags & 0x01)) != 0){
 			this.heavy = MapDatabase.getHeavy(pos);
+			loadHeavies();
+		}
 		this.compressed = (((flags & 0x04)) != 0);
 		if (compressed) {
 			int cursor = 0;
@@ -47,11 +52,10 @@ public class MapChunk {
 				if ((curShort & 16384) != 0) {
 					lightTmp[cursor] = curShort;
 					cursor++;
-				}
-				else{
-					if((curShort&16384)!=0){
-						for(int i=0; i<(curShort&0b0011111111111111); i++){
-							lightTmp[cursor]=0;
+				} else {
+					if ((curShort & 16384) != 0) {
+						for (int i = 0; i < (curShort & 0b0011111111111111); i++) {
+							lightTmp[cursor] = 0;
 							cursor++;
 						}
 					}
@@ -59,15 +63,21 @@ public class MapChunk {
 			}
 			MapGenerator.fillInChunk(lightNodes, pos);
 			// throw new NotImplementedException();
-		}
-		for (int x = 0; x < 16; x++) {
-			for (int y = 0; y < 16; y++) {
-				for (int z = 0; z < 16; z++) {
-					lightNodes[x][y][z] = lightStreamIn.readShort();
+		} else {
+			for (int x = 0; x < 16; x++) {
+				for (int y = 0; y < 16; y++) {
+					for (int z = 0; z < 16; z++) {
+						lightNodes[x][y][z] = lightStreamIn.readShort();
+					}
 				}
 			}
 		}
 
+	}
+
+	private void loadHeavies() {
+		// TODO Heavies not here yet
+		
 	}
 
 	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
@@ -77,6 +87,21 @@ public class MapChunk {
 
 	public int getNodeId(byte x, byte y, byte z) {
 		return lightNodes[x][y][z];
+	}
+	
+	public byte[] writeLight(boolean compressed){
+		
+		ByteArrayOutputStream bos=new ByteArrayOutputStream();
+		
+		try (DataOutputStream dos=new DataOutputStream(bos);) {
+			dos.writeShort(13);
+			dos.flush();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return bos.toByteArray();
 	}
 
 }
