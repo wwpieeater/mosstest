@@ -32,91 +32,6 @@
 			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/j-ogg-vorbisd.jar</location>
 		</link>
 		<link>
-			<name>lib/jME3-android.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-android.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-blender.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-blender.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-bullet-natives-android.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-bullet-natives-android.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-bullet-natives.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-bullet-natives.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-bullet.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-bullet.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-core.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-core.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-desktop.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-desktop.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-effects.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-effects.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-jbullet.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-jbullet.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-jogg.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-jogg.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-lwjgl-natives.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-lwjgl-natives.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-lwjgl.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-lwjgl.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-networking.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-networking.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-niftygui.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-niftygui.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-plugins.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-plugins.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-terrain.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-terrain.jar</location>
-		</link>
-		<link>
-			<name>lib/jME3-testdata.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jME3-testdata.jar</location>
-		</link>
-		<link>
 			<name>lib/jMonkeyEngine3-javadoc.zip</name>
 			<type>1</type>
 			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jMonkeyEngine3-javadoc.zip</location>
@@ -130,11 +45,6 @@
 			<name>lib/jbullet.jar</name>
 			<type>1</type>
 			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jbullet.jar</location>
-		</link>
-		<link>
-			<name>lib/jinput.jar</name>
-			<type>1</type>
-			<location>C:/Program Files/jmonkeyplatform/jmonkeyplatform/libs/jinput.jar</location>
 		</link>
 		<link>
 			<name>lib/launch4j.jar</name>
