@@ -51,7 +51,7 @@ public class MapDatabase {
 		}
 	}
 
-	public static MapChunk getChunk(final Position pos, final boolean generate)
+	public static MapChunk getChunk(final Position pos)
 			{
 		
 		byte[] chunk=map.get(pos.toBytes());
@@ -71,8 +71,8 @@ public class MapDatabase {
 	 * @throws MapDatabaseException
 	 */
 
-	static void addMapChunk(MapChunk mapChunk) {
-		map.put(mapChunk.pos.toBytes(),mapChunk.writeLight(true));
+	static void addMapChunk(Position pos, MapChunk mapChunk) {
+		map.put(pos.toBytes(),mapChunk.writeLight(true));
 
 	}
 
