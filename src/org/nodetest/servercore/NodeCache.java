@@ -1,12 +1,13 @@
 package org.nodetest.servercore;
 
-import java.io.IOException;
 import java.util.Map;
 
-import org.apache.commons.collections4.map.AbstractLinkedMap;
 import org.apache.commons.collections4.map.LRUMap;
 
 public class NodeCache extends LRUMap<Position, MapChunk> {
+
+	private static final long serialVersionUID = 8915103950141113423L;
+
 	@Override
 	protected boolean removeLRU(LinkEntry<Position, MapChunk> entry) {
 		MapDatabase.addMapChunk(entry.getKey(), entry.getValue());
@@ -17,52 +18,53 @@ public class NodeCache extends LRUMap<Position, MapChunk> {
 	private static NodeCache chunks = new NodeCache(1024, true);
 
 	public static MapChunk getChunk(Position pos) {
-		MapChunk ourChunk = null;
-		ourChunk = chunks.get(pos);
-		if (ourChunk == null)
-			ourChunk = MapDatabase.getChunk(pos);
+		synchronized (chunks) {
+			synchronized (MapDatabase.class) {
+				MapChunk ourChunk = null;
+				ourChunk = chunks.get(pos);
+				if (ourChunk == null)
+					ourChunk = MapDatabase.getChunk(pos);
 
-		return ourChunk;
-
+				return ourChunk;
+			}
+		}
 	}
 
 	public static void setChunk(Position pos, MapChunk chunk) {
-		chunks.put(pos, chunk);
+		synchronized (chunks) {
+			synchronized (MapDatabase.class) {
+				chunks.put(pos, chunk);
+			}
+		}
 
 	}
 
-	public NodeCache() {
+	private NodeCache() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public NodeCache(int maxSize, boolean scanUntilRemovable) {
+	private NodeCache(int maxSize, boolean scanUntilRemovable) {
 		super(maxSize, scanUntilRemovable);
-		// TODO Auto-generated constructor stub
 	}
 
-	public NodeCache(int maxSize, float loadFactor, boolean scanUntilRemovable) {
+	private NodeCache(int maxSize, float loadFactor, boolean scanUntilRemovable) {
 		super(maxSize, loadFactor, scanUntilRemovable);
-		// TODO Auto-generated constructor stub
 	}
 
-	public NodeCache(int maxSize, float loadFactor) {
+	private NodeCache(int maxSize, float loadFactor) {
 		super(maxSize, loadFactor);
-		// TODO Auto-generated constructor stub
 	}
 
-	public NodeCache(int maxSize) {
+	private NodeCache(int maxSize) {
 		super(maxSize);
-		// TODO Auto-generated constructor stub
 	}
 
-	public NodeCache(Map<Position, MapChunk> map, boolean scanUntilRemovable) {
+	private NodeCache(Map<Position, MapChunk> map, boolean scanUntilRemovable) {
 		super(map, scanUntilRemovable);
-		// TODO Auto-generated constructor stub
 	}
 
-	public NodeCache(Map<Position, MapChunk> map) {
+	private NodeCache(Map<Position, MapChunk> map) {
 		super(map);
-		// TODO Auto-generated constructor stub
+		
 	}
 }
