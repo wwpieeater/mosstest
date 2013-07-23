@@ -1,7 +1,9 @@
 package org.nodetest.servercore;
 
+import java.util.ArrayList;
+
 public enum ToClientNetCommand {
-	TOCLIENT_NOP,
+	TOCLIENT_NOP(0x00),
 	TOCLIENT_AUTH_REQUESTED,
 	TOCLIENT_AUTH_ACCEPTED,
 	TOCLIENT_AUTH_DENIED,
@@ -22,4 +24,16 @@ public enum ToClientNetCommand {
 	TOCLIENT_FORMSPEC_INSTANCE,
 	TOCLIENT_PlAYER_EVENT,
 	TOCLIENT_ENTITY_FOLLOW_NODEPATH;
+	int command;
+	static ArrayList<ToClientNetCommand> commands=new ArrayList<>();
+	ToClientNetCommand(int cmd){
+		this.command=cmd;
+		add(this);
+	}
+	ToClientNetCommand(){
+		this.command=0xFF;
+	}
+	private static void add(ToClientNetCommand tcnc){
+		ToClientNetCommand.commands.add(tcnc.command, tcnc);
+	}
 }
