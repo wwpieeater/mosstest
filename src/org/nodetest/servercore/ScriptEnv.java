@@ -33,15 +33,13 @@ public class ScriptEnv {
 		Context cx = Context.enter();
 
 		cx.setClassShutter(new ClassShutter() {
-
+			/* MossScriptEnv,MossEventHandler,
+			 * EventProcessingCompletedSignal,MossScriptException
+			 */
 			public boolean visibleToScripts(String className) {
 				if (className.startsWith("adapter")
-						|| className.equals("MossScriptEnv")
-						|| className.equals("MossScriptEnv.MossEventHandler")
-						|| className.equals("EventProcessingCompletedSignal")
-						|| className.equals("MossScriptException"))
+						|| className.startsWith("org.nodetest.scripting"))
 					return true;
-
 				else
 					return false;
 			}

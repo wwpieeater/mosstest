@@ -49,5 +49,11 @@ public class Position {
 		}
 		return true;
 	}
+	@Override
+	public int hashCode(){
+		return Integer.reverseBytes(x)^Integer.reverseBytes(y)^Integer.reverseBytes(z);
+		//Needs to be better
+		
+	}
 
 }

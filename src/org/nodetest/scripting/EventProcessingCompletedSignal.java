@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package org.nodetest.scripting;
 
 public class EventProcessingCompletedSignal extends Throwable {
 

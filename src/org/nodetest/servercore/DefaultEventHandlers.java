@@ -1,8 +1,11 @@
 package org.nodetest.servercore;
 
+import org.nodetest.scripting.MossScriptEnv;
+import org.nodetest.scripting.MossScriptException;
+
 public class DefaultEventHandlers {
 
-	public static void processEvent(MossEvent myEvent) {
+	public static void processEvent(MossEvent myEvent) throws MossScriptException {
 		switch (myEvent.type) {
 		case EVT_CHATCOMMAND:
 			MossScriptEnv.sendChatMessage((Player) myEvent.actor, null,
@@ -23,7 +26,7 @@ public class DefaultEventHandlers {
 						myEvent.nodeBefore);
 				MossScriptEnv.givePlayer((Player) myEvent.actor,
 						myEvent.nodeBefore);
-			} catch (AntiCheatException e) {
+			} catch (MossScriptException e) {
 				//FIXME MossSecurityManager.log(e);
 			}
 			break;

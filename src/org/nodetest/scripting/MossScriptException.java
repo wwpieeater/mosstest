@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package org.nodetest.scripting;
 
 public class MossScriptException extends Exception {
 

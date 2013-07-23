@@ -1,7 +1,13 @@
-package org.nodetest.servercore;
+package org.nodetest.scripting;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import org.nodetest.servercore.Entity;
+import org.nodetest.servercore.MapNode;
+import org.nodetest.servercore.MossEvent;
+import org.nodetest.servercore.Player;
+import org.nodetest.servercore.ScriptSandboxBorderToken;
 /**
  * IMPORTANT, IMPORTANT, IMPORTANT. VERY IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
  * SCRIPTS CAN ACCESS. MAKE ALL FIELDS AND METHODS PRIVATE UNLESS IT IS
@@ -9,16 +15,6 @@ import java.util.HashMap;
  * ScriptSandboxBorderToken.
  */
 public class MossScriptEnv {
-	public interface MossEventHandler {
-		/*
-		 * void processEvent(Entity actor, long posx, long posy, long posz,
-		 * MapNode nodeBefore, MapNode nodeAfter, Entity recvEntity,
-		 * MossFormspec fspec, MossInventoryAction action, String
-		 * initiatingMessage) throws NullPointerException;
-		 */
-		void processEvent(MossEvent myEvent) throws EventProcessingCompletedSignal, MossScriptException;
-	}
-
 	/*
 	 * IMPORTANT, IMPORTANT, IMPORTANT. VERY IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
 	 * SCRIPTS CAN ACCESS. MAKE ALL FIELDS AND METHODS PRIVATE UNLESS IT IS
@@ -91,7 +87,7 @@ public class MossScriptEnv {
 		registeredScriptEvents.get(MossEvent.EvtType.EVT_NODEMOVE).add(r);
 	}
 
-	static ArrayList<MossEventHandler> getHandlers(MossEvent.EvtType type,
+	public static ArrayList<MossEventHandler> getHandlers(MossEvent.EvtType type,
 			ScriptSandboxBorderToken tok) throws SecurityException {
 		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
 			throw new SecurityException(
@@ -112,7 +108,7 @@ public class MossScriptEnv {
 		//TODO Once we have players doing stuff
 	}
 
-	public static void damageTool(Player actor, MapNode nodeBefore) throws AntiCheatException{
+	public static void damageTool(Player actor, MapNode nodeBefore) throws MossScriptException{
 		// TODO Auto-generated method stub
 		
 	}
