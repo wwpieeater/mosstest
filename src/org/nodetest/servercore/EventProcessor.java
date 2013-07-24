@@ -44,6 +44,10 @@ public class EventProcessor {
 			"eventQueueTuneSamples", 100);
 	private static Thread manager = new Thread(eventProcessorGroup,
 			new Runnable() {
+		/**
+		 * 
+		 * The manager. Controls the thread number.
+		 */
 				@Override
 				public void run() {
 
@@ -112,7 +116,7 @@ public class EventProcessor {
 												null,
 												null,
 												null,
-												new ScriptSandboxBorderToken(84)));
+												new ScriptSandboxBorderToken(84, EventProcessor.class)));
 
 							}
 							ticks = 0;
@@ -139,7 +143,7 @@ public class EventProcessor {
 						return;
 					ArrayList<MossEventHandler> evtHandlerList = MossScriptEnv
 							.getHandlers(myEvent.type,
-									new ScriptSandboxBorderToken(84));
+									new ScriptSandboxBorderToken(84, EventProcessor.class));
 					try {
 						for (MossEventHandler ourHandler : evtHandlerList) {
 							ourHandler.processEvent(myEvent);
