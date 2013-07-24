@@ -153,7 +153,7 @@ public class EventProcessor {
 
 				// Otherwise do some cool scripting stuff!
 			} catch (InterruptedException e) {
-
+				e.printStackTrace();
 			}
 			System.out.println("Reached end of thread code");
 		}

@@ -20,7 +20,7 @@ public class RenderProcessor {
 					//Add more events
 				}
 				catch (InterruptedException e) {
-					
+					e.printStackTrace();
 				}
 			}
 			
