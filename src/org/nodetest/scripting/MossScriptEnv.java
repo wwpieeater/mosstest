@@ -7,6 +7,7 @@ import org.nodetest.servercore.Entity;
 import org.nodetest.servercore.MapNode;
 import org.nodetest.servercore.MossEvent;
 import org.nodetest.servercore.Player;
+import org.nodetest.servercore.Position;
 import org.nodetest.servercore.ScriptSandboxBorderToken;
 /**
  * IMPORTANT, IMPORTANT, IMPORTANT. VERY IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
@@ -116,7 +117,13 @@ public class MossScriptEnv {
 	public static void givePlayer(Player player, MapNode nodeBefore) {
 		// TODO Auto-generated method stub
 	}
-
+	public static void setNode(Position pos, String n){
+		// TODO stub
+	}
+	public static String getNode(Position pos){
+		// TODO stub
+		return "internal:__IGNORE";
+	}
 
 	
 	//TODO JS functions for accessing databases, nodes, etc, etc, etc, etc, etc
