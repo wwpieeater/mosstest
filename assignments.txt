@@ -1,0 +1,18 @@
+Assignments:
+
+===ACh===
+Renderer
+Formspecs
+Inventory
+
+===MR===
+JS scipts
+
+===AA===
+Script API
+Event Processor Thread Pool
+Node cache
+File cache
+Mapgen
+DB
+Mapchunk handling
