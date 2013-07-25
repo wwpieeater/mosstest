@@ -16,6 +16,9 @@ import org.nodetest.servercore.ScriptSandboxBorderToken;
  * ScriptSandboxBorderToken.
  */
 public class MossScriptEnv {
+	
+	
+	
 	/*
 	 * IMPORTANT, IMPORTANT, IMPORTANT. VERY IMPORTANT. THIS CLASS IS THE ONLY CLASS THAT
 	 * SCRIPTS CAN ACCESS. MAKE ALL FIELDS AND METHODS PRIVATE UNLESS IT IS
