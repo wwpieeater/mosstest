@@ -13,6 +13,7 @@ import org.nodetest.servercore.Position;
 import org.nodetest.servercore.ScriptSandboxBorderToken;
 
 /**
+ * 
  * This class is used by scripts and script-facing portions of Mosstest. Methods
  * restricted to be called from trusted Java-side shall pass a
  * {@link ScriptSandboxBorderToken}. Each event fired will run in the thread
@@ -22,6 +23,10 @@ import org.nodetest.servercore.ScriptSandboxBorderToken;
  * An event handler may interrupt handling of the event so that no further event
  * handlers nor the default are ever called, by throwing an instance of
  * {@link EventProcessingCompletedSignal}.
+ * 
+ * @author rarkenin
+ * @since 0.0
+ * @version 0.0
  */
 public class MossScriptEnv {
 
@@ -288,18 +293,19 @@ public class MossScriptEnv {
 		// TODO
 	}
 
-	
-	
-	public static MossInventory getInvByName(String name){
+	public static MossInventory getInvByName(String name) {
 		return null;
 	}
-	public static MossInventory createInvByName(String name){
+
+	public static MossInventory createInvByName(String name) {
 		return null;
 	}
-	public static Player getPlayerByName(String name){
+
+	public static Player getPlayerByName(String name) {
 		return null;
 	}
-	public static MapNode getNodeByName(String name){
+
+	public static MapNode getNodeByName(String name) {
 		return null;
 	}
 
