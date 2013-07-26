@@ -25,7 +25,7 @@ public class DefaultEventHandlers {
 				MossScriptEnv.damageTool((Player) myEvent.actor,
 						myEvent.nodeBefore);
 				MossScriptEnv.givePlayer((Player) myEvent.actor,
-						myEvent.nodeBefore);
+						myEvent.nodeBefore.getDrop());
 			} catch (MossScriptException e) {
 				//FIXME MossSecurityManager.log(e);
 			}

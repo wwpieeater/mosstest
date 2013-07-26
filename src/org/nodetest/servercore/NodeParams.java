@@ -14,5 +14,6 @@ public interface NodeParams {
 	public abstract double calcSinkEscape(Player player, double fallheight);
 	public abstract double calcWalkSpeed(Player player);
 	public abstract double calcSprintSpeed(Player player);
+	
 
 }

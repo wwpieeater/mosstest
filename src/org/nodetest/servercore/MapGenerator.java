@@ -47,7 +47,7 @@ public class MapGenerator {
 	}
 
 	public static MapChunk generateChunk(Position pos) {
-		int fillNode=(pos.z)>0?NodeManager.getNode("builtin:air", false):NodeManager.getNode("default:stone", false);
+		int fillNode=(pos.z)>0?NodeManager.getNode("builtin:air").nodeId:NodeManager.getNode("default:stone").nodeId;
 		int[][][] nodes=new int[16][16][16];
 		boolean[][][] edited=new boolean[16][16][16];
 		for (int x = 0; x < 16; x++) {
