@@ -167,7 +167,7 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnInvaction(MossEventHandler r) {
+	static void registerOnInvAction(MossEventHandler r) {
 		registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_INVACTION)
 				.add(r);
 	}
@@ -254,7 +254,7 @@ public class MossScriptEnv {
 	 * event there is no support for scripts accessing this directly.
 	 * 
 	 * @param type
-	 *            A {@link MossEvent#EvtType} enumerable value specifying the
+	 *            A {@link MossEvent.EvtType} enumerable value specifying the
 	 *            event type to retrieve.
 	 * @param tok
 	 *            A {@link ScriptSandboxBorderToken} to be used for ensuring
@@ -354,12 +354,28 @@ public class MossScriptEnv {
 	public static boolean givePlayer(Player player, ItemStack item) {
 		return false;
 	}
+
 	/**
-	 * Sets a 
+	 * Sets a node of the world to a given type. This cannot be called on a
+	 * NodePosition with an existing solid node; use
+	 * {@link #removeNode(NodePosition)} first.
+	 * 
 	 * @param pos
-	 * @param n
+	 *            The position at which to set a node.
+	 * @param node
+	 *            The node to place at that position.
 	 */
 	public static void setNode(NodePosition pos, MapNode node) {
+		// TODO stub
+	}
+
+	/**
+	 * Removes a node, setting it to air. This may be called on a NodePosition
+	 * with an existing solid node.
+	 * 
+	 * @param pos The position at which to remove the node.
+	 */
+	public static void removeNode(NodePosition pos) {
 		// TODO stub
 	}
 

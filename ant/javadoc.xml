@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="private" author="true" classpath="C:\Program Files\jmonkeyplatform\jmonkeyplatform\libs\lwjgl.jar;../lib/commons-cli-1.2.jar;../lib/jts-1.13.jar;../lib/leveldbjni-all-1.7.jar;../lib/js-14.jar;../lib/commons-collections4-4.0-alpha1.jar" destdir="../doc" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" source="1.7" sourcefiles="../src/org/nodetest/scripting/MossScriptEnv.java" sourcepath="../assets;../src" splitindex="true" use="true" version="true">
+            <link href="http://download.oracle.com/javase/7/docs/api/"/>
+        </javadoc>
+    </target>
+</project>
