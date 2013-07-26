@@ -8,6 +8,7 @@ import org.nodetest.servercore.ItemStack;
 import org.nodetest.servercore.MapNode;
 import org.nodetest.servercore.MossEvent;
 import org.nodetest.servercore.MossInventory;
+import org.nodetest.servercore.NodePosition;
 import org.nodetest.servercore.Player;
 import org.nodetest.servercore.Position;
 import org.nodetest.servercore.ScriptSandboxBorderToken;
@@ -247,6 +248,20 @@ public class MossScriptEnv {
 		registeredScriptEvents.get(MossEvent.EvtType.EVT_NODEMOVE).add(r);
 	}
 
+	/**
+	 * Gets handlers for an event type in the form of an {@link ArrayList} for
+	 * Mosstest internal use. At this time due to limited identification of each
+	 * event there is no support for scripts accessing this directly.
+	 * 
+	 * @param type
+	 *            A {@link MossEvent#EvtType} enumerable value specifying the
+	 *            event type to retrieve.
+	 * @param tok
+	 *            A {@link ScriptSandboxBorderToken} to be used for ensuring
+	 *            that scripts cannot call this method.
+	 * @return An {@link ArrayList} of {@link MossEventHandler} objects.
+	 * @throws SecurityException
+	 */
 	public static ArrayList<MossEventHandler> getHandlers(
 			MossEvent.EvtType type, ScriptSandboxBorderToken tok)
 			throws SecurityException {
@@ -256,30 +271,95 @@ public class MossScriptEnv {
 		return registeredScriptEvents.get(type);
 	}
 
+	/**
+	 * Sends a chat message to a player.
+	 * 
+	 * @param recipient
+	 *            A {@link Player} object representing the recipient. A Player
+	 *            object may be constructed with
+	 *            {@link MossScriptEnv#getPlayerByName(String)}.
+	 * @param from
+	 *            A player object representing the sender. A Player object may
+	 *            be constructed with
+	 *            {@link MossScriptEnv#getPlayerByName(String)}. If null a
+	 *            message is sent showing to users as having been sent by the
+	 *            server with the prefix <code>[*] Server:</code>
+	 * @param message
+	 *            A string representing the message that shall be sent to the
+	 *            specified recipient.
+	 */
 	public static void sendChatMessage(Player recipient, Player from,
 			String message) {
 		// TODO
 	}
 
-	public static void sendChatAll(Player actor, String initiatingMessage) {
+	/**
+	 * Sends a chat message to all players.
+	 * 
+	 * @param from
+	 *            A player object representing the sender. A Player object may
+	 *            be constructed with
+	 *            {@link MossScriptEnv#getPlayerByName(String)}. If null a
+	 *            message is sent showing to users as having been sent by the
+	 *            server with the prefix <code>[*] Server:</code>
+	 * @param message
+	 *            A string representing the message that shall be sent to the
+	 *            specified recipient.
+	 */
+	public static void sendChatAll(Player from, String message) {
 		// TODO
 	}
 
-	public static void setHp(Entity actor, int i) {
+	/**
+	 * Sets the health on an entity or player.
+	 * 
+	 * @param ent
+	 *            The entity to set health on.
+	 * @param health
+	 *            An integer representing the amount of health to set, from 0 to
+	 *            {@link Entity#maxHealth()}.
+	 */
+	public static void setHp(Entity ent, int health) {
 		// TODO Once we have players doing stuff
 	}
 
-	public static void damageTool(Player actor, MapNode nodeBefore)
+	/**
+	 * Damages the tool of a player corresponding to a dig. The player's
+	 * currently selected tool is damaged.
+	 * 
+	 * @param actor
+	 *            The player that is digging a node.
+	 * @param nd
+	 *            The node dug.
+	 * @throws MossScriptException
+	 *             Thrown if the current tool cannot be used to dig the node.
+	 */
+	public static void damageTool(Player actor, MapNode nd)
 			throws MossScriptException {
 		// TODO Auto-generated method stub
 
 	}
 
-	public static void givePlayer(Player player, MapNode nodeBefore) {
-		// TODO Auto-generated method stub
+	/**
+	 * Gives a player an item. The item stack will be added to the player's
+	 * default inventory, adding to the first available partial stack. If no
+	 * partial stacks are available the item is added to the first open slot in
+	 * the inventory.
+	 * 
+	 * @param player
+	 * @param item
+	 * @return True if the item could be added, false if the item could not be
+	 *         added due to insufficient space.
+	 */
+	public static boolean givePlayer(Player player, ItemStack item) {
+		return false;
 	}
-
-	public static void setNode(Position pos, String n) {
+	/**
+	 * Sets a 
+	 * @param pos
+	 * @param n
+	 */
+	public static void setNode(NodePosition pos, MapNode node) {
 		// TODO stub
 	}
 
