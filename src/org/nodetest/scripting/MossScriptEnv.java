@@ -21,6 +21,17 @@ import org.nodetest.servercore.ScriptSandboxBorderToken;
  * pool. All requests via this API need not concern themselves with threading as
  * everything is handled by Mosstest itself.
  * 
+ * The event handlers called are the ones defined via this class's registerOnFoo
+ * methods, followed by any handlers defined in an instance of NodeParams via an
+ * anonymous inner class, and finally with the default handler.
+ * 
+ * The order in which handlers registered here are called is undefined due to
+ * the undefined order of scripts being loaded. Generally, this is planned to
+ * occur in an order based on the SHA512 hash of the script. Comments with dummy
+ * information may be used by the script author to attempt to set the position
+ * of a script in the execution order via manipulating the hash. Handlers of the
+ * same types within the same script are guaranteed to be called in order.
+ * 
  * An event handler may interrupt handling of the event so that no further event
  * handlers nor the default are ever called, by throwing an instance of
  * {@link EventProcessingCompletedSignal}.
@@ -373,7 +384,8 @@ public class MossScriptEnv {
 	 * Removes a node, setting it to air. This may be called on a NodePosition
 	 * with an existing solid node.
 	 * 
-	 * @param pos The position at which to remove the node.
+	 * @param pos
+	 *            The position at which to remove the node.
 	 */
 	public static void removeNode(NodePosition pos) {
 		// TODO stub

@@ -1,5 +1,7 @@
 package org.nodetest.servercore;
 
+import org.nodetest.scripting.EventProcessingCompletedSignal;
+
 public class MapNode {
 	short nodeId = 0;
 	public final NodeParams nodeparams;
@@ -9,6 +11,7 @@ public class MapNode {
 	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
+
 	public MapNode(NodeParams nodeparams, GenericTexture textureSpace,
 			String nodeName, String userFacingName, boolean isLiquid,
 			int lightEmission) throws MossWorldLoadException {
@@ -37,40 +40,8 @@ public class MapNode {
 		return new NodeParams() {
 
 			@Override
-			public void onWorldTick(World world) {
-				return;
-
-			}
-
-			@Override
-			public boolean onStepOn(Player player) {
+			public boolean onStepOn(Player player, NodePosition pos) {
 				return true;
-			}
-
-			@Override
-			public void onRightClick(Player player, GenericTool tool,
-					NodeInstance target, Face clickedFace) {
-				return;
-
-			}
-
-			@Override
-			public void onPunch(Player player, GenericTool tool,
-					NodeInstance target, Face punchedFace) {
-				return;
-
-			}
-
-			@Override
-			public void onPlaceNextTo(Player player, GenericTool tool,
-					NodeInstance target, NodeInstance placed) {
-				return;
-			}
-
-			@Override
-			public void onDig(Player player, GenericTool tool,
-					NodeInstance target, Face punchedFace) {
-				return;
 			}
 
 			@Override
@@ -102,6 +73,37 @@ public class MapNode {
 			public double calcBounceHeight(Player player, double fallheight) {
 				// TODO Auto-generated method stub
 				return 0.125;
+			}
+
+			@Override
+			public void onPunch(Player player, GenericTool tool,
+					NodePosition target, Face punchedFace)
+					throws EventProcessingCompletedSignal {
+				return;
+
+			}
+
+			@Override
+			public void onDig(Player player, GenericTool tool,
+					NodePosition target, Face punchedFace)
+					throws EventProcessingCompletedSignal {
+				return;
+
+			}
+
+			@Override
+			public void onPlaceNextTo(Player player, NodePosition target,
+					NodePosition placed) throws EventProcessingCompletedSignal {
+				return;
+
+			}
+
+			@Override
+			public void onRightClick(Player player, GenericTool tool,
+					NodePosition target, Face clickedFace)
+					throws EventProcessingCompletedSignal {
+				return;
+
 			}
 		};
 	}
