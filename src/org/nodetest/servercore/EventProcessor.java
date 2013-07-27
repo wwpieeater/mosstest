@@ -115,7 +115,7 @@ public class EventProcessor {
 												null,
 												null,
 												null,
-												null,
+												0, null,
 												new ScriptSandboxBorderToken(84, EventProcessor.class)));
 
 							}

@@ -71,8 +71,7 @@ public class MapNode {
 
 			@Override
 			public double calcBounceHeight(Player player, double fallheight) {
-				// TODO Auto-generated method stub
-				return 0.125;
+				return 0.125*fallheight;
 			}
 
 			@Override
@@ -105,6 +104,11 @@ public class MapNode {
 				return;
 
 			}
+
+			@Override
+			public double calcFallDamage(Player player, double height) {
+				return (height>6?8:0);
+			}
 		};
 	}
 
@@ -113,7 +117,6 @@ public class MapNode {
 	}
 
 	public ItemStack getDrop() {
-		// TODO Auto-generated method stub
 		return new ItemStack(dropItem, 1);
 	}
 }

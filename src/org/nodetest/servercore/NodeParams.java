@@ -102,10 +102,8 @@ public interface NodeParams {
 	 * 
 	 * @param player
 	 * @return The height the player may jump off this node.
-	 * @throws EventProcessingCompletedSignal
 	 */
-	public abstract double jumpOffHeight(Player player)
-			throws EventProcessingCompletedSignal;
+	public abstract double jumpOffHeight(Player player);
 
 	/**
 	 * Calculates the height a player will bounce when landing on this node.
@@ -114,21 +112,68 @@ public interface NodeParams {
 	 * @param fallheight
 	 *            The height from which the player has fallen.
 	 * @return A double value representing the height the player is to bounce.
-	 * @throws EventProcessingCompletedSignal
 	 */
-	public abstract double calcBounceHeight(Player player, double fallheight)
-			throws EventProcessingCompletedSignal;
+	public abstract double calcBounceHeight(Player player, double fallheight);
 
-	public abstract double calcSinkIn(Player player, double fallheight)
-			throws EventProcessingCompletedSignal;
+	/**
+	 * Calculates how far a player will sink in after landing on this node.
+	 * 
+	 * @param player
+	 *            The player to calculate sink for.
+	 * @param fallheight
+	 *            The height from which they have fallen. 0 if the player walks
+	 *            onto the node without jumping or falling.
+	 * @return The distance for the player to sink. If grater than or equal to
+	 *         1, the player will fall through the node fully.
+	 */
+	public abstract double calcSinkIn(Player player, double fallheight);
 
-	public abstract double calcSinkEscape(Player player, double fallheight)
-			throws EventProcessingCompletedSignal;
+	/**
+	 * Calculates the rate at which a player will rise out of this node if they
+	 * have sunk in. If the player is in multiple node the lowermost node at the
+	 * player's horizontal center is considered.
+	 * 
+	 * @param player
+	 *            The player to perform the calculation for.
+	 * @param sinkheight
+	 *            The depth to which the player has sunk. 1 corresponds to the
+	 *            player's's feet being at the bottom of the node, and 2 refers
+	 *            to the player being fully submerged in multiple nodes.
+	 * @return The rate at which the player should rise when they hold the key
+	 *         corresponding to jumping, in nodes per second.
+	 */
+	public abstract double calcSinkEscape(Player player, double sinkheight);
 
-	public abstract double calcWalkSpeed(Player player)
-			throws EventProcessingCompletedSignal;
+	/**
+	 * Calculates the speed at which a player will move across this node when
+	 * walking.
+	 * 
+	 * @param player
+	 *            The player for which the walk rate is being calculated.
+	 * @return The rate in nodes/second at which the player should walk.
+	 */
+	public abstract double calcWalkSpeed(Player player);
 
-	public abstract double calcSprintSpeed(Player player)
-			throws EventProcessingCompletedSignal;
+	/**
+	 * Calculates the speed at which a player will move across this node when
+	 * sprinting.
+	 * 
+	 * @param player
+	 *            The player for which the sprint rate is being calculated.
+	 * @return The rate in nodes/second at which the player should sprint.
+	 */
+	public abstract double calcSprintSpeed(Player player);
+
+	/**
+	 * Calculates the damage a player will take when falling onto this node.
+	 * 
+	 * @param player
+	 *            The player falling onto this node.
+	 * @param height
+	 *            The fall height.
+	 * @return The damage to be given to the player. A player has a default
+	 *         health of 64 units.
+	 */
+	public abstract double calcFallDamage(Player player, double height);
 
 }

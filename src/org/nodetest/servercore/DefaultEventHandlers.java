@@ -17,7 +17,7 @@ public class DefaultEventHandlers {
 			break;
 		case EVT_DIEPLAYER:
 			MossScriptEnv.setHp(myEvent.actor, 64); // Max HP=64
-			// FIXME dolinsky296 MossScriptEnv.moveEntity(myEvent.actor,
+			// FIXME rarkenin MossScriptEnv.moveEntity(myEvent.actor,
 			// Mapgen.getSpawnPoint);
 			break;
 		case EVT_DIGNODE:

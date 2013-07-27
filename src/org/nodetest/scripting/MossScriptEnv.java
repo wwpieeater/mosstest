@@ -195,6 +195,18 @@ public class MossScriptEnv {
 	}
 
 	/**
+	 * Registers an event hander to fire on a player taking damage. This will be
+	 * run in the event processor thread pool. The default handler causes the
+	 * player to take the damage.
+	 * 
+	 * @param r
+	 *            The event handler to register.
+	 */
+	static void registerOnPlayerDamage(MossEventHandler r) {
+		registeredScriptEvents.get(MossEvent.EvtType.EVT_PLAYERDAMAGE).add(r);
+	}
+
+	/**
 	 * Registers an event hander to fire on entity death. This will be run in
 	 * the event processor thread pool. The default handler performs no action
 	 * aside from the removal of said entity.
