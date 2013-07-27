@@ -16,3 +16,7 @@
 /testDBs
 /.settings
 /doc
+*.dll
+*.so
+*.exe
+/executable
