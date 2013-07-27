@@ -11,18 +11,24 @@ import com.jme3.input.controls.KeyTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
+import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
+import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 public class RenderProcessor extends SimpleApplication {
 	
 	private Random rand = new Random();
-	private boolean left, right, forward, back;
-	private double speed = 0.001;
+	private float speed = (float) 0.001;
+	private float[] locChanges = {0,0,0};
+	private Node worldNode;
 	public static ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
-			EngineSettings.getInt("eventQueueCapacity", 40), false);
+			24000, false);
 	
 	@Override
 	public void simpleUpdate (float tpf) {
+		MoveWorld(locChanges[0], locChanges[1], locChanges[2]);
+		
+		
 		MossRenderEvent myEvent = renderEventQueue.poll();
 		if (myEvent instanceof MossRenderStopEvent) {
 			System.out.println("Thread shutting down");
@@ -39,8 +45,8 @@ public class RenderProcessor extends SimpleApplication {
 		    Material mat = new Material(assetManager,
 		    "Common/MatDefs/Misc/Unshaded.j3md");
 		    mat.setColor("Color", ColorRGBA.Blue);
-		        geom.setMaterial(mat);
-		        rootNode.attachChild(geom);
+		    geom.setMaterial(mat);
+		    worldNode.attachChild(geom);
 		}
 		else if (myEvent instanceof MossRenderPlayerMoveEvent) {
 			cam.setLocation(((MossRenderPlayerMoveEvent) myEvent).getPos());
@@ -49,6 +55,11 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	static void init () { //This and the main method are simply temporary.  Need to keep a testing environment in here.
 		RenderProcessor app = new RenderProcessor ();
+		AppSettings settings = new AppSettings(true);
+		settings.setResolution(800, 600);
+		settings.setSamples(2);
+		app.setSettings(settings);
+		app.setShowSettings(false);
 		app.start();
 	}
 	public static void main (String [] args) {
@@ -58,8 +69,18 @@ public class RenderProcessor extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		// TODO Auto-generated method stub
-		flyCam.setMoveSpeed(30);
+		worldNode = new Node("world");
+		rootNode.attachChild(worldNode);
+		renderEventQueue.add(new MossRenderChunkEvent());
+		flyCam.setMoveSpeed(0);
 		initKeyBindings();
+	}
+	
+	private void MoveWorld (float cx, float cy, float cz) {
+		worldNode.setLocalTranslation(new Vector3f(
+				worldNode.getLocalTranslation().x+cx,
+				worldNode.getLocalTranslation().y+cy,
+				worldNode.getLocalTranslation().z+cz));
 	}
 	
 	private ActionListener actionListener = new ActionListener() {
@@ -67,11 +88,31 @@ public class RenderProcessor extends SimpleApplication {
 	    	if (name.equals("Test") && !keyPressed) {
 	    		renderEventQueue.add(new MossRenderChunkEvent());
 	    	}
+	    	if (name.equals("Left") && keyPressed) {locChanges[0] = speed;} //On key down
+	    	else if (name.equals("Left") && !keyPressed && locChanges[0] == speed) {locChanges[0] = 0;} //on key up
+	    	
+	    	if (name.equals("Right") && keyPressed) {locChanges[0] = -speed;} //On key down
+	    	else if (name.equals("Right") && !keyPressed && locChanges[0] == -speed) {locChanges[0] = 0;} //on key up
+	    	
+	    	if (name.equals("Forward") && keyPressed) {locChanges[2] = speed;} //On key down
+	    	else if (name.equals("Forward") && !keyPressed && locChanges[2] == speed) {locChanges[2] = 0;} //on key up
+	    	
+	    	if (name.equals("Back") && keyPressed) {locChanges[2] = -speed;} //On key down
+	    	else if (name.equals("Back") && !keyPressed && locChanges[2] == -speed) {locChanges[2] = 0;} //on key up
 	    }
 	};
 	
 	private void initKeyBindings () {
-		inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_P));
-		inputManager.addListener(actionListener, "Test");
+		//inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_P));
+		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
+		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
+		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
+		inputManager.addMapping("Back", new KeyTrigger(KeyInput.KEY_S));
+		
+		//inputManager.addListener(actionListener, "Test");
+		inputManager.addListener(actionListener, "Left");
+		inputManager.addListener(actionListener, "Right");
+		inputManager.addListener(actionListener, "Forward");
+		inputManager.addListener(actionListener, "Back");
 	}
 }
