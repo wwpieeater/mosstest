@@ -9,13 +9,4 @@ public class MossItem {
 	double invWeight;
 	boolean mayStack;
 	String displayName;
-	/**
-	 * Determines the dig time for the specified node with this tool, in milliseconds.
-	 * @param nd The node
-	 * @return
-	 */
-	int getDigTime(MapNode nd) {
-		return 1000;
-		//TODO
-	}
 }

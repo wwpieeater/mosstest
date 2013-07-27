@@ -11,7 +11,6 @@ public class MapNode {
 	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
-
 	public MapNode(NodeParams nodeparams, GenericTexture textureSpace,
 			String nodeName, String userFacingName, boolean isLiquid,
 			int lightEmission) throws MossWorldLoadException {
@@ -39,9 +38,36 @@ public class MapNode {
 	private static NodeParams getDefaultParams() {
 		return new NodeParams() {
 
+
 			@Override
 			public boolean onStepOn(Player player, NodePosition pos) {
 				return true;
+			}
+
+			@Override
+			public void onRightClick(Player player, GenericTool tool,
+					NodePosition target, Face clickedFace) {
+				return;
+
+			}
+
+			@Override
+			public void onPunch(Player player, GenericTool tool,
+					NodePosition target, Face punchedFace) {
+				return;
+
+			}
+
+			@Override
+			public void onPlaceNextTo(Player player,
+					NodePosition target, NodePosition placed) {
+				return;
+			}
+
+			@Override
+			public void onDig(Player player, GenericTool tool,
+					NodePosition target, Face punchedFace) {
+				return;
 			}
 
 			@Override
@@ -71,43 +97,19 @@ public class MapNode {
 
 			@Override
 			public double calcBounceHeight(Player player, double fallheight) {
-				return 0.125*fallheight;
+				// TODO Auto-generated method stub
+				return 0.125;
 			}
 
-			@Override
-			public void onPunch(Player player, GenericTool tool,
-					NodePosition target, Face punchedFace)
-					throws EventProcessingCompletedSignal {
-				return;
+			
 
-			}
+		
 
-			@Override
-			public void onDig(Player player, GenericTool tool,
-					NodePosition target, Face punchedFace)
-					throws EventProcessingCompletedSignal {
-				return;
-
-			}
-
-			@Override
-			public void onPlaceNextTo(Player player, NodePosition target,
-					NodePosition placed) throws EventProcessingCompletedSignal {
-				return;
-
-			}
-
-			@Override
-			public void onRightClick(Player player, GenericTool tool,
-					NodePosition target, Face clickedFace)
-					throws EventProcessingCompletedSignal {
-				return;
-
-			}
 
 			@Override
 			public double calcFallDamage(Player player, double height) {
-				return (height>6?8:0);
+				// TODO Auto-generated method stub
+				return 0;
 			}
 		};
 	}
@@ -117,6 +119,7 @@ public class MapNode {
 	}
 
 	public ItemStack getDrop() {
+		// TODO Auto-generated method stub
 		return new ItemStack(dropItem, 1);
 	}
 }

@@ -143,36 +143,23 @@ public interface NodeParams {
 	 *         corresponding to jumping, in nodes per second.
 	 */
 	public abstract double calcSinkEscape(Player player, double sinkheight);
-
-	/**
-	 * Calculates the speed at which a player will move across this node when
-	 * walking.
-	 * 
-	 * @param player
-	 *            The player for which the walk rate is being calculated.
-	 * @return The rate in nodes/second at which the player should walk.
-	 */
+/**
+ * Calculates the speed at which a player will move across this node when walking.
+ * @param player The player for which the walk rate is being calculated.
+ * @return The rate in nodes/second at which the player should walk.
+ */
 	public abstract double calcWalkSpeed(Player player);
-
 	/**
-	 * Calculates the speed at which a player will move across this node when
-	 * sprinting.
-	 * 
-	 * @param player
-	 *            The player for which the sprint rate is being calculated.
+	 * Calculates the speed at which a player will move across this node when sprinting.
+	 * @param player The player for which the sprint rate is being calculated.
 	 * @return The rate in nodes/second at which the player should sprint.
 	 */
 	public abstract double calcSprintSpeed(Player player);
-
 	/**
 	 * Calculates the damage a player will take when falling onto this node.
-	 * 
-	 * @param player
-	 *            The player falling onto this node.
-	 * @param height
-	 *            The fall height.
-	 * @return The damage to be given to the player. A player has a default
-	 *         health of 64 units.
+	 * @param player The player falling onto this node.
+	 * @param height The fall height.
+	 * @return The damage to be given to the player. A player has a default health of 64 units.
 	 */
 	public abstract double calcFallDamage(Player player, double height);
 
