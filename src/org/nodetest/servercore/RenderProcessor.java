@@ -14,6 +14,7 @@ import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.material.Material;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
@@ -83,11 +84,19 @@ public class RenderProcessor extends SimpleApplication {
 		
 	}
 	
-	private void MoveWorld (float cx, float cy, float cz) {
-		worldNode.setLocalTranslation(new Vector3f(
-				worldNode.getLocalTranslation().x+cx,
-				worldNode.getLocalTranslation().y+cy,
-				worldNode.getLocalTranslation().z+cz));
+	private void MoveWorld(float cx, float cy, float cz) {
+
+		Vector2f transVector = new Vector2f(cam.getDirection().x,
+				cam.getDirection().z);
+	
+		worldNode
+				.setLocalTranslation(worldNode
+						.getLocalTranslation()
+						.addLocal(
+								new Vector3f(-cz * transVector.x, 0f, -cz
+										* transVector.y))
+						.addLocal(-cx * transVector.y, 0, cx * transVector.x));
+
 	}
 	
 	private void rotateCamera(float value, Vector3f axis){
