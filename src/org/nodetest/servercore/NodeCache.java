@@ -29,6 +29,19 @@ public class NodeCache extends LRUMap<Position, MapChunk> {
 			}
 		}
 	}
+	
+	public static MapChunk getChunkClient(Position pos) {
+		synchronized (chunks) {
+			
+				MapChunk ourChunk = null;
+				ourChunk = chunks.get(pos);
+				if (ourChunk == null)
+					ClientNetworkingManager.sendChunkRequest(pos);
+
+				return ourChunk;
+			
+		}
+	}
 
 	public static void setChunk(Position pos, MapChunk chunk) {
 		synchronized (chunks) {

@@ -10,11 +10,10 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-
 public class ClientNetworkingManager {
-	private static Socket bulkDataSocket=new Socket();
-	private static Socket lowLatencyStreamSocket=new Socket();
-	private static Socket udpSocket=new Socket();
+	private static Socket bulkDataSocket = new Socket();
+	private static Socket lowLatencyStreamSocket = new Socket();
+	private static Socket udpSocket = new Socket();
 	private static BufferedReader bulkReader;
 	private static BufferedReader lowlatencyReader;
 	private static BufferedReader udpReader;
@@ -27,15 +26,36 @@ public class ClientNetworkingManager {
 	private static DataInputStream bulkDataIn;
 	private static DataInputStream lowlatencyDataIn;
 	private static DataInputStream udpDataIn;
-	public static void init(String endpoint, int port, boolean useUdp) throws IOException{
+
+	public static void init(String endpoint, int port, boolean useUdp)
+			throws IOException {
 		lowLatencyStreamSocket.setPerformancePreferences(0, 1, 0);
 		lowLatencyStreamSocket.setTrafficClass(0x10);
 		lowLatencyStreamSocket.setTcpNoDelay(true);
 		bulkDataSocket.connect(new InetSocketAddress(endpoint, port), 10000);
-		bulkReader=new BufferedReader(new InputStreamReader(bulkDataSocket.getInputStream()));
-		bulkWriter=new BufferedWriter(new PrintWriter(bulkDataSocket.getOutputStream()));
-		bulkDataOut=new DataOutputStream(bulkDataSocket.getOutputStream());
-		bulkDataIn=new DataInputStream(bulkDataSocket.getInputStream());
-		//TODO we need to get all of our back-and-forth stuff done. And use nio for that matter.
+		bulkReader = new BufferedReader(new InputStreamReader(
+				bulkDataSocket.getInputStream()));
+		bulkWriter = new BufferedWriter(new PrintWriter(
+				bulkDataSocket.getOutputStream()));
+		bulkDataOut = new DataOutputStream(bulkDataSocket.getOutputStream());
+		bulkDataIn = new DataInputStream(bulkDataSocket.getInputStream());
+		// TODO we need to get all of our back-and-forth stuff done. And use nio
+		// for that matter.
+	}
+
+	public static void sendChunkRequest(Position pos) {
+		// TODO Auto-generated method stub
+
+	}
+
+	private static class StateMachine {
+		static final int DISCONNECTED = 0;
+		static final int LINK = 1;
+		static final int AUTH = 2;
+		static final int RESOURCE_XFER = 3;
+		static final int ESTABLISHED = 4;
+		static final int DENIED = 5;
+		static final int TIMEDOUT = 6;
+		int curStatus=0;
 	}
 }
