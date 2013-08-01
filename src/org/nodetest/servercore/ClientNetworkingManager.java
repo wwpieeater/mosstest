@@ -12,8 +12,12 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
+import java.nio.CharBuffer;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientNetworkingManager {
+	private AtomicBoolean runReader = new AtomicBoolean(true);
 	private Socket bulkDataSocket = new Socket();
 	private Socket lowLatencyStreamSocket = new Socket();
 	private DatagramSocket udpSocket;
@@ -32,8 +36,59 @@ public class ClientNetworkingManager {
 	private boolean udpOn = false;
 	private InetAddress endpoint;
 	private int port;
+	public ArrayBlockingQueue<MossNetPacket> packets=new ArrayBlockingQueue<>(1024);
+	private Thread bulkReadHandler = new Thread(new Runnable() {
+		
+		@Override
+		public void run() {
 
-	public void init(String endpoint, int port, boolean useUdp)
+			try {
+				while (runReader.get()) {
+
+					if (bulkDataIn.readInt() != CommonNetworking.magic) {
+						// Handle reconnect
+					}
+					int length = bulkDataIn.readInt();
+					StringBuilder sb = new StringBuilder(length);
+					int read = 0;
+					int commandId = bulkDataIn.readUnsignedByte();
+
+					while (read < length) {
+						sb.append(bulkDataIn.readByte());
+						read++;
+					}
+					packets.add(new MossNetPacket(commandId, sb.toString()));
+					if(packets.remainingCapacity()<32) sendQuench();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+	}, "ClientBulkRecv");
+	private Thread fastReadHandler = new Thread(new Runnable() {
+//TODO
+		@Override
+		public void run() {
+			while (runReader.get()) {
+
+			}
+
+		}
+	}, "ClientBulkRecv");
+	private Thread dgramReadHandler = new Thread(new Runnable() {
+//TODO--spanish for "all"
+		@Override
+		public void run() {
+			while (runReader.get()) {
+
+			}
+
+		}
+	}, "ClientDgramRecv");
+
+	public ClientNetworkingManager(String endpoint, int port, boolean useUdp)
 			throws IOException {
 		this.endpoint = InetAddress.getByName(endpoint);
 		lowLatencyStreamSocket.setPerformancePreferences(0, 1, 0);
@@ -65,11 +120,17 @@ public class ClientNetworkingManager {
 			} catch (SocketException e) {
 				udpOn = false;
 			}
-
 		}
-		// TODO we need to get all of our back-and-forth stuff done. And use nio
-		// for that matter.
+
 	}
+
+	protected void sendQuench() {
+		// TODO Sends a request for the server to back off with data and skip non-essential data.
+		
+	}
+
+	// TODO we need to get all of our back-and-forth stuff done. And use nio
+	// for that matter.
 
 	/**
 	 * Send a packet, dispatching to the correct
@@ -127,10 +188,20 @@ public class ClientNetworkingManager {
 				bulkDataSocket.getOutputStream()));
 		bulkDataOut = new DataOutputStream(bulkDataSocket.getOutputStream());
 		bulkDataIn = new DataInputStream(bulkDataSocket.getInputStream());
+		performReconnect(bulkDataOut, bulkDataIn);
 
 	}
 
-	private void sendPacketLowLatency(int commandId, String payload) throws IOException {
+	private void performReconnect(DataOutputStream oStream,
+			DataInputStream iStream) {
+		synchronized (oStream) {
+			// PERFORM RECONNECTION
+		}
+
+	}
+
+	private void sendPacketLowLatency(int commandId, String payload)
+			throws IOException {
 		try {
 			lowlatencyDataOut.writeInt(CommonNetworking.magic);
 			lowlatencyDataOut.writeInt(payload.length());
@@ -166,6 +237,11 @@ public class ClientNetworkingManager {
 		final int DENIED = 5;
 		final int TIMEDOUT = 6;
 		int curStatus = 0;
+	}
+
+	public void beginConnectHandshake() {
+		// TODO Auto-generated method stub
+
 	}
 
 }

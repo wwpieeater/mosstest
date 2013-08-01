@@ -36,7 +36,7 @@ public class NodeCache extends LRUMap<Position, MapChunk> {
 				MapChunk ourChunk = null;
 				ourChunk = chunks.get(pos);
 				if (ourChunk == null)
-					ClientNetworkingManager.sendChunkRequest(pos);
+					ClientManager.getNetworkingManager().sendChunkRequest(pos);
 
 				return ourChunk;
 			
