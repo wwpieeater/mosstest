@@ -18,7 +18,7 @@ public class FileManager {
 			while(shouldRun.get()){
 				MossFile fileIn = resolutionQueue.poll();
 				if (fileIn!=null){
-					// FIXME 
+					// FIXME rarkenin
 					//NetworkManager.send(NetworkManager.PacketTypes.TOSERVER_INIT, fileIn.sha256);
 				}
 			}
