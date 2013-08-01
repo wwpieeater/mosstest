@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 public class CommonNetworking {
 	static final int magic=0xfa7d2e4a;

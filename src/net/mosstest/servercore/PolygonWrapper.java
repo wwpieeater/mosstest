@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 import java.util.TreeMap;
 

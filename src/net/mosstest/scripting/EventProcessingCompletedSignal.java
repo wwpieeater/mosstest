@@ -1,4 +1,4 @@
-package org.nodetest.scripting;
+package net.mosstest.scripting;
 
 public class EventProcessingCompletedSignal extends Throwable {
 

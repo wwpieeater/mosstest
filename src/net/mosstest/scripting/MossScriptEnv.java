@@ -1,17 +1,17 @@
-package org.nodetest.scripting;
+package net.mosstest.scripting;
 
 import java.util.ArrayList;
 import java.util.EnumMap;
 
-import org.nodetest.servercore.Entity;
-import org.nodetest.servercore.ItemStack;
-import org.nodetest.servercore.MapNode;
-import org.nodetest.servercore.MossEvent;
-import org.nodetest.servercore.MossInventory;
-import org.nodetest.servercore.NodePosition;
-import org.nodetest.servercore.Player;
-import org.nodetest.servercore.Position;
-import org.nodetest.servercore.ScriptSandboxBorderToken;
+import net.mosstest.servercore.Entity;
+import net.mosstest.servercore.ItemStack;
+import net.mosstest.servercore.MapNode;
+import net.mosstest.servercore.MossEvent;
+import net.mosstest.servercore.MossInventory;
+import net.mosstest.servercore.NodePosition;
+import net.mosstest.servercore.Player;
+import net.mosstest.servercore.Position;
+import net.mosstest.servercore.ScriptSandboxBorderToken;
 
 /**
  * 

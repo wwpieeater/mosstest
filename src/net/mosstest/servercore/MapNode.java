@@ -1,6 +1,6 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
-import org.nodetest.scripting.EventProcessingCompletedSignal;
+import net.mosstest.scripting.EventProcessingCompletedSignal;
 
 public class MapNode {
 	short nodeId = 0;

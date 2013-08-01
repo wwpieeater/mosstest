@@ -1,4 +1,4 @@
-package org.nodetest.testing;
+package net.mosstest.testing;
 
 import org.fusesource.leveldbjni.internal.NativeDB;
 import org.iq80.leveldb.*;

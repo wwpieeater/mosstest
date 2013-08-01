@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 public class MapDatabaseException extends Exception{
 	private static final long serialVersionUID = -1261363696203853384L;

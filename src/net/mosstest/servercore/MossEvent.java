@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 public class MossEvent {
 	public MossEvent(EvtType type, Entity actor, long posx, long posy,

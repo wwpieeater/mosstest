@@ -1,14 +1,14 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.nodetest.scripting.EventProcessingCompletedSignal;
-import org.nodetest.scripting.MossEventHandler;
-import org.nodetest.scripting.MossScriptEnv;
-import org.nodetest.scripting.MossScriptException;
-import org.nodetest.servercore.MossEvent.EvtType;
+import net.mosstest.scripting.EventProcessingCompletedSignal;
+import net.mosstest.scripting.MossEventHandler;
+import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.scripting.MossScriptException;
+import net.mosstest.servercore.MossEvent.EvtType;
 
 /**
  * 

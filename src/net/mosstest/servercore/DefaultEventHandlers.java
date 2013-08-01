@@ -1,7 +1,7 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
-import org.nodetest.scripting.MossScriptEnv;
-import org.nodetest.scripting.MossScriptException;
+import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.scripting.MossScriptException;
 
 public class DefaultEventHandlers {
 

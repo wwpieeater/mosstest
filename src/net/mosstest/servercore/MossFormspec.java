@@ -1,7 +1,7 @@
 /**
  *  TODO
  */
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 
 public class MossFormspec {

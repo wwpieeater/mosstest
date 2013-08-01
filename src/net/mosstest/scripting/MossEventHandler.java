@@ -1,6 +1,6 @@
-package org.nodetest.scripting;
+package net.mosstest.scripting;
 
-import org.nodetest.servercore.MossEvent;
+import net.mosstest.servercore.MossEvent;
 
 public interface MossEventHandler {
 	/*

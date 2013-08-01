@@ -1,7 +1,7 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
-import org.nodetest.scripting.EventProcessingCompletedSignal;
-import org.nodetest.scripting.MossScriptEnv;
+import net.mosstest.scripting.EventProcessingCompletedSignal;
+import net.mosstest.scripting.MossScriptEnv;
 
 /**
  * Interface to specify handlers to be called when various actions are taken by

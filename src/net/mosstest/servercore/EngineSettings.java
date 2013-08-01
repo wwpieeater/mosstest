@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 public class EngineSettings {
 	static int getInt(String name, int def){

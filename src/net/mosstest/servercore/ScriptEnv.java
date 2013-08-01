@@ -1,4 +1,4 @@
-package org.nodetest.servercore;
+package net.mosstest.servercore;
 
 import java.util.HashMap;
 
@@ -38,7 +38,7 @@ public class ScriptEnv {
 			 */
 			public boolean visibleToScripts(String className) {
 				if (className.startsWith("adapter")
-						|| className.startsWith("org.nodetest.scripting"))
+						|| className.startsWith("net.mosstest.scripting"))
 					return true;
 				else
 					return false;
