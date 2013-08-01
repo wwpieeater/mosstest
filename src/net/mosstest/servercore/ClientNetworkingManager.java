@@ -36,6 +36,9 @@ public class ClientNetworkingManager {
 	private boolean udpOn = false;
 	private InetAddress endpoint;
 	private int port;
+	/*
+	 * Should be no need for another lowlatency queue unless we find poor performance
+	 */
 	public ArrayBlockingQueue<MossNetPacket> packets=new ArrayBlockingQueue<>(1024);
 	private Thread bulkReadHandler = new Thread(new Runnable() {
 		
@@ -71,8 +74,28 @@ public class ClientNetworkingManager {
 //TODO
 		@Override
 		public void run() {
-			while (runReader.get()) {
 
+			try {
+				while (runReader.get()) {
+
+					if (lowlatencyDataIn.readInt() != CommonNetworking.magic) {
+						// Handle reconnect
+					}
+					int length = lowlatencyDataIn.readInt();
+					StringBuilder sb = new StringBuilder(length);
+					int read = 0;
+					int commandId = lowlatencyDataIn.readUnsignedByte();
+
+					while (read < length) {
+						sb.append(lowlatencyDataIn.readByte());
+						read++;
+					}
+					packets.add(new MossNetPacket(commandId, sb.toString()));
+					if(packets.remainingCapacity()<32) sendQuench();
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
 
 		}
@@ -116,12 +139,18 @@ public class ClientNetworkingManager {
 			try {
 				udpSocket = new DatagramSocket(port,
 						InetAddress.getByName(endpoint));
-
+				udpSocket.setSoTimeout(0);
+				sendTosUdpConn(); 
 			} catch (SocketException e) {
 				udpOn = false;
 			}
 		}
 
+	}
+
+	private void sendTosUdpConn() {
+		// TODO Auto-generated method stub
+		
 	}
 
 	protected void sendQuench() {
