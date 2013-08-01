@@ -120,9 +120,9 @@ public class ClientNetworkingManager {
 					}
 					DataInputStream dos = new DataInputStream(bufStr);
 					int magic = dos.readInt();
-					int seqnum = dos.readUnsignedShort();
+					
 					if (magic == CommonNetworking.magic)
-						sendAck(seqnum);
+						sendAck(dos.readUnsignedShort());
 					if (!(magic == CommonNetworking.magic || magic == CommonNetworking.magicNoAck)) {
 						System.out.println("bad magic");
 						continue recvLoop;
