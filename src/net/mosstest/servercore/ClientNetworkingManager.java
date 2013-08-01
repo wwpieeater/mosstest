@@ -2,11 +2,13 @@ package net.mosstest.servercore;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -23,25 +25,23 @@ public class ClientNetworkingManager {
 	private DatagramSocket udpSocket;
 	private BufferedReader bulkReader;
 	private BufferedReader lowlatencyReader;
-	private BufferedReader udpReader;
 	private BufferedWriter bulkWriter;
 	private BufferedWriter lowlatencyWriter;
-	private BufferedWriter udpWriter;
 	private DataOutputStream bulkDataOut;
 	private DataOutputStream lowlatencyDataOut;
-	private DataOutputStream udpDataOut;
 	private DataInputStream bulkDataIn;
 	private DataInputStream lowlatencyDataIn;
-	private DataInputStream udpDataIn;
 	private boolean udpOn = false;
 	private InetAddress endpoint;
 	private int port;
 	/*
-	 * Should be no need for another lowlatency queue unless we find poor performance
+	 * Should be no need for another lowlatency queue unless we find poor
+	 * performance
 	 */
-	public ArrayBlockingQueue<MossNetPacket> packets=new ArrayBlockingQueue<>(1024);
+	public ArrayBlockingQueue<MossNetPacket> packets = new ArrayBlockingQueue<>(
+			1024);
 	private Thread bulkReadHandler = new Thread(new Runnable() {
-		
+
 		@Override
 		public void run() {
 
@@ -61,7 +61,8 @@ public class ClientNetworkingManager {
 						read++;
 					}
 					packets.add(new MossNetPacket(commandId, sb.toString()));
-					if(packets.remainingCapacity()<32) sendQuench();
+					if (packets.remainingCapacity() < 32)
+						sendQuench();
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -71,7 +72,7 @@ public class ClientNetworkingManager {
 		}
 	}, "ClientBulkRecv");
 	private Thread fastReadHandler = new Thread(new Runnable() {
-//TODO
+		// TODO
 		@Override
 		public void run() {
 
@@ -91,7 +92,8 @@ public class ClientNetworkingManager {
 						read++;
 					}
 					packets.add(new MossNetPacket(commandId, sb.toString()));
-					if(packets.remainingCapacity()<32) sendQuench();
+					if (packets.remainingCapacity() < 32)
+						sendQuench();
 				}
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -101,11 +103,42 @@ public class ClientNetworkingManager {
 		}
 	}, "ClientBulkRecv");
 	private Thread dgramReadHandler = new Thread(new Runnable() {
-//TODO--spanish for "all"
+		// TODO--spanish for "all"
 		@Override
 		public void run() {
-			while (runReader.get()) {
 
+			recvLoop: while (runReader.get()) {
+				byte[] buf = new byte[270];
+				DatagramPacket pckt = new DatagramPacket(buf, 270);
+				try {
+					udpSocket.receive(pckt);
+					ByteArrayInputStream bufStr = new ByteArrayInputStream(
+							pckt.getData());
+					if (!pckt.getAddress().equals(endpoint)) {
+						System.out.println("received mismatched packet source");
+						continue recvLoop;
+					}
+					DataInputStream dos = new DataInputStream(bufStr);
+					int magic = dos.readInt();
+					int seqnum = dos.readUnsignedShort();
+					if (magic == CommonNetworking.magic)
+						sendAck(seqnum);
+					if (!(magic == CommonNetworking.magic || magic == CommonNetworking.magicNoAck)) {
+						System.out.println("bad magic");
+						continue recvLoop;
+					}
+					int length = dos.readUnsignedByte();
+					int commandId = dos.readUnsignedByte();
+					StringBuilder sb = new StringBuilder();
+					int read = 0;
+					while (read < length) {
+						sb.append(dos.readByte());
+					}
+					packets.add(new MossNetPacket(commandId, sb.toString()));
+
+				} catch (IOException e) {
+					udpOn = false;
+				}
 			}
 
 		}
@@ -140,7 +173,7 @@ public class ClientNetworkingManager {
 				udpSocket = new DatagramSocket(port,
 						InetAddress.getByName(endpoint));
 				udpSocket.setSoTimeout(0);
-				sendTosUdpConn(); 
+				sendTosUdpConn();
 			} catch (SocketException e) {
 				udpOn = false;
 			}
@@ -148,14 +181,20 @@ public class ClientNetworkingManager {
 
 	}
 
+	protected void sendAck(int seqnum) {
+		// TODO Auto-generated method stub
+
+	}
+
 	private void sendTosUdpConn() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	protected void sendQuench() {
-		// TODO Sends a request for the server to back off with data and skip non-essential data.
-		
+		// TODO Sends a request for the server to back off with data and skip
+		// non-essential data.
+
 	}
 
 	// TODO we need to get all of our back-and-forth stuff done. And use nio
