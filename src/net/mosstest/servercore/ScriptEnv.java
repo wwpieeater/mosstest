@@ -46,12 +46,12 @@ public class ScriptEnv {
 
 		cx.setClassShutter(new ScriptClassShutter());
 		Scriptable scope = cx.initStandardObjects();
-		cx.evaluateString(scope, "function run(){print(\"foo123\");}", "foo",
+		cx.evaluateString(scope, "obj={run(): function(){print(\"foo123\");}}"
+				+ "\r\n r=new java.lang.Runnable(obj);"
+				+ "return r", "foo",; //$NON-NLS-1$
 				1, null);
-		Invocable inv = (Invocable) cx;
-		Runnable r = inv.getInterface(Runnable.class);
-		r.run();
-
+		Object r=scope.get("r", scope);
+		Runnable ru=(Runnable) r;
 	}
 
 	public static class SandboxWrapFactory extends WrapFactory {
@@ -91,6 +91,9 @@ public class ScriptEnv {
 
 			return super.get(name, start);
 		}
+	}
+	public static void main(String[] args) {
+		new ScriptEnv(false, null, null, null);
 	}
 
 }

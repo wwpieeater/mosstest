@@ -437,5 +437,8 @@ public class MossScriptEnv {
 	public static MapNode getNodeByName(String name) {
 		return null;
 	}
+	public static void includeScript(String name) {
+		//TODO
+	}
 
 }
