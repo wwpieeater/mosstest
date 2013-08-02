@@ -290,7 +290,7 @@ public class MossScriptEnv {
 			throws SecurityException {
 		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
 			throw new SecurityException(
-					"Attempt to access controlled resources in the script DMZ.");
+					"Attempt to access controlled resources in the script DMZ."); //$NON-NLS-1$
 		return registeredScriptEvents.get(type);
 	}
 
@@ -409,7 +409,7 @@ public class MossScriptEnv {
 	}
 
 	public static ItemStack[] getInventory(MossInventory inv) {
-		return null;
+		return new ItemStack[] {};
 		// TODO
 	}
 

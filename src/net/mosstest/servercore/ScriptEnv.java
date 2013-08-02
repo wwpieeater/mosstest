@@ -7,6 +7,23 @@ import javax.script.Invocable;
 import org.mozilla.javascript.*;
 
 public class ScriptEnv {
+	private static class ScriptClassShutter implements ClassShutter {
+		public ScriptClassShutter() {
+			
+		}
+
+		/*
+		 * MossScriptEnv,MossEventHandler,
+		 * EventProcessingCompletedSignal,MossScriptException
+		 */
+		public boolean visibleToScripts(String className) {
+			if (className.startsWith("adapter") //$NON-NLS-1$
+					|| className.startsWith("net.mosstest.scripting")) //$NON-NLS-1$
+				return true;
+			else
+				return false;
+		}
+	}
 
 	HashMap<String, Script> scriptMap = new HashMap<>();
 	boolean allowDb;
@@ -14,12 +31,7 @@ public class ScriptEnv {
 	private GameMap map;
 	private HashMap<String, Player> players;
 
-	@Deprecated
-	public ScriptEnv(boolean allowDb, GameWorld game) {
-		super();
-		// this.scriptMap = scriptMap;
-		this.allowDb = allowDb;
-	}
+
 
 	public ScriptEnv(boolean isServer, HashMap<String, Player> players,
 			GameMap map, HashMap<String, Entity> entities) {
@@ -32,18 +44,7 @@ public class ScriptEnv {
 		this.players = players;
 		Context cx = Context.enter();
 
-		cx.setClassShutter(new ClassShutter() {
-			/* MossScriptEnv,MossEventHandler,
-			 * EventProcessingCompletedSignal,MossScriptException
-			 */
-			public boolean visibleToScripts(String className) {
-				if (className.startsWith("adapter")
-						|| className.startsWith("net.mosstest.scripting"))
-					return true;
-				else
-					return false;
-			}
-		});
+		cx.setClassShutter(new ScriptClassShutter());
 		Scriptable scope = cx.initStandardObjects();
 		cx.evaluateString(scope, "function run(){print(\"foo123\");}", "foo",
 				1, null);
@@ -61,7 +62,7 @@ public class ScriptEnv {
 		}
 	}
 
-	public class SandboxContextFactory extends ContextFactory {
+	public static class SandboxContextFactory extends ContextFactory {
 		@Override
 		protected Context makeContext() {
 			Context cx = super.makeContext();

@@ -4,7 +4,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FileManager {
-	public class Chunk {
+	public static class Chunk {
 		byte[] fileSha512;
 		byte[] data;
 	}

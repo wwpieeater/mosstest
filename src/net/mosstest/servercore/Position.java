@@ -88,7 +88,7 @@ public class Position {
 			// TODO Auto-generated catch block
 			isValid = false;
 		}
-		return null;
+		return new byte[] {};
 	}
 
 }

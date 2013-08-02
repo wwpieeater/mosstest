@@ -19,49 +19,50 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ClientNetworkingManager {
-	private AtomicBoolean runReader = new AtomicBoolean(true);
-	private Socket bulkDataSocket = new Socket();
-	private Socket lowLatencyStreamSocket = new Socket();
-	private DatagramSocket udpSocket;
-	private BufferedReader bulkReader;
-	private BufferedReader lowlatencyReader;
-	private BufferedWriter bulkWriter;
-	private BufferedWriter lowlatencyWriter;
-	private DataOutputStream bulkDataOut;
-	private DataOutputStream lowlatencyDataOut;
-	private DataInputStream bulkDataIn;
-	private DataInputStream lowlatencyDataIn;
-	private boolean udpOn = false;
-	private InetAddress endpoint;
-	private int port;
+	protected AtomicBoolean runReader = new AtomicBoolean(true);
+	protected Socket bulkDataSocket = new Socket();
+	protected Socket lowLatencyStreamSocket = new Socket();
+	protected DatagramSocket udpSocket;
+	protected DataOutputStream bulkDataOut;
+	protected DataOutputStream lowlatencyDataOut;
+	protected DataInputStream bulkDataIn;
+	protected DataInputStream lowlatencyDataIn;
+	protected boolean udpOn = false;
+	protected InetAddress endpoint;
+	protected int port;
 	/*
 	 * Should be no need for another lowlatency queue unless we find poor
 	 * performance
 	 */
 	public ArrayBlockingQueue<MossNetPacket> packets = new ArrayBlockingQueue<>(
 			1024);
-	private Thread bulkReadHandler = new Thread(new Runnable() {
+	protected Thread bulkReadHandler = new Thread(new Runnable() {
 
 		@Override
 		public void run() {
 
 			try {
-				while (runReader.get()) {
+				while (ClientNetworkingManager.this.runReader.get()) {
 
-					if (bulkDataIn.readInt() != CommonNetworking.magic) {
+					if (ClientNetworkingManager.this.bulkDataIn.readInt() != CommonNetworking.magic) {
 						// Handle reconnect
 					}
-					int length = bulkDataIn.readInt();
+					int length = ClientNetworkingManager.this.bulkDataIn
+							.readInt();
 					StringBuilder sb = new StringBuilder(length);
 					int read = 0;
-					int commandId = bulkDataIn.readUnsignedByte();
+					int commandId = ClientNetworkingManager.this.bulkDataIn
+							.readUnsignedByte();
 
 					while (read < length) {
-						sb.append(bulkDataIn.readByte());
+						sb.append(ClientNetworkingManager.this.bulkDataIn
+								.readByte());
 						read++;
 					}
-					packets.add(new MossNetPacket(commandId, sb.toString()));
-					if (packets.remainingCapacity() < 32)
+					ClientNetworkingManager.this.packets.add(new MossNetPacket(
+							commandId, sb.toString()));
+					if (ClientNetworkingManager.this.packets
+							.remainingCapacity() < 32)
 						sendQuench();
 				}
 			} catch (IOException e) {
@@ -70,29 +71,34 @@ public class ClientNetworkingManager {
 			}
 
 		}
-	}, "ClientBulkRecv");
-	private Thread fastReadHandler = new Thread(new Runnable() {
+	}, "ClientBulkRecv"); //$NON-NLS-1$
+	protected Thread fastReadHandler = new Thread(new Runnable() {
 		// TODO
 		@Override
 		public void run() {
 
 			try {
-				while (runReader.get()) {
+				while (ClientNetworkingManager.this.runReader.get()) {
 
-					if (lowlatencyDataIn.readInt() != CommonNetworking.magic) {
+					if (ClientNetworkingManager.this.lowlatencyDataIn.readInt() != CommonNetworking.magic) {
 						// Handle reconnect
 					}
-					int length = lowlatencyDataIn.readInt();
+					int length = ClientNetworkingManager.this.lowlatencyDataIn
+							.readInt();
 					StringBuilder sb = new StringBuilder(length);
 					int read = 0;
-					int commandId = lowlatencyDataIn.readUnsignedByte();
+					int commandId = ClientNetworkingManager.this.lowlatencyDataIn
+							.readUnsignedByte();
 
 					while (read < length) {
-						sb.append(lowlatencyDataIn.readByte());
+						sb.append(ClientNetworkingManager.this.lowlatencyDataIn
+								.readByte());
 						read++;
 					}
-					packets.add(new MossNetPacket(commandId, sb.toString()));
-					if (packets.remainingCapacity() < 32)
+					ClientNetworkingManager.this.packets.add(new MossNetPacket(
+							commandId, sb.toString()));
+					if (ClientNetworkingManager.this.packets
+							.remainingCapacity() < 32)
 						sendQuench();
 				}
 			} catch (IOException e) {
@@ -101,30 +107,31 @@ public class ClientNetworkingManager {
 			}
 
 		}
-	}, "ClientBulkRecv");
-	private Thread dgramReadHandler = new Thread(new Runnable() {
+	}, "ClientBulkRecv"); //$NON-NLS-1$
+	protected Thread dgramReadHandler = new Thread(new Runnable() {
 		// TODO--spanish for "all"
 		@Override
 		public void run() {
 
-			recvLoop: while (runReader.get()) {
+			recvLoop: while (ClientNetworkingManager.this.runReader.get()) {
 				byte[] buf = new byte[270];
 				DatagramPacket pckt = new DatagramPacket(buf, 270);
 				try {
-					udpSocket.receive(pckt);
+					ClientNetworkingManager.this.udpSocket.receive(pckt);
 					ByteArrayInputStream bufStr = new ByteArrayInputStream(
 							pckt.getData());
-					if (!pckt.getAddress().equals(endpoint)) {
-						System.out.println("received mismatched packet source");
+					if (!pckt.getAddress().equals(
+							ClientNetworkingManager.this.endpoint)) {
+						System.out.println("received mismatched packet source"); //$NON-NLS-1$
 						continue recvLoop;
 					}
 					DataInputStream dos = new DataInputStream(bufStr);
 					int magic = dos.readInt();
-					
+
 					if (magic == CommonNetworking.magic)
 						sendAck(dos.readUnsignedShort());
 					if (!(magic == CommonNetworking.magic || magic == CommonNetworking.magicNoAck)) {
-						System.out.println("bad magic");
+						System.out.println("bad magic"); //$NON-NLS-1$
 						continue recvLoop;
 					}
 					int length = dos.readUnsignedByte();
@@ -133,49 +140,48 @@ public class ClientNetworkingManager {
 					int read = 0;
 					while (read < length) {
 						sb.append(dos.readByte());
+						read++;
 					}
-					packets.add(new MossNetPacket(commandId, sb.toString()));
+					ClientNetworkingManager.this.packets.add(new MossNetPacket(
+							commandId, sb.toString()));
 
 				} catch (IOException e) {
-					udpOn = false;
+					ClientNetworkingManager.this.udpOn = false;
 				}
 			}
 
 		}
-	}, "ClientDgramRecv");
+	}, "ClientDgramRecv"); //$NON-NLS-1$
 
 	public ClientNetworkingManager(String endpoint, int port, boolean useUdp)
 			throws IOException {
 		this.endpoint = InetAddress.getByName(endpoint);
-		lowLatencyStreamSocket.setPerformancePreferences(0, 1, 0);
-		lowLatencyStreamSocket.setTrafficClass(0x10);
-		lowLatencyStreamSocket.setTcpNoDelay(true);
-		bulkDataSocket.connect(new InetSocketAddress(endpoint, 16511), 16511);
-		bulkReader = new BufferedReader(new InputStreamReader(
-				bulkDataSocket.getInputStream()));
-		bulkWriter = new BufferedWriter(new PrintWriter(
-				bulkDataSocket.getOutputStream()));
-		bulkDataOut = new DataOutputStream(bulkDataSocket.getOutputStream());
-		bulkDataIn = new DataInputStream(bulkDataSocket.getInputStream());
-		lowLatencyStreamSocket.connect(new InetSocketAddress(endpoint, 16511),
+		this.lowLatencyStreamSocket.setPerformancePreferences(0, 1, 0);
+		this.lowLatencyStreamSocket.setTrafficClass(0x10);
+		this.lowLatencyStreamSocket.setTcpNoDelay(true);
+		this.bulkDataSocket.connect(new InetSocketAddress(endpoint, 16511),
 				16511);
-		lowlatencyReader = new BufferedReader(new InputStreamReader(
-				lowLatencyStreamSocket.getInputStream()));
-		lowlatencyWriter = new BufferedWriter(new PrintWriter(
-				lowLatencyStreamSocket.getOutputStream()));
-		lowlatencyDataOut = new DataOutputStream(
-				lowLatencyStreamSocket.getOutputStream());
-		lowlatencyDataIn = new DataInputStream(
-				lowLatencyStreamSocket.getInputStream());
-		udpOn = false;
+
+		this.bulkDataOut = new DataOutputStream(
+				this.bulkDataSocket.getOutputStream());
+		this.bulkDataIn = new DataInputStream(
+				this.bulkDataSocket.getInputStream());
+		this.lowLatencyStreamSocket.connect(new InetSocketAddress(endpoint,
+				16511), 16511);
+
+		this.lowlatencyDataOut = new DataOutputStream(
+				this.lowLatencyStreamSocket.getOutputStream());
+		this.lowlatencyDataIn = new DataInputStream(
+				this.lowLatencyStreamSocket.getInputStream());
+		this.udpOn = false;
 		if (useUdp) {
 			try {
-				udpSocket = new DatagramSocket(port,
+				this.udpSocket = new DatagramSocket(port,
 						InetAddress.getByName(endpoint));
-				udpSocket.setSoTimeout(0);
+				this.udpSocket.setSoTimeout(0);
 				sendTosUdpConn();
 			} catch (SocketException e) {
-				udpOn = false;
+				this.udpOn = false;
 			}
 		}
 
@@ -186,7 +192,7 @@ public class ClientNetworkingManager {
 
 	}
 
-	private void sendTosUdpConn() {
+	protected void sendTosUdpConn() {
 		// TODO Auto-generated method stub
 
 	}
@@ -211,10 +217,10 @@ public class ClientNetworkingManager {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	private void sendPacket(int commandId, String payload, boolean needsFast,
+	protected void sendPacket(int commandId, String payload, boolean needsFast,
 			boolean needsAck) throws IOException {
 		if (needsFast) {
-			if ((payload.length() < 250) && udpOn)
+			if ((payload.length() < 250) && this.udpOn)
 				sendPacketUdp(commandId, payload, needsAck);
 			else
 				sendPacketLowLatency(commandId, payload);
@@ -223,44 +229,42 @@ public class ClientNetworkingManager {
 
 	}
 
-	private void sendPacketDefault(int commandId, String payload)
+	protected void sendPacketDefault(int commandId, String payload)
 			throws IOException {
 		try {
-			bulkDataOut.writeInt(CommonNetworking.magic);
-			bulkDataOut.writeInt(payload.length());
-			bulkDataOut.write(commandId);
-			bulkDataOut.writeBytes(payload);
-			bulkDataOut.flush();
+			this.bulkDataOut.writeInt(CommonNetworking.magic);
+			this.bulkDataOut.writeInt(payload.length());
+			this.bulkDataOut.write(commandId);
+			this.bulkDataOut.writeBytes(payload);
+			this.bulkDataOut.flush();
 		} catch (IOException e) {
 			defaultReinit();
-			bulkDataOut.writeInt(CommonNetworking.magic);
-			bulkDataOut.writeInt(payload.length());
-			bulkDataOut.write(commandId);
-			bulkDataOut.writeBytes(payload);
-			bulkDataOut.flush();
+			this.bulkDataOut.writeInt(CommonNetworking.magic);
+			this.bulkDataOut.writeInt(payload.length());
+			this.bulkDataOut.write(commandId);
+			this.bulkDataOut.writeBytes(payload);
+			this.bulkDataOut.flush();
 		}
 
 	}
 
-	private void defaultReinit() throws IOException {
-		bulkDataIn.close();
-		bulkDataOut.close();
-		bulkReader.close();
-		bulkWriter.close();
-		bulkDataSocket.close();
-		bulkDataSocket = new Socket();
-		bulkDataSocket.connect(new InetSocketAddress(endpoint, port), 10000);
-		bulkReader = new BufferedReader(new InputStreamReader(
-				bulkDataSocket.getInputStream()));
-		bulkWriter = new BufferedWriter(new PrintWriter(
-				bulkDataSocket.getOutputStream()));
-		bulkDataOut = new DataOutputStream(bulkDataSocket.getOutputStream());
-		bulkDataIn = new DataInputStream(bulkDataSocket.getInputStream());
-		performReconnect(bulkDataOut, bulkDataIn);
+	protected void defaultReinit() throws IOException {
+		this.bulkDataIn.close();
+		this.bulkDataOut.close();
+		this.bulkDataSocket.close();
+		this.bulkDataSocket = new Socket();
+		this.bulkDataSocket.connect(new InetSocketAddress(this.endpoint,
+				this.port), 10000);
+
+		this.bulkDataOut = new DataOutputStream(
+				this.bulkDataSocket.getOutputStream());
+		this.bulkDataIn = new DataInputStream(
+				this.bulkDataSocket.getInputStream());
+		performReconnect(this.bulkDataOut, this.bulkDataIn);
 
 	}
 
-	private void performReconnect(DataOutputStream oStream,
+	protected void performReconnect(DataOutputStream oStream,
 			DataInputStream iStream) {
 		synchronized (oStream) {
 			// PERFORM RECONNECTION
@@ -268,25 +272,25 @@ public class ClientNetworkingManager {
 
 	}
 
-	private void sendPacketLowLatency(int commandId, String payload)
+	protected void sendPacketLowLatency(int commandId, String payload)
 			throws IOException {
 		try {
-			lowlatencyDataOut.writeInt(CommonNetworking.magic);
-			lowlatencyDataOut.writeInt(payload.length());
-			lowlatencyDataOut.write(commandId);
-			lowlatencyDataOut.writeBytes(payload);
-			lowlatencyDataOut.flush();
+			this.lowlatencyDataOut.writeInt(CommonNetworking.magic);
+			this.lowlatencyDataOut.writeInt(payload.length());
+			this.lowlatencyDataOut.write(commandId);
+			this.lowlatencyDataOut.writeBytes(payload);
+			this.lowlatencyDataOut.flush();
 		} catch (IOException e) {
 			defaultReinit();
-			lowlatencyDataOut.writeInt(CommonNetworking.magic);
-			lowlatencyDataOut.writeInt(payload.length());
-			lowlatencyDataOut.write(commandId);
-			lowlatencyDataOut.writeBytes(payload);
-			lowlatencyDataOut.flush();
+			this.lowlatencyDataOut.writeInt(CommonNetworking.magic);
+			this.lowlatencyDataOut.writeInt(payload.length());
+			this.lowlatencyDataOut.write(commandId);
+			this.lowlatencyDataOut.writeBytes(payload);
+			this.lowlatencyDataOut.flush();
 		}
 	}
 
-	private void sendPacketUdp(int commandId, String payload, boolean needsAck) {
+	protected void sendPacketUdp(int commandId, String payload, boolean needsAck) {
 		// TODO Auto-generated method stub
 
 	}
@@ -296,14 +300,14 @@ public class ClientNetworkingManager {
 
 	}
 
-	private class StateMachine {
-		final int DISCONNECTED = 0;
-		final int LINK = 1;
-		final int AUTH = 2;
-		final int RESOURCE_XFER = 3;
-		final int ESTABLISHED = 4;
-		final int DENIED = 5;
-		final int TIMEDOUT = 6;
+	protected class StateMachine {
+		static final int DISCONNECTED = 0;
+		static final int LINK = 1;
+		static final int AUTH = 2;
+		static final int RESOURCE_XFER = 3;
+		static final int ESTABLISHED = 4;
+		static final int DENIED = 5;
+		static final int TIMEDOUT = 6;
 		int curStatus = 0;
 	}
 
