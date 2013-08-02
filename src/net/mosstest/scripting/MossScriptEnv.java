@@ -407,6 +407,15 @@ public class MossScriptEnv {
 		// TODO stub
 		return null;
 	}
+	public static MapNode registerNode(String sysname, String userFacingName, NodeParams params, String[] textures, boolean isLiquid, int light) {
+		MapNode nd=new MapNode(params, textures, sysname, userFacingName,isLiquid, light);
+		return nd;
+	}
+	
+	public static MapNode registerNodeDefParams(String sysname, String userFacingName, String[] textures, boolean isLiquid, int light) {
+		MapNode nd=new MapNode(textures, sysname, userFacingName, isLiquid, light);
+		return nd;
+	}
 
 	public static ItemStack[] getInventory(MossInventory inv) {
 		return new ItemStack[] {};

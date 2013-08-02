@@ -231,21 +231,22 @@ public class ClientNetworkingManager {
 
 	protected void sendPacketDefault(int commandId, String payload)
 			throws IOException {
-		try {
-			this.bulkDataOut.writeInt(CommonNetworking.magic);
-			this.bulkDataOut.writeInt(payload.length());
-			this.bulkDataOut.write(commandId);
-			this.bulkDataOut.writeBytes(payload);
-			this.bulkDataOut.flush();
-		} catch (IOException e) {
-			defaultReinit();
-			this.bulkDataOut.writeInt(CommonNetworking.magic);
-			this.bulkDataOut.writeInt(payload.length());
-			this.bulkDataOut.write(commandId);
-			this.bulkDataOut.writeBytes(payload);
-			this.bulkDataOut.flush();
+		synchronized (this.bulkDataOut) {
+			try {
+				this.bulkDataOut.writeInt(CommonNetworking.magic);
+				this.bulkDataOut.writeInt(payload.length());
+				this.bulkDataOut.write(commandId);
+				this.bulkDataOut.writeBytes(payload);
+				this.bulkDataOut.flush();
+			} catch (IOException e) {
+				defaultReinit();
+				this.bulkDataOut.writeInt(CommonNetworking.magic);
+				this.bulkDataOut.writeInt(payload.length());
+				this.bulkDataOut.write(commandId);
+				this.bulkDataOut.writeBytes(payload);
+				this.bulkDataOut.flush();
+			}
 		}
-
 	}
 
 	protected void defaultReinit() throws IOException {
@@ -260,13 +261,12 @@ public class ClientNetworkingManager {
 				this.bulkDataSocket.getOutputStream());
 		this.bulkDataIn = new DataInputStream(
 				this.bulkDataSocket.getInputStream());
-		performReconnect(this.bulkDataOut, this.bulkDataIn);
+		performBulkReconnect();
 
 	}
 
-	protected void performReconnect(DataOutputStream oStream,
-			DataInputStream iStream) {
-		synchronized (oStream) {
+	protected void performBulkReconnect() {
+		synchronized (this.bulkDataOut) {
 			// PERFORM RECONNECTION
 		}
 

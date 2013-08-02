@@ -38,7 +38,7 @@ public class NodePosition extends Position {
 		}
 		if (obj == null) {
 			return false;
-		}
+		} 
 		if (!(obj instanceof NodePosition)) {
 			return false;
 		}
