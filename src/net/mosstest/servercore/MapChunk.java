@@ -61,7 +61,8 @@ public class MapChunk {
 					}
 				}
 			}
-			MapGenerator.fillInChunk(lightNodes, pos);
+			//Aaron here, until this does something I'll keep it commented out
+			//MapGenerator.fillInChunk(lightNodes, pos);
 			// throw new NotImplementedException();
 		} else {
 			for (int x = 0; x < 16; x++) {

@@ -33,9 +33,12 @@ public class RenderProcessor extends SimpleApplication {
 	public static ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 	
+	private Position testPosition = new Position (0,0,0,0);
+	private MapChunk testChunk = new MapChunk (testPosition, null, null);
+	
 	@Override
 	public void simpleUpdate (float tpf) {
-		MoveWorld(locChanges[0], locChanges[1], locChanges[2]);
+		moveWorld(locChanges[0], locChanges[1], locChanges[2]);
 		
 		inputManager.setCursorVisible(false); 
 		MossRenderEvent myEvent = renderEventQueue.poll();
@@ -59,7 +62,7 @@ public class RenderProcessor extends SimpleApplication {
 		}
 			//Add more events
 	}
-	static void init () { //This and the main method are simply temporary.  Need to keep a testing environment in here.
+	public static void init () { //This and the main method are simply temporary.  Need to keep a testing environment in here.
 		RenderProcessor app = new RenderProcessor ();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
@@ -84,7 +87,7 @@ public class RenderProcessor extends SimpleApplication {
 		
 	}
 	
-	private void MoveWorld(float cx, float cy, float cz) {
+	private void moveWorld(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
 				cam.getDirection().z);
