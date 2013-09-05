@@ -15,9 +15,26 @@ public class ClientManager {
 	static void init(String host, int port, String username, char[] password) throws IOException{
 		net=new ClientNetworkingManager(host, port, EngineSettings.getBool("client_udp", true));
 		net.beginConnectHandshake();
+		
 	}
 
 	public static ClientNetworkingManager getNetworkingManager() {
 		return net;
+	}
+
+	public static ApplicationLevelNetworkingManager getApplicationLevelNetworkingManager() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	/**
+	 * Show an error screen on the client
+	 * @param title The title to show
+	 * @param msg The message to show
+	 * @param disconnect Whether to disconnect from the current server, if any.
+	 */
+	public static void showErrorScreen(String title, String msg, boolean disconnect) {
+		// TODO Auto-generated method stub
+		
 	}
 }

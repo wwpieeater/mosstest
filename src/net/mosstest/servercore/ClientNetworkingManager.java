@@ -1,25 +1,23 @@
 package net.mosstest.servercore;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.CharBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ClientNetworkingManager {
-	protected AtomicBoolean runReader = new AtomicBoolean(true);
+	protected AtomicBoolean runThreads = new AtomicBoolean(true);
 	protected Socket bulkDataSocket = new Socket();
 	protected Socket lowLatencyStreamSocket = new Socket();
 	protected DatagramSocket udpSocket;
@@ -28,8 +26,14 @@ public class ClientNetworkingManager {
 	protected DataInputStream bulkDataIn;
 	protected DataInputStream lowlatencyDataIn;
 	protected boolean udpOn = false;
-	protected InetAddress endpoint;
+	protected final InetAddress endpoint;
 	protected int port;
+	protected AtomicLong lastBulkOut = new AtomicLong();
+	protected AtomicLong lastBulkIn = new AtomicLong();
+	protected AtomicLong lastFastOut = new AtomicLong();
+	protected AtomicLong lastFastIn = new AtomicLong();
+	protected AtomicLong lastUdpOut = new AtomicLong();
+	protected AtomicLong lastUdpIn = new AtomicLong();
 	/*
 	 * Should be no need for another lowlatency queue unless we find poor
 	 * performance
@@ -42,25 +46,23 @@ public class ClientNetworkingManager {
 		public void run() {
 
 			try {
-				while (ClientNetworkingManager.this.runReader.get()) {
+				while (ClientNetworkingManager.this.runThreads.get()) {
 
 					if (ClientNetworkingManager.this.bulkDataIn.readInt() != CommonNetworking.magic) {
 						// Handle reconnect
 					}
+
 					int length = ClientNetworkingManager.this.bulkDataIn
 							.readInt();
-					StringBuilder sb = new StringBuilder(length);
-					int read = 0;
+					byte[] buf = new byte[length];
+
 					int commandId = ClientNetworkingManager.this.bulkDataIn
 							.readUnsignedByte();
-
-					while (read < length) {
-						sb.append(ClientNetworkingManager.this.bulkDataIn
-								.readByte());
-						read++;
-					}
+					ClientNetworkingManager.this.bulkStreamIn.read(buf);
 					ClientNetworkingManager.this.packets.add(new MossNetPacket(
-							commandId, sb.toString()));
+							commandId, buf));
+					ClientNetworkingManager.this.lastBulkIn.set(System
+							.currentTimeMillis());
 					if (ClientNetworkingManager.this.packets
 							.remainingCapacity() < 32)
 						sendQuench();
@@ -78,25 +80,24 @@ public class ClientNetworkingManager {
 		public void run() {
 
 			try {
-				while (ClientNetworkingManager.this.runReader.get()) {
+				while (ClientNetworkingManager.this.runThreads.get()) {
 
 					if (ClientNetworkingManager.this.lowlatencyDataIn.readInt() != CommonNetworking.magic) {
 						// Handle reconnect
 					}
 					int length = ClientNetworkingManager.this.lowlatencyDataIn
 							.readInt();
-					StringBuilder sb = new StringBuilder(length);
-					int read = 0;
+					byte[] buf = new byte[length];
+
 					int commandId = ClientNetworkingManager.this.lowlatencyDataIn
 							.readUnsignedByte();
-
-					while (read < length) {
-						sb.append(ClientNetworkingManager.this.lowlatencyDataIn
-								.readByte());
-						read++;
-					}
+					ClientNetworkingManager.this.fastStreamIn.read(buf);
 					ClientNetworkingManager.this.packets.add(new MossNetPacket(
-							commandId, sb.toString()));
+							commandId, buf));
+					ClientNetworkingManager.this.lastFastIn.set(System
+							.currentTimeMillis());
+					ClientNetworkingManager.this.packets.add(new MossNetPacket(
+							commandId, buf));
 					if (ClientNetworkingManager.this.packets
 							.remainingCapacity() < 32)
 						sendQuench();
@@ -108,12 +109,14 @@ public class ClientNetworkingManager {
 
 		}
 	}, "ClientBulkRecv"); //$NON-NLS-1$
+	protected AtomicBoolean partyQuenched = new AtomicBoolean(false);
+	private AtomicLong quenchedSince = new AtomicLong(0);
 	protected Thread dgramReadHandler = new Thread(new Runnable() {
 		// TODO--spanish for "all"
 		@Override
 		public void run() {
 
-			recvLoop: while (ClientNetworkingManager.this.runReader.get()) {
+			recvLoop: while (ClientNetworkingManager.this.runThreads.get()) {
 				byte[] buf = new byte[270];
 				DatagramPacket pckt = new DatagramPacket(buf, 270);
 				try {
@@ -136,14 +139,16 @@ public class ClientNetworkingManager {
 					}
 					int length = dos.readUnsignedByte();
 					int commandId = dos.readUnsignedByte();
-					StringBuilder sb = new StringBuilder();
-					int read = 0;
-					while (read < length) {
-						sb.append(dos.readByte());
-						read++;
+					if (commandId == 255) {
+						ClientNetworkingManager.this.partyQuenched.set(true);
+						continue recvLoop;
 					}
+					byte[] pBuf = new byte[length];
+					bufStr.read(pBuf);
+					ClientNetworkingManager.this.lastUdpIn.set(System
+							.currentTimeMillis());
 					ClientNetworkingManager.this.packets.add(new MossNetPacket(
-							commandId, sb.toString()));
+							commandId, pBuf));
 
 				} catch (IOException e) {
 					ClientNetworkingManager.this.udpOn = false;
@@ -153,6 +158,11 @@ public class ClientNetworkingManager {
 		}
 	}, "ClientDgramRecv"); //$NON-NLS-1$
 
+	protected InputStream bulkStreamIn;
+	protected OutputStream bulkStreamOut;
+	protected InputStream fastStreamIn;
+	protected OutputStream fastStreamOut;
+
 	public ClientNetworkingManager(String endpoint, int port, boolean useUdp)
 			throws IOException {
 		this.endpoint = InetAddress.getByName(endpoint);
@@ -161,18 +171,16 @@ public class ClientNetworkingManager {
 		this.lowLatencyStreamSocket.setTcpNoDelay(true);
 		this.bulkDataSocket.connect(new InetSocketAddress(endpoint, 16511),
 				16511);
-
-		this.bulkDataOut = new DataOutputStream(
-				this.bulkDataSocket.getOutputStream());
-		this.bulkDataIn = new DataInputStream(
-				this.bulkDataSocket.getInputStream());
+		this.bulkStreamIn = this.bulkDataSocket.getInputStream();
+		this.bulkStreamOut = this.bulkDataSocket.getOutputStream();
+		this.bulkDataOut = new DataOutputStream(this.bulkStreamOut);
+		this.bulkDataIn = new DataInputStream(this.bulkStreamIn);
 		this.lowLatencyStreamSocket.connect(new InetSocketAddress(endpoint,
 				16511), 16511);
-
-		this.lowlatencyDataOut = new DataOutputStream(
-				this.lowLatencyStreamSocket.getOutputStream());
-		this.lowlatencyDataIn = new DataInputStream(
-				this.lowLatencyStreamSocket.getInputStream());
+		this.fastStreamIn = this.lowLatencyStreamSocket.getInputStream();
+		this.fastStreamOut = this.lowLatencyStreamSocket.getOutputStream();
+		this.lowlatencyDataOut = new DataOutputStream(this.fastStreamOut);
+		this.lowlatencyDataIn = new DataInputStream(this.fastStreamIn);
 		this.udpOn = false;
 		if (useUdp) {
 			try {
@@ -184,7 +192,17 @@ public class ClientNetworkingManager {
 				this.udpOn = false;
 			}
 		}
-
+		this.lastBulkIn.set(System.currentTimeMillis());
+		this.lastBulkOut.set(System.currentTimeMillis());
+		this.lastFastIn.set(System.currentTimeMillis());
+		this.lastFastOut.set(System.currentTimeMillis());
+		this.lastUdpIn.set(System.currentTimeMillis());
+		this.lastUdpOut.set(System.currentTimeMillis());
+		this.bulkReadHandler.start();
+		this.fastReadHandler.start();
+		this.dgramReadHandler.start();
+		this.sendQueueThread.start();
+		this.netTimeoutThread.start();
 	}
 
 	protected void sendAck(int seqnum) {
@@ -203,9 +221,6 @@ public class ClientNetworkingManager {
 
 	}
 
-	// TODO we need to get all of our back-and-forth stuff done. And use nio
-	// for that matter.
-
 	/**
 	 * Send a packet, dispatching to the correct
 	 * 
@@ -217,10 +232,10 @@ public class ClientNetworkingManager {
 	 * @throws IOException
 	 */
 	@SuppressWarnings("unused")
-	protected void sendPacket(int commandId, String payload, boolean needsFast,
+	protected void sendPacket(int commandId, byte[] payload, boolean needsFast,
 			boolean needsAck) throws IOException {
 		if (needsFast) {
-			if ((payload.length() < 250) && this.udpOn)
+			if ((payload.length < 250) && this.udpOn)
 				sendPacketUdp(commandId, payload, needsAck);
 			else
 				sendPacketLowLatency(commandId, payload);
@@ -229,21 +244,22 @@ public class ClientNetworkingManager {
 
 	}
 
-	protected void sendPacketDefault(int commandId, String payload)
+	protected void sendPacketDefault(int commandId, byte[] payload)
 			throws IOException {
+		this.lastBulkOut.set(System.currentTimeMillis());
 		synchronized (this.bulkDataOut) {
 			try {
 				this.bulkDataOut.writeInt(CommonNetworking.magic);
-				this.bulkDataOut.writeInt(payload.length());
+				this.bulkDataOut.writeInt(payload.length);
 				this.bulkDataOut.write(commandId);
-				this.bulkDataOut.writeBytes(payload);
+				this.bulkDataOut.write(payload);
 				this.bulkDataOut.flush();
 			} catch (IOException e) {
 				defaultReinit();
 				this.bulkDataOut.writeInt(CommonNetworking.magic);
-				this.bulkDataOut.writeInt(payload.length());
+				this.bulkDataOut.writeInt(payload.length);
 				this.bulkDataOut.write(commandId);
-				this.bulkDataOut.writeBytes(payload);
+				this.bulkDataOut.write(payload);
 				this.bulkDataOut.flush();
 			}
 		}
@@ -262,6 +278,8 @@ public class ClientNetworkingManager {
 		this.bulkDataIn = new DataInputStream(
 				this.bulkDataSocket.getInputStream());
 		performBulkReconnect();
+		this.lastBulkIn.set(System.currentTimeMillis());
+		this.lastBulkOut.set(System.currentTimeMillis());
 
 	}
 
@@ -272,32 +290,41 @@ public class ClientNetworkingManager {
 
 	}
 
-	protected void sendPacketLowLatency(int commandId, String payload)
+	protected void sendPacketLowLatency(int commandId, byte[] payload)
 			throws IOException {
+		this.lastFastOut.set(System.currentTimeMillis());
 		try {
 			this.lowlatencyDataOut.writeInt(CommonNetworking.magic);
-			this.lowlatencyDataOut.writeInt(payload.length());
+			this.lowlatencyDataOut.writeInt(payload.length);
 			this.lowlatencyDataOut.write(commandId);
-			this.lowlatencyDataOut.writeBytes(payload);
 			this.lowlatencyDataOut.flush();
+			this.fastStreamOut.write(payload);
+			this.fastStreamOut.flush();
+
 		} catch (IOException e) {
 			defaultReinit();
 			this.lowlatencyDataOut.writeInt(CommonNetworking.magic);
-			this.lowlatencyDataOut.writeInt(payload.length());
+			this.lowlatencyDataOut.writeInt(payload.length);
 			this.lowlatencyDataOut.write(commandId);
-			this.lowlatencyDataOut.writeBytes(payload);
 			this.lowlatencyDataOut.flush();
+			this.fastStreamOut.write(payload);
+			this.fastStreamOut.flush();
 		}
 	}
 
-	protected void sendPacketUdp(int commandId, String payload, boolean needsAck) {
-		// TODO Auto-generated method stub
+	protected void sendPacketUdp(int commandId, byte[] payload, boolean needsAck)
+			throws IOException {
+		this.lastUdpOut.set(System.currentTimeMillis());
+		DatagramPacket toSend = new DatagramPacket(payload, payload.length);
+		toSend.setSocketAddress(new InetSocketAddress(this.endpoint, this.port));
+		synchronized (this.udpSocket) {
+			this.udpSocket.send(toSend);
+		}
 
 	}
 
-	public void sendChunkRequest(Position pos) {
-		// TODO Auto-generated method stub
-
+	public void enqueuePacket(MossNetPacket p) throws InterruptedException {
+		this.sendQueue.put(p);
 	}
 
 	protected class StateMachine {
@@ -315,5 +342,91 @@ public class ClientNetworkingManager {
 		// TODO Auto-generated method stub
 
 	}
+
+	private final ArrayBlockingQueue<MossNetPacket> sendQueue = new ArrayBlockingQueue<MossNetPacket>(
+			1024);
+
+	private Thread sendQueueThread = new Thread(new Runnable() {
+
+		@Override
+		public void run() {
+			while (ClientNetworkingManager.this.runThreads.get()) {
+				try {
+					MossNetPacket p = ClientNetworkingManager.this.sendQueue.take();
+					ClientNetworkingManager.this.sendPacket(p.commandId,
+							p.payload, p.needsFast, p.needsAck);
+				} catch (InterruptedException | IOException e) {
+					// superfluous exception
+				}
+			}
+		}
+	}, "netClientSendQueue");
+
+	private Thread netTimeoutThread = new Thread(new Runnable() {
+
+		@Override
+		public void run() {
+			while (ClientNetworkingManager.this.runThreads.get()) {
+				long cTime = System.currentTimeMillis();
+				if (cTime - ClientNetworkingManager.this.lastBulkIn.get() > 10000
+						|| cTime
+								- ClientNetworkingManager.this.lastFastIn.get() > 10000
+						|| cTime - ClientNetworkingManager.this.lastUdpIn.get() > 10000) {
+					ClientManager
+							.showErrorScreen(
+									"Network Timeout",
+									"The connection to the server has been lost or has become too slow to continue. \r\nThis is likely caused by an unstable connection, poor WiFi, loose cables, or a firewall issue.",
+									true);
+
+				}
+				try {
+					if (cTime - ClientNetworkingManager.this.lastBulkOut.get() > 4000)
+						sendPacketDefault(00, new byte[] {});
+				} catch (IOException e) {
+					// pass
+				}
+				try {
+					if (cTime - ClientNetworkingManager.this.lastFastOut.get() > 4000)
+						sendPacketLowLatency(00, new byte[] {});
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					if (cTime - ClientNetworkingManager.this.lastUdpOut.get() > 4000)
+						sendPacketUdp(00, new byte[] {}, false);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				try {
+					//oh, joy
+					Thread.sleep(4000
+							- cTime
+							+ Math.min(
+									ClientNetworkingManager.this.lastBulkIn
+											.get(),
+									Math.min(
+											ClientNetworkingManager.this.lastBulkOut
+													.get(),
+											Math.min(
+													ClientNetworkingManager.this.lastFastIn
+															.get(),
+													Math.min(
+															ClientNetworkingManager.this.lastFastOut
+																	.get(),
+															Math.min(
+																	ClientNetworkingManager.this.lastUdpIn
+																			.get(),
+																	ClientNetworkingManager.this.lastUdpOut
+																			.get()))))));
+				} catch (InterruptedException e) {
+					
+				}
+
+			}
+
+		}
+	}, "netTimeout");
 
 }

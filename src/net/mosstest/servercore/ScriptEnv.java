@@ -11,11 +11,6 @@ public class ScriptEnv {
 		public ScriptClassShutter() {
 			
 		}
-
-		/*
-		 * MossScriptEnv,MossEventHandler,
-		 * EventProcessingCompletedSignal,MossScriptException
-		 */
 		public boolean visibleToScripts(String className) {
 			if (className.startsWith("adapter") //$NON-NLS-1$
 					|| className.startsWith("net.mosstest.scripting")) //$NON-NLS-1$
@@ -26,33 +21,12 @@ public class ScriptEnv {
 	}
 
 	HashMap<String, Script> scriptMap = new HashMap<>();
-	boolean allowDb;
-	private HashMap<String, Entity> entities;
-	private GameMap map;
-	private HashMap<String, Player> players;
+	boolean localDb;
 
 
+	
 
-	public ScriptEnv(boolean isServer, HashMap<String, Player> players,
-			GameMap map, HashMap<String, Entity> entities) {
-		super();
-		ContextFactory.initGlobal(new SandboxContextFactory());
-		this.scriptMap = new HashMap<>();
-		this.allowDb = isServer;
-		this.map = map;
-		this.entities = entities;
-		this.players = players;
-		Context cx = Context.enter();
-
-		cx.setClassShutter(new ScriptClassShutter());
-		Scriptable scope = cx.initStandardObjects();
-		cx.evaluateString(scope, "obj={run(): function(){print(\"foo123\");}}"
-				+ "\r\n r=new java.lang.Runnable(obj);"
-				+ "return r", "foo",; //$NON-NLS-1$
-				1, null);
-		Object r=scope.get("r", scope);
-		Runnable ru=(Runnable) r;
-	}
+	
 
 	public static class SandboxWrapFactory extends WrapFactory {
 		@Override
@@ -92,8 +66,6 @@ public class ScriptEnv {
 			return super.get(name, start);
 		}
 	}
-	public static void main(String[] args) {
-		new ScriptEnv(false, null, null, null);
-	}
+	
 
 }

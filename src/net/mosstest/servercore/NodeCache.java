@@ -61,7 +61,7 @@ public class NodeCache {
 			MapChunk ourChunk = null;
 			ourChunk = chunks.get(pos).get();
 			if (ourChunk == null)
-				ClientManager.getNetworkingManager().sendChunkRequest(pos);
+				ClientManager.getApplicationLevelNetworkingManager().sendChunkRequest(pos);
 
 			return ourChunk;
 
