@@ -12,17 +12,16 @@ import net.mosstest.servercore.MossEvent.EvtType;
 
 /**
  * 
- * @author rarkenin, hexafraction 
+ * @author rarkenin, hexafraction
  * 
- * Blargh.
+ *         Blargh.
  * 
- *  This is a nasty thread pool. 
- *  If you don't understand threading or Java well,
- *  you may want to stick to only accessing the queue as otherwise asphyxiation,
- *  drowning, or chlorine poisoning may occur. 
- *  USE ACCESS METHODS OTHER THAN THE QUEUE AT YOUR OWN RISK.
- *  Oh, and this code is so fluffy you may be bludgeoned to death by way of a
- *  pillow if not careful.
+ *         This is a nasty thread pool. If you don't understand threading or
+ *         Java well, you may want to stick to only accessing the queue as
+ *         otherwise asphyxiation, drowning, or chlorine poisoning may occur.
+ *         USE ACCESS METHODS OTHER THAN THE QUEUE AT YOUR OWN RISK. Oh, and
+ *         this code is so fluffy you may be bludgeoned to death by way of a
+ *         pillow if not careful.
  * 
  */
 public class EventProcessor {
@@ -44,10 +43,10 @@ public class EventProcessor {
 			"eventQueueTuneSamples", 100);
 	private static Thread manager = new Thread(eventProcessorGroup,
 			new Runnable() {
-		/**
-		 * 
-		 * The manager. Controls the thread number.
-		 */
+				/**
+				 * 
+				 * The manager. Controls the thread number.
+				 */
 				@Override
 				public void run() {
 
@@ -103,20 +102,11 @@ public class EventProcessor {
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) downshift / (float) samples)) {
 								System.out.println(("Stopping one thread"));
-								eventQueue
-										.add(new MossEvent(
-												MossEvent.EvtType.EVT_THREADSTOP,
-												null,
-												0,
-												0,
-												0,
-												null,
-												null,
-												null,
-												null,
-												null,
-												0, null,
-												new ScriptSandboxBorderToken(84, EventProcessor.class)));
+								eventQueue.add(new MossEvent(
+										MossEvent.EvtType.EVT_THREADSTOP, null,
+										0, 0, 0, null, null, null, null, null,
+										0, null, new ScriptSandboxBorderToken(
+												84, EventProcessor.class)));
 
 							}
 							ticks = 0;
@@ -143,7 +133,8 @@ public class EventProcessor {
 						return;
 					ArrayList<MossEventHandler> evtHandlerList = MossScriptEnv
 							.getHandlers(myEvent.type,
-									new ScriptSandboxBorderToken(84, EventProcessor.class));
+									new ScriptSandboxBorderToken(84,
+											EventProcessor.class));
 					try {
 						for (MossEventHandler ourHandler : evtHandlerList) {
 							ourHandler.processEvent(myEvent);

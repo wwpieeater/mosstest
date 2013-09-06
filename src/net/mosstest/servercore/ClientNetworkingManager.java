@@ -17,6 +17,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ClientNetworkingManager {
+	// There's a potential DoS attack here but it can only be mounted by the
+	// server, so you might as well just not use that server. No security
+	// threat, won't fix.
 	protected AtomicBoolean runThreads = new AtomicBoolean(true);
 	protected Socket bulkDataSocket = new Socket();
 	protected Socket lowLatencyStreamSocket = new Socket();
@@ -26,7 +29,7 @@ public class ClientNetworkingManager {
 	protected DataInputStream bulkDataIn;
 	protected DataInputStream lowlatencyDataIn;
 	protected boolean udpOn = false;
-	protected volatile boolean fastLinkAckd = false;
+	protected AtomicBoolean fastLinkAckd = new AtomicBoolean(false);
 	protected final InetAddress endpoint;
 	protected int port;
 	protected AtomicLong lastBulkOut = new AtomicLong();
@@ -66,7 +69,7 @@ public class ClientNetworkingManager {
 
 					ClientNetworkingManager.this.bulkStreamIn.read(buf);
 					if (commandId == 254) {
-						ClientNetworkingManager.this.fastLinkAckd = true; //This can't be thread-safe.
+						ClientNetworkingManager.this.fastLinkAckd.set(true); 
 						sendPacketLowLatency(254, buf);
 						sendPacketUdp(254, buf, true);
 						continue recvLoop;
@@ -247,16 +250,17 @@ public class ClientNetworkingManager {
 	 * @param latencyPrio
 	 * @throws IOException
 	 */
-	protected void sendPacket(int commandId, byte[] payload, boolean needsFast,
-			boolean needsAck) throws IOException {
-		if (needsFast) {
-			if ((payload.length < 250) && this.udpOn)
-				sendPacketUdp(commandId, payload, needsAck);
+	protected void sendPacket(MossNetPacket p) throws IOException {
+		if(this.partyQuenched.get()&&!p.isImportant) return;
+		
+		if (p.needsFast) {
+			if ((p.payload.length < 250) && this.udpOn)
+				sendPacketUdp(p.commandId, p.payload, p.needsAck);
 			else {
-				sendPacketLowLatency(commandId, payload);
+				sendPacketLowLatency(p.commandId, p.payload);
 			}
 		} else
-			sendPacketDefault(commandId, payload);
+			sendPacketDefault(p.commandId, p.payload);
 
 	}
 
@@ -308,7 +312,7 @@ public class ClientNetworkingManager {
 
 	protected void sendPacketLowLatency(int commandId, byte[] payload)
 			throws IOException {
-		if (!this.fastLinkAckd) {
+		if (!this.fastLinkAckd.get()) {
 			sendPacketDefault(commandId, payload);
 		} else {
 			this.lastFastOut.set(System.currentTimeMillis());
@@ -373,8 +377,7 @@ public class ClientNetworkingManager {
 			while (ClientNetworkingManager.this.runThreads.get()) {
 				try {
 					MossNetPacket p = ClientNetworkingManager.this.sendQueue.take();
-					ClientNetworkingManager.this.sendPacket(p.commandId,
-							p.payload, p.needsFast, p.needsAck);
+					ClientNetworkingManager.this.sendPacket(p);
 				} catch (InterruptedException | IOException e) {
 					// superfluous exception
 				}
