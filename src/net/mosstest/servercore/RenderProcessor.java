@@ -3,6 +3,8 @@ package net.mosstest.servercore;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import jme3tools.optimize.GeometryBatchFactory;
+
 import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
@@ -21,10 +23,11 @@ import com.jme3.scene.Node;
 import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
+import java.util.Arrays;
 public class RenderProcessor extends SimpleApplication {
 	
-	private Random rand = new Random();
-	private float speed = (float) 0.001;
+	private float speed = (float) 0.1;
+	private final float blockSize = (float)15;
 	private float[] locChanges = {0,0,0};
 	private boolean invertY = false;
 	private Vector3f initialUpVec;
@@ -33,8 +36,6 @@ public class RenderProcessor extends SimpleApplication {
 	public static ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 	
-	private Position testPosition = new Position (0,0,0,0);
-	private MapChunk testChunk = new MapChunk (testPosition, null, null);
 	
 	@Override
 	public void simpleUpdate (float tpf) {
@@ -46,19 +47,38 @@ public class RenderProcessor extends SimpleApplication {
 			System.out.println("Thread shutting down");
 		}
 		else if (myEvent instanceof MossRenderChunkEvent) {
-			System.out.println("RENDERING CHUNK");
-			float x = (float)rand.nextInt(2);
-			float y = (float)rand.nextInt(2);
-			float z = (float)rand.nextInt(2);
-			Vector3f loc = new Vector3f (x, y, z);
+			int x = ((MossRenderChunkEvent) myEvent).getX();
+			int y = ((MossRenderChunkEvent) myEvent).getY();
+			int z = ((MossRenderChunkEvent) myEvent).getZ();
 			
-			Box b = new Box(loc, 1, 1, 1); // create cube shape
-		    Geometry geom = new Geometry("Box", b);
-		    Material mat = new Material(assetManager,
-		    "Common/MatDefs/Misc/Unshaded.j3md");
-		    mat.setColor("Color", ColorRGBA.Blue);
-		    geom.setMaterial(mat);
-		    worldNode.attachChild(geom);
+			Vector3f home = new Vector3f (x, y, z);
+			
+			
+			for(byte i=0; i<16; i++) { //x
+				for(byte j=0; j<1; j++) { //y
+					for(byte k=0; k<16; k++) { //z
+						int nVal = ((MossRenderChunkEvent) myEvent).getNodeId(i, j, k);
+						
+						switch (nVal) {
+						case 0: break;
+						case 1:
+							Vector3f loc = new Vector3f(home.x+i*(blockSize), home.y-j*(blockSize)-40, home.z+k*(blockSize));
+							Box b = new Box(loc, blockSize, blockSize, blockSize);
+						    Geometry geom = new Geometry("Box", b);
+						    Material mat = new Material(assetManager,
+						    "Common/MatDefs/Misc/Unshaded.j3md");
+						    mat.setColor("Color", ColorRGBA.Blue);
+						    geom.setMaterial(mat);
+						    worldNode.attachChild(geom);
+						    break;
+						}
+						
+					}
+				}
+			}
+			
+			System.out.println("FINISHED MAKING BOXES");
+			
 		}
 			//Add more events
 	}
@@ -80,11 +100,40 @@ public class RenderProcessor extends SimpleApplication {
 		// TODO Auto-generated method stub
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
-		renderEventQueue.add(new MossRenderChunkEvent());
+		testChunkEvents();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
 		
+	}
+	
+	public void testChunkEvents () {
+		for(int i=0; i<3; i++) {
+			for(int j=0; j<3; j++) {
+				Position pos = new Position(-16+(i*8), 0, -16+(j*8), 0);
+				boolean[][][] testModified = new boolean[16][16][16];
+				for(boolean[][] l1 : testModified) {
+					for(boolean[] l2 : l1) {
+						Arrays.fill(l2, false);
+					}
+				}
+				
+				int[][][] testNodes = new int[16][16][16];
+				for(int[][] l1 : testNodes) {
+					for(int[] l2 : l1) {
+						Arrays.fill(l2, 1);
+					}
+				}
+				
+				testNodes[0][0][0] = 0;
+				testNodes[0][0][1] = 0;
+				
+				MapChunk ch = new MapChunk(pos, testNodes, testModified);
+				MossRenderChunkEvent evt = new MossRenderChunkEvent (ch);
+				renderEventQueue.add(evt);
+			}
+		}
+		GeometryBatchFactory.optimize(worldNode);
 	}
 	
 	private void moveWorld(float cx, float cy, float cz) {
@@ -125,7 +174,7 @@ public class RenderProcessor extends SimpleApplication {
 	private ActionListener actionListener = new ActionListener() {
 	    public void onAction(String name, boolean keyPressed, float tpf) {
 	    	if (name.equals("Test") && !keyPressed) {
-	    		renderEventQueue.add(new MossRenderChunkEvent());
+	    		//renderEventQueue.add(testEvent2);
 	    	}
 	    	if (name.equals("Left") && keyPressed) {locChanges[0] = speed;} //On key down
 	    	else if (name.equals("Left") && !keyPressed && locChanges[0] == speed) {locChanges[0] = 0;} //on key up
@@ -151,7 +200,7 @@ public class RenderProcessor extends SimpleApplication {
 		}
 	};
 	private void initKeyBindings () {
-		//inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_P));
+		inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_P));
 		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
 		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
@@ -169,7 +218,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addMapping("CAM_Down", new MouseAxisTrigger(MouseInput.AXIS_Y, true),
 		                new KeyTrigger(KeyInput.KEY_DOWN));
 		
-		//inputManager.addListener(actionListener, "Test");
+		inputManager.addListener(actionListener, "Test");
 		inputManager.addListener(actionListener, "Left");
 		inputManager.addListener(actionListener, "Right");
 		inputManager.addListener(actionListener, "Forward");

@@ -82,6 +82,7 @@ public class MapChunk {
 	}
 
 	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
+		pos = pos2;
 		lightNodes = nodes;
 		this.modified = modified;
 	}
@@ -104,5 +105,4 @@ public class MapChunk {
 		
 		return bos.toByteArray();
 	}
-
 }
