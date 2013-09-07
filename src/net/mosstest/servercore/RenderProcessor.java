@@ -13,7 +13,10 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
+import com.jme3.light.AmbientLight;
+import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
+import com.jme3.math.FastMath;
 import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
@@ -33,6 +36,7 @@ public class RenderProcessor extends SimpleApplication {
 	private Vector3f initialUpVec;
 	protected float rotationSpeed = 1f;
 	private Node worldNode;
+	private SpotLight spot = new SpotLight();
 	public static ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 	
@@ -66,8 +70,10 @@ public class RenderProcessor extends SimpleApplication {
 							Box b = new Box(loc, blockSize, blockSize, blockSize);
 						    Geometry geom = new Geometry("Box", b);
 						    Material mat = new Material(assetManager,
-						    "Common/MatDefs/Misc/Unshaded.j3md");
-						    mat.setColor("Color", ColorRGBA.Blue);
+						    "Common/MatDefs/Light/Lighting.j3md");
+						    mat.setBoolean("UseMaterialColors",true);
+						    mat.setColor("Ambient", ColorRGBA.Green);
+						    mat.setColor("Diffuse", ColorRGBA.Green);
 						    geom.setMaterial(mat);
 						    worldNode.attachChild(geom);
 						    break;
@@ -76,7 +82,10 @@ public class RenderProcessor extends SimpleApplication {
 					}
 				}
 			}
-			
+			/*AmbientLight al = new AmbientLight();
+			al.setColor(ColorRGBA.White.mult(1.3f));
+			rootNode.addLight(al);
+			*/
 			System.out.println("FINISHED MAKING BOXES");
 			
 		}
@@ -100,6 +109,13 @@ public class RenderProcessor extends SimpleApplication {
 		// TODO Auto-generated method stub
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
+		spot.setSpotRange(150f);                           // distance
+		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD); // inner light cone (central beam)
+		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD); // outer light cone (edge of the light)
+		spot.setColor(ColorRGBA.White.mult(3f));         // light color
+		spot.setPosition(cam.getLocation());               // shine from camera loc
+		spot.setDirection(cam.getDirection());             // shine forward from camera loc
+		rootNode.addLight(spot);
 		testChunkEvents();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
@@ -108,8 +124,8 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	
 	public void testChunkEvents () {
-		for(int i=0; i<3; i++) {
-			for(int j=0; j<3; j++) {
+		for(int i=0; i<2; i++) {
+			for(int j=0; j<2; j++) {
 				Position pos = new Position(-16+(i*8), 0, -16+(j*8), 0);
 				boolean[][][] testModified = new boolean[16][16][16];
 				for(boolean[][] l1 : testModified) {
@@ -169,6 +185,8 @@ public class RenderProcessor extends SimpleApplication {
         q.normalizeLocal();
 
         cam.setAxes(q);
+        
+        spot.setDirection(cam.getDirection());
     }
 	
 	private ActionListener actionListener = new ActionListener() {
