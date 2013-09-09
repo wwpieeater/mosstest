@@ -6,6 +6,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Arrays;
 
 public class MapChunk {
 	Position pos;
@@ -27,7 +28,7 @@ public class MapChunk {
 	 */
 	public MapChunk(Position pos, byte[] light) throws IOException {
 		this.pos = pos;
-		this.light = light;
+		this.light = Arrays.copyOf(light, light.length);
 		DataInputStream lightStreamIn = new DataInputStream(
 				new ByteArrayInputStream(light));
 		int flags = lightStreamIn.readUnsignedShort();
@@ -82,9 +83,9 @@ public class MapChunk {
 	}
 
 	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
-		pos = pos2;
-		lightNodes = nodes;
-		this.modified = modified;
+		this.pos=pos2;
+		lightNodes = Arrays.copyOf(nodes, nodes.length);
+		this.modified = Arrays.copyOf(modified, modified.length);
 	}
 
 	public int getNodeId(byte x, byte y, byte z) {

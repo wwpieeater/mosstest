@@ -1,34 +1,43 @@
 package net.mosstest.servercore;
 
-import net.mosstest.scripting.EventProcessingCompletedSignal;
+import net.mosstest.scripting.NodeParams;
 
 public class MapNode {
 	short nodeId = 0;
 	public final NodeParams nodeparams;
-	private final GenericTexture textureSpace;
+	private final String[] textureSpace;
 	public String nodeName;
 	public String userFacingName;
 	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
-	public MapNode(NodeParams nodeparams, GenericTexture textureSpace,
-			String nodeName, String userFacingName, boolean isLiquid,
-			int lightEmission) throws MossWorldLoadException {
+
+	public MapNode(NodeParams nodeparams, String[] tex, String nodeName,
+			String userFacingName, boolean isLiquid, int lightEmission) {
 		this.nodeparams = nodeparams;
-		this.textureSpace = textureSpace;
+		this.textureSpace = tex;
 		this.nodeName = nodeName;
-		for (int i = 0; i < nodeName.length(); i++) {
+
+		try {
 			nodeId = NodeManager.putNode(this);
+		} catch (MossWorldLoadException e) {
+
 		}
+
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
 	}
 
-	public MapNode(GenericTexture textureSpace, String nodeName,
+	public MapNode(String [] tex, String nodeName,
 			String userFacingName, boolean isLiquid, int lightEmission) {
 		this.nodeparams = getDefaultParams();
-		this.textureSpace = textureSpace;
+		this.textureSpace = tex;
+		try {
+			nodeId = NodeManager.putNode(this);
+		} catch (MossWorldLoadException e) {
+
+		}
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
@@ -37,7 +46,6 @@ public class MapNode {
 
 	private static NodeParams getDefaultParams() {
 		return new NodeParams() {
-
 
 			@Override
 			public boolean onStepOn(Player player, NodePosition pos) {
@@ -59,8 +67,8 @@ public class MapNode {
 			}
 
 			@Override
-			public void onPlaceNextTo(Player player,
-					NodePosition target, NodePosition placed) {
+			public void onPlaceNextTo(Player player, NodePosition target,
+					NodePosition placed) {
 				return;
 			}
 
@@ -100,11 +108,6 @@ public class MapNode {
 				// TODO Auto-generated method stub
 				return 0.125;
 			}
-
-			
-
-		
-
 
 			@Override
 			public double calcFallDamage(Player player, double height) {

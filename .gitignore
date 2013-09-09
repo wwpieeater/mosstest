@@ -19,3 +19,4 @@
 *.dll
 *.exe
 *.so
+.DS_Store

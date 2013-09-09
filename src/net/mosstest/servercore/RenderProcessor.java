@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -33,6 +34,7 @@ public class RenderProcessor extends SimpleApplication {
 	private final float blockSize = (float)15;
 	private float[] locChanges = {0,0,0};
 	private boolean invertY = false;
+	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, MapChunk> ();
 	private Vector3f initialUpVec;
 	protected float rotationSpeed = 1f;
 	private Node worldNode;

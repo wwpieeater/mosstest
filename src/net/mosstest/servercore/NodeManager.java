@@ -2,19 +2,18 @@ package net.mosstest.servercore;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.TreeMap;
 
 public class NodeManager {
 	private static ArrayList<MapNode> definedNodes = new ArrayList<>();
 	private static HashMap<String, MapNode> defNodeByName = new HashMap<>();
 
 	static MapNode getNode(short nodeId) {
-		return definedNodes.get(new Short(nodeId));
+		return definedNodes.get(nodeId);
 	}
 
 	static short putNode(MapNode node) throws MossWorldLoadException {
 		if (definedNodes.size() > 16384)
-			throw new MossWorldLoadException("Too many nodedefs");
+			throw new MossWorldLoadException("Too many nodedefs"); //$NON-NLS-1$
 		if (!definedNodes.contains(node)) {
 			node.nodeId = (short) definedNodes.size();
 			definedNodes.add(node);

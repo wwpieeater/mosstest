@@ -1,7 +1,12 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
-import net.mosstest.scripting.EventProcessingCompletedSignal;
-import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.servercore.Face;
+import net.mosstest.servercore.GenericTool;
+import net.mosstest.servercore.NodePosition;
+import net.mosstest.servercore.Player;
+
+
+
 
 /**
  * Interface to specify handlers to be called when various actions are taken by

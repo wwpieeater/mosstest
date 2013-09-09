@@ -290,7 +290,7 @@ public class MossScriptEnv {
 			throws SecurityException {
 		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
 			throw new SecurityException(
-					"Attempt to access controlled resources in the script DMZ.");
+					"Attempt to access controlled resources in the script DMZ."); //$NON-NLS-1$
 		return registeredScriptEvents.get(type);
 	}
 
@@ -407,9 +407,18 @@ public class MossScriptEnv {
 		// TODO stub
 		return null;
 	}
+	public static MapNode registerNode(String sysname, String userFacingName, NodeParams params, String[] textures, boolean isLiquid, int light) {
+		MapNode nd=new MapNode(params, textures, sysname, userFacingName,isLiquid, light);
+		return nd;
+	}
+	
+	public static MapNode registerNodeDefParams(String sysname, String userFacingName, String[] textures, boolean isLiquid, int light) {
+		MapNode nd=new MapNode(textures, sysname, userFacingName, isLiquid, light);
+		return nd;
+	}
 
 	public static ItemStack[] getInventory(MossInventory inv) {
-		return null;
+		return new ItemStack[] {};
 		// TODO
 	}
 
@@ -427,6 +436,9 @@ public class MossScriptEnv {
 
 	public static MapNode getNodeByName(String name) {
 		return null;
+	}
+	public static void includeScript(String name) {
+		//TODO
 	}
 
 }
