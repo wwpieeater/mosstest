@@ -15,8 +15,7 @@ public class MossTest {
 		Options options=new Options();
 		options.addOption("server", false, "Run as standalone server");
 		options.addOption("port", true, "Port number to use");
-		options.addOption("disable-udp", false, "Disable use of UDP");
-		options.addOption("only-udp", false, "Only use UDP");
+
 		
 		
 	}

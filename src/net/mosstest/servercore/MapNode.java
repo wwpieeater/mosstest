@@ -117,12 +117,4 @@ public class MapNode {
 		};
 	}
 
-	public void draw(DrawableWorld world, NodePosition pos) {
-		world.addBlockMesh(this, pos);
-	}
-
-	public ItemStack getDrop() {
-		// TODO Auto-generated method stub
-		return new ItemStack(dropItem, 1);
-	}
 }

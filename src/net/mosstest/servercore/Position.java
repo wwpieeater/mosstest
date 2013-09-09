@@ -67,10 +67,13 @@ public class Position {
 
 	@Override
 	public int hashCode() {
-		return Integer.reverseBytes(x) ^ Integer.reverseBytes(y)
-				^ Integer.reverseBytes(z);
-		// Needs to be better
-
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + realm;
+		result = prime * result + x;
+		result = prime * result + y;
+		result = prime * result + z;
+		return result;
 	}
 
 	public byte[] toBytes() {
