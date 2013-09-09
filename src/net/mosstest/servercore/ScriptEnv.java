@@ -21,7 +21,7 @@ import org.mozilla.javascript.*;
  * @author rarkenin
  */
 public class ScriptEnv {
-	
+
 	private static class ScriptClassShutter implements ClassShutter {
 		public ScriptClassShutter() {
 
@@ -48,11 +48,11 @@ public class ScriptEnv {
 	 * access to the database, and gameplay data, without access to
 	 * authentication data. These scripts have access to
 	 * <code>Hashmap&lt;String, Object&gt;</code>-style maps used for extended
-	 * custom attributes, and may access java.lang, java.util, java.awt.geom,
-	 * javax.crypto, java.math, java.text via {@link UtilityClassSandbox}(which
-	 * internally uses reflection to obtain classes). Via an ACL, certain
-	 * classes may be blocked or replaced with limited versions thereof. At the
-	 * time of writing, this feature is incomplete and will use a limited ACL.
+	 * custom attributes, and may access various API classes via
+	 * {@link net.mosstest.scripting.JavaApi JavaApi}(which internally uses
+	 * reflection to obtain classes). Via an ACL, certain classes may be blocked
+	 * or replaced with limited versions thereof. At the time of writing, this
+	 * feature is incomplete and will use a limited ACL.
 	 * 
 	 * @param script
 	 *            A string representing the script to run
@@ -62,7 +62,7 @@ public class ScriptEnv {
 	public static ScriptResult runScript(String script) {
 		return null;
 	}
-	
+
 	public static Future<ScriptResult> runScriptAsync(String script) {
 		return new Future<ScriptEnv.ScriptResult>() {
 
@@ -100,7 +100,7 @@ public class ScriptEnv {
 			}
 		};
 	}
-	
+
 	public static ScriptResult runScriptSuper(String script) {
 		return null;
 	}

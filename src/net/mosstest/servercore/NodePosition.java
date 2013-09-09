@@ -6,12 +6,13 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-public class NodePosition extends Position {
+public class NodePosition {
 	byte xl, yl, zl;
+	Position chunk;
 
 	public NodePosition(int x, int y, int z, int realm, byte xl, byte yl,
 			byte zl) {
-		super(x, y, z, realm);
+		chunk = new Position(x, y, z, realm);
 		this.xl = xl;
 		this.yl = yl;
 		this.zl = zl;
@@ -21,14 +22,23 @@ public class NodePosition extends Position {
 		super();
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bis);
-		this.x = dis.readInt();
-		this.y = dis.readInt();
-		this.z = dis.readInt();
-		this.realm = dis.readInt();
+		this.chunk = new Position(dis.readInt(), dis.readInt(), dis.readInt(),
+				dis.readInt());
 		this.xl = dis.readByte();
 		this.yl = dis.readByte();
 		this.zl = dis.readByte();
-		this.isValid = true;
+		// this.isValid = true;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((chunk == null) ? 0 : chunk.hashCode());
+		result = prime * result + xl;
+		result = prime * result + yl;
+		result = prime * result + zl;
+		return result;
 	}
 
 	@Override
@@ -38,52 +48,37 @@ public class NodePosition extends Position {
 		}
 		if (obj == null) {
 			return false;
-		} 
+		}
 		if (!(obj instanceof NodePosition)) {
 			return false;
 		}
 		NodePosition other = (NodePosition) obj;
-		
-		if (this.realm != other.realm) {
+		if (chunk == null) {
+			if (other.chunk != null) {
+				return false;
+			}
+		} else if (!chunk.equals(other.chunk)) {
 			return false;
 		}
-		if (this.x != other.x) {
+		if (xl != other.xl) {
 			return false;
 		}
-		if (this.y != other.y) {
+		if (yl != other.yl) {
 			return false;
 		}
-		if (this.z != other.z) {
-			return false;
-		}
-		if (this.xl != other.xl) {
-			return false;
-		}
-		if (this.yl != other.yl) {
-			return false;
-		}
-		if (this.zl != other.zl) {
+		if (zl != other.zl) {
 			return false;
 		}
 		return true;
 	}
 
-	@Override
-	public int hashCode() {
-		return Integer.reverseBytes(this.x) ^ Integer.reverseBytes(this.y)
-				^ Integer.reverseBytes(this.z);
-		// Needs to be better
-
-	}
+	
 
 	public byte[] toBytes() {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 		try {
-			dos.writeInt(this.x);
-			dos.writeInt(this.y);
-			dos.writeInt(this.z);
-			dos.writeInt(this.realm);
+			bos.write(chunk.toBytes());
 			dos.writeByte(this.xl);
 			dos.writeByte(this.yl);
 			dos.writeByte(this.zl);
@@ -91,8 +86,8 @@ public class NodePosition extends Position {
 			bos.flush();
 			return bos.toByteArray();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			this.isValid = false;
+			// Auto-generated catch block
+			
 		}
 		return new byte[] {};
 	}
