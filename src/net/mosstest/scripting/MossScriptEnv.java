@@ -422,11 +422,11 @@ public class MossScriptEnv {
 		// TODO
 	}
 
-	public static MossInventory getInvByName(String name) {
+	public static MossInventory getInvByName(Player player, String name) {
 		return null;
 	}
 
-	public static MossInventory createInvByName(String name) {
+	public static MossInventory createInvByName(Player p, String name) {
 		return null;
 	}
 
