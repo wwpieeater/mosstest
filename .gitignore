@@ -19,4 +19,5 @@
 *.dll
 *.exe
 *.so
+COMMIT_EDITMSG
 .DS_Store
