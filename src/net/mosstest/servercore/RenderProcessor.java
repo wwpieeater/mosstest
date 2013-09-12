@@ -31,19 +31,22 @@ import java.util.Arrays;
 public class RenderProcessor extends SimpleApplication {
 	
 	private float speed = (float) 0.1;
-	private final float blockSize = (float)15;
+	private final float blockSize = 15f;
 	private float[] locChanges = {0,0,0};
 	private boolean invertY = false;
-	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, MapChunk> ();
+	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk> ();
 	private Vector3f initialUpVec;
-	protected float rotationSpeed = 1f;
+	private float rotationSpeed = 1f;
 	private Node worldNode;
 	private SpotLight spot = new SpotLight();
-	public static ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
-			24000, false);
+	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(24000, false);
 	
 	
 	@Override
+	/**
+	 * Constant running loop that's built into SimpleApplication.
+	 * Looks for new events in the renderEventQueue, moves if necessary.
+	 */
 	public void simpleUpdate (float tpf) {
 		moveWorld(locChanges[0], locChanges[1], locChanges[2]);
 		
@@ -69,14 +72,13 @@ public class RenderProcessor extends SimpleApplication {
 						case 0: break;
 						case 1:
 							Vector3f loc = new Vector3f(home.x+i*(blockSize), home.y-j*(blockSize)-40, home.z+k*(blockSize));
-							Box b = new Box(loc, blockSize, blockSize, blockSize);
-						    Geometry geom = new Geometry("Box", b);
 						    Material mat = new Material(assetManager,
 						    "Common/MatDefs/Light/Lighting.j3md");
 						    mat.setBoolean("UseMaterialColors",true);
 						    mat.setColor("Ambient", ColorRGBA.Green);
 						    mat.setColor("Diffuse", ColorRGBA.Green);
-						    geom.setMaterial(mat);
+						    
+						    RenderNode geom = new RenderNode (mat, loc, blockSize, /*NodeManager.getNode((short) nVal)*/ null);
 						    worldNode.attachChild(geom);
 						    break;
 						}
@@ -84,16 +86,19 @@ public class RenderProcessor extends SimpleApplication {
 					}
 				}
 			}
-			/*AmbientLight al = new AmbientLight();
-			al.setColor(ColorRGBA.White.mult(1.3f));
-			rootNode.addLight(al);
-			*/
-			System.out.println("FINISHED MAKING BOXES");
 			
 		}
 			//Add more events
 	}
-	public static void init () { //This and the main method are simply temporary.  Need to keep a testing environment in here.
+	
+	/**
+	 * Temporary
+	 * Allows the rendering processor to run independently 
+	 */
+	public static void main (String [] args) {
+		RenderProcessor.init();
+	}
+	public static void init () {
 		RenderProcessor app = new RenderProcessor ();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
@@ -102,21 +107,20 @@ public class RenderProcessor extends SimpleApplication {
 		app.setShowSettings(false);
 		app.start();
 	}
-	public static void main (String [] args) {
-		//Temporary
-		RenderProcessor.init();
-	}
+	
+	/**
+	 * Starting everything up
+	 */
 	@Override
 	public void simpleInitApp() {
-		// TODO Auto-generated method stub
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
-		spot.setSpotRange(150f);                           // distance
-		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD); // inner light cone (central beam)
-		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD); // outer light cone (edge of the light)
-		spot.setColor(ColorRGBA.White.mult(3f));         // light color
-		spot.setPosition(cam.getLocation());               // shine from camera loc
-		spot.setDirection(cam.getDirection());             // shine forward from camera loc
+		spot.setSpotRange(150f);
+		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD); 
+		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
+		spot.setColor(ColorRGBA.White.mult(3f)); 
+		spot.setPosition(cam.getLocation());
+		spot.setDirection(cam.getDirection()); 
 		rootNode.addLight(spot);
 		testChunkEvents();
 		flyCam.setEnabled(false);
@@ -125,6 +129,9 @@ public class RenderProcessor extends SimpleApplication {
 		
 	}
 	
+	/**
+	 * Temporary testing method that just loads chunks into the renderEventQueue
+	 */
 	public void testChunkEvents () {
 		for(int i=0; i<2; i++) {
 			for(int j=0; j<2; j++) {
@@ -154,21 +161,29 @@ public class RenderProcessor extends SimpleApplication {
 		GeometryBatchFactory.optimize(worldNode);
 	}
 	
+	
+	/**
+	 * Looks for changes in position, moves in direction of camera.
+	 * @param cx change in x
+	 * @param cy change in y
+	 * @param cz change in z
+	 */
 	private void moveWorld(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
 				cam.getDirection().z);
 	
-		worldNode
-				.setLocalTranslation(worldNode
+		worldNode.setLocalTranslation(worldNode
 						.getLocalTranslation()
 						.addLocal(
-								new Vector3f(-cz * transVector.x, 0f, -cz
-										* transVector.y))
+								new Vector3f(-cz * transVector.x, 0f, -cz* transVector.y))
 						.addLocal(-cx * transVector.y, 0, cx * transVector.x));
-
 	}
 	
+	
+	/**
+	 * Runs when the mouse moves to look around.
+	 */
 	private void rotateCamera(float value, Vector3f axis){
 
         Matrix3f mat = new Matrix3f();
@@ -191,34 +206,10 @@ public class RenderProcessor extends SimpleApplication {
         spot.setDirection(cam.getDirection());
     }
 	
-	private ActionListener actionListener = new ActionListener() {
-	    public void onAction(String name, boolean keyPressed, float tpf) {
-	    	if (name.equals("Test") && !keyPressed) {
-	    		//renderEventQueue.add(testEvent2);
-	    	}
-	    	if (name.equals("Left") && keyPressed) {locChanges[0] = speed;} //On key down
-	    	else if (name.equals("Left") && !keyPressed && locChanges[0] == speed) {locChanges[0] = 0;} //on key up
-	    	
-	    	if (name.equals("Right") && keyPressed) {locChanges[0] = -speed;} //On key down
-	    	else if (name.equals("Right") && !keyPressed && locChanges[0] == -speed) {locChanges[0] = 0;} //on key up
-	    	
-	    	if (name.equals("Forward") && keyPressed) {locChanges[2] = speed;} //On key down
-	    	else if (name.equals("Forward") && !keyPressed && locChanges[2] == speed) {locChanges[2] = 0;} //on key up
-	    	
-	    	if (name.equals("Back") && keyPressed) {locChanges[2] = -speed;} //On key down
-	    	else if (name.equals("Back") && !keyPressed && locChanges[2] == -speed) {locChanges[2] = 0;} //on key up
-	    	
-	    	
-	    }
-	};
-	private AnalogListener analogListener = new AnalogListener () {
-		public void onAnalog (String name, float value, float tpf) {
-			if (name.equals("CAM_Left")){rotateCamera(value, initialUpVec);}
-		   	else if (name.equals("CAM_Right")){rotateCamera(-value, initialUpVec);}
-		       else if (name.equals("CAM_Up")){rotateCamera(-value * (invertY ? -1 : 1), cam.getLeft());}
-		   	else if (name.equals("CAM_Down")){rotateCamera(value * (invertY ? -1 : 1), cam.getLeft());}
-		}
-	};
+	
+	/**
+	 * Set up key bindings and event listeners for key bindings
+	 */
 	private void initKeyBindings () {
 		inputManager.addMapping("Test", new KeyTrigger(KeyInput.KEY_P));
 		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
@@ -246,7 +237,33 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addListener(analogListener, "CAM_Left");
 		inputManager.addListener(analogListener, "CAM_Right");
 		inputManager.addListener(analogListener, "CAM_Up");
-		inputManager.addListener(analogListener, "CAM_Down");
-		
+		inputManager.addListener(analogListener, "CAM_Down");	
 	}
+	private AnalogListener analogListener = new AnalogListener () {
+
+		public void onAnalog (String name, float value, float tpf) {
+			if (name.equals("CAM_Left")){rotateCamera(value, initialUpVec);}
+		   	else if (name.equals("CAM_Right")){rotateCamera(-value, initialUpVec);}
+		       else if (name.equals("CAM_Up")){rotateCamera(-value * (invertY ? -1 : 1), cam.getLeft());}
+		   	else if (name.equals("CAM_Down")){rotateCamera(value * (invertY ? -1 : 1), cam.getLeft());}
+		}
+	};
+	private ActionListener actionListener = new ActionListener() {
+	    public void onAction(String name, boolean keyPressed, float tpf) {
+	    	if (name.equals("Test") && !keyPressed) {
+	    		//renderEventQueue.add(testEvent2);
+	    	}
+	    	if (name.equals("Left") && keyPressed) {locChanges[0] = speed;}
+	    	else if (name.equals("Left") && !keyPressed && locChanges[0] == speed) {locChanges[0] = 0;}
+	    	
+	    	if (name.equals("Right") && keyPressed) {locChanges[0] = -speed;}
+	    	else if (name.equals("Right") && !keyPressed && locChanges[0] == -speed) {locChanges[0] = 0;}
+	    	
+	    	if (name.equals("Forward") && keyPressed) {locChanges[2] = speed;}
+	    	else if (name.equals("Forward") && !keyPressed && locChanges[2] == speed) {locChanges[2] = 0;}
+	    	
+	    	if (name.equals("Back") && keyPressed) {locChanges[2] = -speed;}
+	    	else if (name.equals("Back") && !keyPressed && locChanges[2] == -speed) {locChanges[2] = 0;}
+	    }
+	};
 }
