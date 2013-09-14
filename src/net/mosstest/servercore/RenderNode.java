@@ -10,7 +10,7 @@ public class RenderNode extends Geometry {
 	MapNode definition;
 	
 	public RenderNode (Material mat, Vector3f loc, float blockSize, MapNode def) {
-		super("Box", new Box(loc, blockSize, blockSize/2, blockSize));
+		super("Box", new Box(loc, blockSize/2, blockSize/2, blockSize/2));
 		super.setMaterial(mat);
 		definition = def;
 	}

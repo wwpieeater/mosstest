@@ -24,7 +24,7 @@ import com.jme3.math.ColorRGBA;
 import java.util.Arrays;
 public class RenderProcessor extends SimpleApplication {
 	
-	private float speed = (float) 0.1;
+	private float speed = (float) 0.5;
 	private final float blockSize = 15f;
 	private float[] locChanges = {0,0,0};
 	private boolean invertY = false;
@@ -61,17 +61,11 @@ public class RenderProcessor extends SimpleApplication {
 				for(byte j=0; j<1; j++) {
 					for(byte k=0; k<16; k++) {
 						int nVal = ((MossRenderChunkEvent) myEvent).getNodeId(i, j, k);
-						
+						Material mat = getMaterial((short)nVal);
 						switch (nVal) {
-						case 0: break;
+						case 0: System.out.println("NOPE"); break;
 						case 1:
 							Vector3f loc = new Vector3f(home.x+i*(blockSize), home.y-j*(blockSize)-40, home.z+k*(blockSize));
-						    Material mat = new Material(assetManager,
-						    "Common/MatDefs/Light/Lighting.j3md");
-						    mat.setBoolean("UseMaterialColors",true);
-						    mat.setColor("Ambient", ColorRGBA.Green);
-						    mat.setColor("Diffuse", ColorRGBA.Green);
-						    
 						    RenderNode geom = new RenderNode (mat, loc, blockSize, /*NodeManager.getNode((short) nVal)*/ null);
 						    nodesInChunk[i][j][k] = geom;
 						    worldNode.attachChild(geom);
@@ -91,20 +85,111 @@ public class RenderProcessor extends SimpleApplication {
 			int y = ((MossNodeAddEvent) myEvent).getY();
 			int z = ((MossNodeAddEvent) myEvent).getZ();
 			Position pos = ((MossNodeAddEvent) myEvent).getPosition();
-			MapNode def = ((MossNodeAddEvent) myEvent).getDef();
-			Material mat = new Material(assetManager,
+
+			short defRef = ((MossNodeAddEvent) myEvent).getDef();
+			MapNode def = /*NodeManager.getNode(defRef);*/null;
+			Material mat = getMaterial(defRef);
+			allChunks.get(pos).addNode(def, mat, blockSize, x, y, z);
+			Vector3f loc = allChunks.get(pos).getNodeLoc(x, y, z, blockSize); 
+			RenderNode geom = new RenderNode (mat, loc, blockSize, def);
+			worldNode.attachChild(geom);
+			System.out.println("ADDED A NODE");
+		}
+			//Add more events
+	}
+	
+	/**
+	 * Temporary testing method that just loads chunks into the renderEventQueue
+	 */
+	public void testChunkEvents () {
+		Position pos = null;
+		for(int i=0; i<2; i++) {
+			for(int j=0; j<2; j++) {
+				pos = new Position(-16+(i*8), 0, -16+(j*8), 0);
+				boolean[][][] testModified = new boolean[16][16][16];
+				for(boolean[][] l1 : testModified) {
+					for(boolean[] l2 : l1) {
+						Arrays.fill(l2, false);
+					}
+				}
+				
+				int[][][] testNodes = new int[16][16][16];
+				for(int[][] l1 : testNodes) {
+					for(int[] l2 : l1) {
+						Arrays.fill(l2, 1);
+					}
+				}
+				
+				testNodes[0][0][0] = 0;
+				//testNodes[0][0][1] = 0;
+				testNodes[0][0][2] = 0;
+				//testNodes[0][0][3] = 0;
+				testNodes[0][0][4] = 0;
+				
+				MapChunk ch = new MapChunk(pos, testNodes, testModified);
+				MossRenderChunkEvent evt = new MossRenderChunkEvent (ch);
+				renderEventQueue.add(evt);
+			}
+		}
+		renderEventQueue.add(new MossNodeAddEvent(0, 0, 2, new Position(-16, 0, -16, 0), (short) 1));
+		GeometryBatchFactory.optimize(worldNode);
+	}
+	public Material getMaterial (short nVal) {
+		Material mat = null;
+		switch(nVal) {
+		case 1:
+			mat = new Material(assetManager,
 				    "Common/MatDefs/Light/Lighting.j3md");
 				    mat.setBoolean("UseMaterialColors",true);
 				    mat.setColor("Ambient", ColorRGBA.Green);
 				    mat.setColor("Diffuse", ColorRGBA.Green);
-			allChunks.get(pos).addNode(def, mat, blockSize, x, y, z);
-			Vector3f loc = allChunks.get(pos).getNodeLoc(x, y, z, blockSize); 
-			
-			RenderNode geom = new RenderNode (mat, loc, blockSize, def);
-			worldNode.attachChild(geom);
 		}
-			//Add more events
+		return mat;
 	}
+	
+	/**
+	 * Looks for changes in position, moves in direction of camera.
+	 * @param cx change in x
+	 * @param cy change in y
+	 * @param cz change in z
+	 */
+	private void moveWorld(float cx, float cy, float cz) {
+
+		Vector2f transVector = new Vector2f(cam.getDirection().x,
+				cam.getDirection().z);
+	
+		worldNode.setLocalTranslation(worldNode
+						.getLocalTranslation()
+						.addLocal(
+								new Vector3f(-cz * transVector.x, 0f, -cz* transVector.y))
+						.addLocal(-cx * transVector.y, 0, cx * transVector.x));
+	}
+	
+	/**
+	 * Runs when the mouse moves to look around.
+	 */
+	private void rotateCamera(float value, Vector3f axis){
+
+        Matrix3f mat = new Matrix3f();
+        mat.fromAngleNormalAxis(rotationSpeed * value, axis);
+
+        Vector3f up = cam.getUp();
+        Vector3f left = cam.getLeft();
+        Vector3f dir = cam.getDirection();
+
+        mat.mult(up, up);
+        mat.mult(left, left);
+        mat.mult(dir, dir);
+
+        Quaternion q = new Quaternion();
+        q.fromAxes(left, up, dir);
+        q.normalizeLocal();
+
+        cam.setAxes(q);
+        
+        spot.setDirection(cam.getDirection());
+    }
+	
 	
 	/**
 	 * Temporary
@@ -143,84 +228,6 @@ public class RenderProcessor extends SimpleApplication {
 		initKeyBindings();
 		
 	}
-	
-	/**
-	 * Temporary testing method that just loads chunks into the renderEventQueue
-	 */
-	public void testChunkEvents () {
-		for(int i=0; i<2; i++) {
-			for(int j=0; j<2; j++) {
-				Position pos = new Position(-16+(i*8), 0, -16+(j*8), 0);
-				boolean[][][] testModified = new boolean[16][16][16];
-				for(boolean[][] l1 : testModified) {
-					for(boolean[] l2 : l1) {
-						Arrays.fill(l2, false);
-					}
-				}
-				
-				int[][][] testNodes = new int[16][16][16];
-				for(int[][] l1 : testNodes) {
-					for(int[] l2 : l1) {
-						Arrays.fill(l2, 1);
-					}
-				}
-				
-				testNodes[0][0][0] = 0;
-				testNodes[0][0][1] = 0;
-				
-				MapChunk ch = new MapChunk(pos, testNodes, testModified);
-				MossRenderChunkEvent evt = new MossRenderChunkEvent (ch);
-				renderEventQueue.add(evt);
-			}
-		}
-		GeometryBatchFactory.optimize(worldNode);
-	}
-	
-	
-	/**
-	 * Looks for changes in position, moves in direction of camera.
-	 * @param cx change in x
-	 * @param cy change in y
-	 * @param cz change in z
-	 */
-	private void moveWorld(float cx, float cy, float cz) {
-
-		Vector2f transVector = new Vector2f(cam.getDirection().x,
-				cam.getDirection().z);
-	
-		worldNode.setLocalTranslation(worldNode
-						.getLocalTranslation()
-						.addLocal(
-								new Vector3f(-cz * transVector.x, 0f, -cz* transVector.y))
-						.addLocal(-cx * transVector.y, 0, cx * transVector.x));
-	}
-	
-	
-	/**
-	 * Runs when the mouse moves to look around.
-	 */
-	private void rotateCamera(float value, Vector3f axis){
-
-        Matrix3f mat = new Matrix3f();
-        mat.fromAngleNormalAxis(rotationSpeed * value, axis);
-
-        Vector3f up = cam.getUp();
-        Vector3f left = cam.getLeft();
-        Vector3f dir = cam.getDirection();
-
-        mat.mult(up, up);
-        mat.mult(left, left);
-        mat.mult(dir, dir);
-
-        Quaternion q = new Quaternion();
-        q.fromAxes(left, up, dir);
-        q.normalizeLocal();
-
-        cam.setAxes(q);
-        
-        spot.setDirection(cam.getDirection());
-    }
-	
 	
 	/**
 	 * Set up key bindings and event listeners for key bindings
