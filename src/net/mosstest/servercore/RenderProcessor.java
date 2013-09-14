@@ -82,9 +82,26 @@ public class RenderProcessor extends SimpleApplication {
 				}
 			}
 			
-			RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk);
+			RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
 			allChunks.put(((MossRenderChunkEvent) myEvent).getPos(), thisChunk);
 			
+		}
+		else if (myEvent instanceof MossNodeAddEvent) {
+			int x = ((MossNodeAddEvent) myEvent).getX();
+			int y = ((MossNodeAddEvent) myEvent).getY();
+			int z = ((MossNodeAddEvent) myEvent).getZ();
+			Position pos = ((MossNodeAddEvent) myEvent).getPosition();
+			MapNode def = ((MossNodeAddEvent) myEvent).getDef();
+			Material mat = new Material(assetManager,
+				    "Common/MatDefs/Light/Lighting.j3md");
+				    mat.setBoolean("UseMaterialColors",true);
+				    mat.setColor("Ambient", ColorRGBA.Green);
+				    mat.setColor("Diffuse", ColorRGBA.Green);
+			allChunks.get(pos).addNode(def, mat, blockSize, x, y, z);
+			Vector3f loc = allChunks.get(pos).getNodeLoc(x, y, z, blockSize); 
+			
+			RenderNode geom = new RenderNode (mat, loc, blockSize, def);
+			worldNode.attachChild(geom);
 		}
 			//Add more events
 	}
