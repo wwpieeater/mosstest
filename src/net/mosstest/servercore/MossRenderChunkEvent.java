@@ -2,27 +2,28 @@ package net.mosstest.servercore;
 
 public class MossRenderChunkEvent extends MossRenderEvent {
 	private MapChunk myChunk;
-	private int x;
-	private int y;
-	private int z;
+	private Position myPos;
 	public MossRenderChunkEvent (MapChunk ch) {
 		myChunk = ch;
-		x = ch.pos.x;
-		y = ch.pos.y;
-		z = ch.pos.z;
+		myPos = ch.pos;
 	}
 	
 	public int getX () {
-		return x;
+		return myPos.x;
 	}
 	public int getY() {
-		return y;
+		return myPos.y;
 	}
 	public int getZ() {
-		return z;
+		return myPos.z;
+	}
+	
+	public Position getPos () {
+		return myPos;
 	}
 	
 	public int getNodeId (byte x, byte y, byte z) {
 		return myChunk.getNodeId(x, y, z);
 	}
 }
+ 

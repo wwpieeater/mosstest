@@ -1,12 +1,9 @@
 package net.mosstest.servercore;
 
 import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import jme3tools.optimize.GeometryBatchFactory;
-
-import com.jme3.app.Application;
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -14,7 +11,6 @@ import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
-import com.jme3.light.AmbientLight;
 import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.FastMath;
@@ -22,9 +18,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
-import com.jme3.scene.Geometry;
 import com.jme3.scene.Node;
-import com.jme3.scene.shape.Box;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 import java.util.Arrays;
@@ -61,11 +55,11 @@ public class RenderProcessor extends SimpleApplication {
 			int z = ((MossRenderChunkEvent) myEvent).getZ();
 			
 			Vector3f home = new Vector3f (x, y, z);
+			RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 			
-			
-			for(byte i=0; i<16; i++) { //x
-				for(byte j=0; j<1; j++) { //y
-					for(byte k=0; k<16; k++) { //z
+			for(byte i=0; i<16; i++) {
+				for(byte j=0; j<1; j++) {
+					for(byte k=0; k<16; k++) {
 						int nVal = ((MossRenderChunkEvent) myEvent).getNodeId(i, j, k);
 						
 						switch (nVal) {
@@ -79,6 +73,7 @@ public class RenderProcessor extends SimpleApplication {
 						    mat.setColor("Diffuse", ColorRGBA.Green);
 						    
 						    RenderNode geom = new RenderNode (mat, loc, blockSize, /*NodeManager.getNode((short) nVal)*/ null);
+						    nodesInChunk[i][j][k] = geom;
 						    worldNode.attachChild(geom);
 						    break;
 						}
@@ -86,6 +81,9 @@ public class RenderProcessor extends SimpleApplication {
 					}
 				}
 			}
+			
+			RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk);
+			allChunks.put(((MossRenderChunkEvent) myEvent).getPos(), thisChunk);
 			
 		}
 			//Add more events
