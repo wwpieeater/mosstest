@@ -15,7 +15,7 @@ public class MapChunk {
 	private byte[] heavy;
 	boolean[][][] modified = new boolean[16][16][16];
 	boolean compressed;
-
+	transient MapDatabase db;
 	static final int MAPCHUNK_SERIALIZATION_VERSION = 1;
 
 	/*
@@ -26,7 +26,9 @@ public class MapChunk {
 	 * the start of a new node/run 1: This is repeating a *changed* node. Next
 	 * short value identifies node type
 	 */
-	public MapChunk(Position pos, byte[] light) throws IOException {
+	public MapChunk(Position pos, byte[] light, MapDatabase db)
+			throws IOException {
+		this.db = db;
 		this.pos = pos;
 		this.light = Arrays.copyOf(light, light.length);
 		DataInputStream lightStreamIn = new DataInputStream(
@@ -40,8 +42,8 @@ public class MapChunk {
 		 * flags short: 1=has heavies 2=none yet 4=run-length diff compression
 		 * (not implemented yet) 8...=reserved
 		 */
-		if (((flags & 0x01)) != 0){
-			this.heavy = MapDatabase.getHeavy(pos);
+		if (((flags & 0x01)) != 0) {
+			this.heavy = db.getHeavy(pos);
 			loadHeavies();
 		}
 		this.compressed = (((flags & 0x04)) != 0);
@@ -78,11 +80,11 @@ public class MapChunk {
 
 	private void loadHeavies() {
 		// TODO Heavies not here yet
-		
+
 	}
 
 	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
-		this.pos=pos2;
+		this.pos = pos2;
 		lightNodes = Arrays.copyOf(nodes, nodes.length);
 		this.modified = Arrays.copyOf(modified, modified.length);
 	}
@@ -90,19 +92,19 @@ public class MapChunk {
 	public int getNodeId(byte x, byte y, byte z) {
 		return lightNodes[x][y][z];
 	}
-	
-	public byte[] writeLight(boolean compressed){
-		
-		ByteArrayOutputStream bos=new ByteArrayOutputStream();
-		
-		try (DataOutputStream dos=new DataOutputStream(bos);) {
+
+	public byte[] writeLight(boolean compressed) {
+
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+
+		try (DataOutputStream dos = new DataOutputStream(bos);) {
 			dos.writeShort(13);
 			dos.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return bos.toByteArray();
 	}
 

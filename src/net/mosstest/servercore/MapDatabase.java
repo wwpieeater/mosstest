@@ -14,12 +14,12 @@ import static org.fusesource.leveldbjni.JniDBFactory.*;
 import java.io.*;
 
 public class MapDatabase {
-	static DB map;
-	static DB entities;
-	static DB metadata;
-	static DB mapHeavies;
-	static DB landclaims;
-	public static void init(String name, boolean create)
+	DB map;
+	DB entities;
+	DB metadata;
+	DB mapHeavies;
+	DB landclaims;
+	public MapDatabase(String name, boolean create)
 			throws MapDatabaseException, MossWorldLoadException {
 		if (!name.matches("^[A-Z[a-z[0-9[ ]]]]+$")) {
 			throw new MossWorldLoadException(
@@ -42,7 +42,7 @@ public class MapDatabase {
 
 	}
 
-	public static void close() throws  MapDatabaseException {
+	public void close() throws  MapDatabaseException {
 		try {
 			map.close();
 			entities.close();
@@ -52,13 +52,13 @@ public class MapDatabase {
 		}
 	}
 
-	public static MapChunk getChunk(final Position pos)
+	public MapChunk getChunk(final Position pos)
 			{
 		
 		byte[] chunk=map.get(pos.toBytes());
 		if(chunk==null) return MapGenerator.generateChunk(pos);
 		try {
-			return new MapChunk(pos, chunk);
+			return new MapChunk(pos, chunk, this);
 		} catch (IOException e) {
 			ExceptionHandler.registerException(e);
 			return null;
@@ -72,12 +72,12 @@ public class MapDatabase {
 	 * @throws MapDatabaseException
 	 */
 
-	static void addMapChunk(Position pos, MapChunk mapChunk) {
+	void addMapChunk(Position pos, MapChunk mapChunk) {
 		map.put(pos.toBytes(),mapChunk.writeLight(true));
 
 	}
 
-	public static byte[] getHeavy(Position pos) {
+	public byte[] getHeavy(Position pos) {
 		return mapHeavies.get(pos.toBytes());
 	}
 
