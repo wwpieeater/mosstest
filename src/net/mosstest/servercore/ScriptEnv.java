@@ -8,6 +8,9 @@ import java.util.concurrent.TimeoutException;
 
 import javax.script.Invocable;
 
+import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.scripting.ScriptableDatabase;
+
 import org.mozilla.javascript.*;
 
 /**
@@ -36,8 +39,8 @@ public class ScriptEnv {
 		}
 	}
 
-	private HashMap<String, Script> scriptMap = new HashMap<>();
-	private boolean localDb;
+
+	private ScriptableDatabase localDb;
 
 	public enum ScriptResult {
 		RESULT_EXECUTED, RESULT_EXECUTNG_BACKGROUND, RESULT_ERROR, RESULT_SECURITY_EXCEPTION, RESULT_SECURITY_ELEVATABLE
@@ -59,11 +62,11 @@ public class ScriptEnv {
 	 * @return A {@link ScriptEnv.ScriptResult} constant representing the
 	 *         result.
 	 */
-	public static ScriptResult runScript(String script) {
+	public ScriptResult runScript(MossScript script) {
 		return null;
 	}
 
-	public static Future<ScriptResult> runScriptAsync(String script) {
+	public Future<ScriptResult> runScriptAsync(MossScript script) {
 		return new Future<ScriptEnv.ScriptResult>() {
 
 			@Override
@@ -101,25 +104,36 @@ public class ScriptEnv {
 		};
 	}
 
-	public static ScriptResult runScriptSuper(String script) {
+	public ScriptResult runScriptSuper(MossScript script) {
 		return null;
 	}
 
-	private static class SandboxWrapFactory extends WrapFactory {
+	protected static class SandboxWrapFactory extends WrapFactory {
 		@Override
 		public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
-				Object javaObject, Class staticType) {
+				Object javaObject, Class<?> staticType) {
 			return new SandboxNativeJavaObject(scope, javaObject, staticType);
 		}
 	}
 
-	private static class SandboxContextFactory extends ContextFactory {
+	protected static class SandboxContextFactory extends ContextFactory {
+		
 		@Override
 		protected Context makeContext() {
 			Context cx = super.makeContext();
+			cx.setClassShutter(new ScriptClassShutter());
 			cx.setWrapFactory(new SandboxWrapFactory());
 			return cx;
 		}
+	}
+
+	private Context cx;
+
+	public ScriptEnv(MossScriptEnv ev) {
+		ContextFactory.initGlobal(new SandboxContextFactory());
+		this.cx = ContextFactory.getGlobal().enterContext();
+		ScriptableObject globalScope=this.cx.initStandardObjects();
+		globalScope.put("moss", globalScope, ev);
 	}
 
 	public static class SandboxNativeJavaObject extends NativeJavaObject {
@@ -127,13 +141,13 @@ public class ScriptEnv {
 		private static final long serialVersionUID = 4829780635666396547L;
 
 		public SandboxNativeJavaObject(Scriptable scope, Object javaObject,
-				Class staticType) {
+				Class<?> staticType) {
 			super(scope, javaObject, staticType);
 		}
 
 		@Override
 		public Object get(String name, Scriptable start) {
-			if (name.equals("getClass")) {
+			if (name.equals("getClass")) { //$NON-NLS-1$
 				return NOT_FOUND;
 			}
 

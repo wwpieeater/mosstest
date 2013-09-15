@@ -19,21 +19,23 @@ public class MapDatabase {
 	DB metadata;
 	DB mapHeavies;
 	DB landclaims;
-	public MapDatabase(String name, boolean create)
-			throws MapDatabaseException, MossWorldLoadException {
-		if (!name.matches("^[A-Z[a-z[0-9[ ]]]]+$")) {
-			throw new MossWorldLoadException(
-					"World name contains invalid characters");
-		}
+	DB players;
 
+	public MapDatabase(File basedir) throws MapDatabaseException,
+			MossWorldLoadException {
+		File dbDir=new File(basedir, "db");
+		dbDir.mkdirs();
 		try {
 			Options options = new Options();
 			options.createIfMissing(true);
-			map = factory.open(new File("worlds/" + name + "/map.db"), options);
-			mapHeavies=factory.open(new File("worlds/" + name + "/mapHeavies.db"), options);
-			entities = factory.open(new File("worlds/" + name + "/entities.db"),
+			this.map = factory.open(new File(dbDir, "map.db"), options);
+			this.mapHeavies = factory.open(new File(dbDir, "mapHeavies.db"),
 					options);
-			metadata = factory.open(new File("worlds/" + name + "/metadata.db"),
+			this.entities = factory.open(new File(dbDir, "entities.db"),
+					options);
+			this.metadata = factory.open(new File(dbDir, "metadata.db"),
+					options);
+			this.players = factory.open(new File(dbDir, "players.db"),
 					options);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,21 +44,24 @@ public class MapDatabase {
 
 	}
 
-	public void close() throws  MapDatabaseException {
+	public void close() throws MapDatabaseException {
 		try {
-			map.close();
-			entities.close();
-			metadata.close();
+			this.map.close();
+			this.entities.close();
+			this.metadata.close();
 		} catch (IOException e) {
-			throw new MapDatabaseException(MapDatabaseException.SEVERITY_UNKNOWN|MapDatabaseException.SEVERITY_FATAL_TRANSIENT, "Database shutdown failed!");
+			throw new MapDatabaseException(
+					MapDatabaseException.SEVERITY_UNKNOWN
+							| MapDatabaseException.SEVERITY_FATAL_TRANSIENT,
+					"Database shutdown failed!");
 		}
 	}
 
-	public MapChunk getChunk(final Position pos)
-			{
-		
-		byte[] chunk=map.get(pos.toBytes());
-		if(chunk==null) return MapGenerator.generateChunk(pos);
+	public MapChunk getChunk(final Position pos) {
+
+		byte[] chunk = this.map.get(pos.toBytes());
+		if (chunk == null)
+			return MapGenerator.generateChunk(pos);
 		try {
 			return new MapChunk(pos, chunk, this);
 		} catch (IOException e) {
@@ -73,14 +78,12 @@ public class MapDatabase {
 	 */
 
 	void addMapChunk(Position pos, MapChunk mapChunk) {
-		map.put(pos.toBytes(),mapChunk.writeLight(true));
+		this.map.put(pos.toBytes(), mapChunk.writeLight(true));
 
 	}
 
 	public byte[] getHeavy(Position pos) {
-		return mapHeavies.get(pos.toBytes());
+		return this.mapHeavies.get(pos.toBytes());
 	}
-
-
 
 }

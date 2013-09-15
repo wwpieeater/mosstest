@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 
 import net.mosstest.servercore.Entity;
+import net.mosstest.servercore.EventProcessor;
 import net.mosstest.servercore.ItemStack;
 import net.mosstest.servercore.MapNode;
 import net.mosstest.servercore.MossEvent;
 import net.mosstest.servercore.MossInventory;
+import net.mosstest.servercore.NodeCache;
 import net.mosstest.servercore.NodePosition;
 import net.mosstest.servercore.Player;
 import net.mosstest.servercore.Position;
@@ -47,9 +49,10 @@ public class MossScriptEnv {
 	 * CLASS THAT SCRIPTS CAN ACCESS. MAKE ALL FIELDS AND METHODS PRIVATE UNLESS
 	 * IT IS INTENDED TO FACE UNTRUSTED SCRIPTS.
 	 */
-	private static EnumMap<MossEvent.EvtType, ArrayList<MossEventHandler>> registeredScriptEvents = new EnumMap<>(
+	private EnumMap<MossEvent.EvtType, ArrayList<MossEventHandler>> registeredScriptEvents = new EnumMap<>(
 			MossEvent.EvtType.class);
-
+	private ScriptableDatabase db;
+	private NodeCache nc;
 	/**
 	 * Registers an event hander to fire on a player death. This will be run in
 	 * the event processor thread pool. The default handler shall respawn the
@@ -58,8 +61,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnDieplayer(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_DIEPLAYER).add(r);
+	void registerOnDieplayer(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_DIEPLAYER).add(r);
 	}
 
 	/**
@@ -70,8 +73,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnDignode(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_DIGNODE).add(r);
+	void registerOnDignode(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_DIGNODE).add(r);
 	}
 
 	/**
@@ -83,8 +86,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnGenerate(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_GENERATE).add(r);
+	void registerOnGenerate(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_GENERATE).add(r);
 	}
 
 	/**
@@ -98,8 +101,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnJoinplayer(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_JOINPLAYER).add(r);
+	void registerOnJoinplayer(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_JOINPLAYER).add(r);
 	}
 
 	/**
@@ -112,8 +115,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnQuitplayer(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_QUITPLAYER).add(r);
+	void registerOnQuitplayer(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_QUITPLAYER).add(r);
 	}
 
 	/**
@@ -127,8 +130,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnNewplayer(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_NEWPLAYER).add(r);
+	void registerOnNewplayer(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_NEWPLAYER).add(r);
 	}
 
 	/**
@@ -139,8 +142,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnPlacenode(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_PLACENODE).add(r);
+	void registerOnPlacenode(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_PLACENODE).add(r);
 	}
 
 	/**
@@ -153,8 +156,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnFspecOpen(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_OPEN).add(r);
+	void registerOnFspecOpen(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_OPEN).add(r);
 	}
 
 	/**
@@ -166,8 +169,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnFspecSubmit(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_SUBMIT).add(r);
+	void registerOnFspecSubmit(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_SUBMIT).add(r);
 	}
 
 	/**
@@ -178,8 +181,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnInvAction(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_INVACTION)
+	void registerOnInvAction(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_FSPEC_INVACTION)
 				.add(r);
 	}
 
@@ -190,8 +193,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnEntityPunch(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_ENTITY_PUNCH).add(r);
+	void registerOnEntityPunch(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_ENTITY_PUNCH).add(r);
 	}
 
 	/**
@@ -202,8 +205,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnPlayerDamage(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_PLAYERDAMAGE).add(r);
+	void registerOnPlayerDamage(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_PLAYERDAMAGE).add(r);
 	}
 
 	/**
@@ -214,8 +217,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnEntityDeath(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_ENTITY_DEATH).add(r);
+	void registerOnEntityDeath(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_ENTITY_DEATH).add(r);
 	}
 
 	/**
@@ -226,8 +229,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnChatMessage(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_CHATMESSAGE).add(r);
+	void registerOnChatMessage(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_CHATMESSAGE).add(r);
 	}
 
 	/**
@@ -243,8 +246,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnShutdown(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_SHUTDOWN).add(r);
+	void registerOnShutdown(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_SHUTDOWN).add(r);
 	}
 
 	/**
@@ -256,8 +259,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnChatCommand(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_CHATCOMMAND).add(r);
+	void registerOnChatCommand(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_CHATCOMMAND).add(r);
 	}
 
 	/**
@@ -267,8 +270,8 @@ public class MossScriptEnv {
 	 * @param r
 	 *            The event handler to register.
 	 */
-	static void registerOnNodeMove(MossEventHandler r) {
-		registeredScriptEvents.get(MossEvent.EvtType.EVT_NODEMOVE).add(r);
+	void registerOnNodeMove(MossEventHandler r) {
+		this.registeredScriptEvents.get(MossEvent.EvtType.EVT_NODEMOVE).add(r);
 	}
 
 	/**
@@ -285,13 +288,12 @@ public class MossScriptEnv {
 	 * @return An {@link ArrayList} of {@link MossEventHandler} objects.
 	 * @throws SecurityException
 	 */
-	public static ArrayList<MossEventHandler> getHandlers(
-			MossEvent.EvtType type, ScriptSandboxBorderToken tok)
-			throws SecurityException {
+	public ArrayList<MossEventHandler> getHandlers(MossEvent.EvtType type,
+			ScriptSandboxBorderToken tok) throws SecurityException {
 		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
 			throw new SecurityException(
 					"Attempt to access controlled resources in the script DMZ."); //$NON-NLS-1$
-		return registeredScriptEvents.get(type);
+		return this.registeredScriptEvents.get(type);
 	}
 
 	/**
@@ -311,8 +313,7 @@ public class MossScriptEnv {
 	 *            A string representing the message that shall be sent to the
 	 *            specified recipient.
 	 */
-	public static void sendChatMessage(Player recipient, Player from,
-			String message) {
+	public void sendChatMessage(Player recipient, Player from, String message) {
 		// TODO
 	}
 
@@ -329,7 +330,7 @@ public class MossScriptEnv {
 	 *            A string representing the message that shall be sent to the
 	 *            specified recipient.
 	 */
-	public static void sendChatAll(Player from, String message) {
+	public void sendChatAll(Player from, String message) {
 		// TODO
 	}
 
@@ -342,7 +343,7 @@ public class MossScriptEnv {
 	 *            An integer representing the amount of health to set, from 0 to
 	 *            {@link Entity#maxHealth()}.
 	 */
-	public static void setHp(Entity ent, int health) {
+	public void setHp(Entity ent, int health) {
 		// TODO Once we have players doing stuff
 	}
 
@@ -357,8 +358,7 @@ public class MossScriptEnv {
 	 * @throws MossScriptException
 	 *             Thrown if the current tool cannot be used to dig the node.
 	 */
-	public static void damageTool(Player actor, MapNode nd)
-			throws MossScriptException {
+	public void damageTool(Player actor, MapNode nd) throws MossScriptException {
 		// TODO Auto-generated method stub
 
 	}
@@ -374,7 +374,7 @@ public class MossScriptEnv {
 	 * @return True if the item could be added, false if the item could not be
 	 *         added due to insufficient space.
 	 */
-	public static boolean givePlayer(Player player, ItemStack item) {
+	public boolean givePlayer(Player player, ItemStack item) {
 		return false;
 	}
 
@@ -388,7 +388,7 @@ public class MossScriptEnv {
 	 * @param node
 	 *            The node to place at that position.
 	 */
-	public static void setNode(NodePosition pos, MapNode node) {
+	public void setNode(NodePosition pos, MapNode node) {
 		// TODO stub
 	}
 
@@ -399,46 +399,60 @@ public class MossScriptEnv {
 	 * @param pos
 	 *            The position at which to remove the node.
 	 */
-	public static void removeNode(NodePosition pos) {
+	public void removeNode(NodePosition pos) {
 		// TODO stub
 	}
 
-	public static MapNode getNode(Position pos) {
+	public MapNode getNode(Position pos) {
 		// TODO stub
 		return null;
 	}
-	public static MapNode registerNode(String sysname, String userFacingName, NodeParams params, String[] textures, boolean isLiquid, int light) {
-		MapNode nd=new MapNode(params, textures, sysname, userFacingName,isLiquid, light);
-		return nd;
-	}
-	
-	public static MapNode registerNodeDefParams(String sysname, String userFacingName, String[] textures, boolean isLiquid, int light) {
-		MapNode nd=new MapNode(textures, sysname, userFacingName, isLiquid, light);
+
+	public MapNode registerNode(String sysname, String userFacingName,
+			NodeParams params, String[] textures, boolean isLiquid, int light) {
+		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
+				isLiquid, light);
 		return nd;
 	}
 
-	public static ItemStack[] getInventory(MossInventory inv) {
+	public MapNode registerNodeDefParams(String sysname, String userFacingName,
+			String[] textures, boolean isLiquid, int light) {
+		MapNode nd = new MapNode(textures, sysname, userFacingName, isLiquid,
+				light);
+		return nd;
+	}
+
+	public ItemStack[] getInventory(MossInventory inv) {
 		return new ItemStack[] {};
 		// TODO
 	}
 
-	public static MossInventory getInvByName(Player player, String name) {
+	public MossInventory getInvByName(Player player, String name) {
 		return null;
 	}
 
-	public static MossInventory createInvByName(Player p, String name) {
+	public MossInventory createInvByName(Player p, String name) {
 		return null;
 	}
 
-	public static Player getPlayerByName(String name) {
+	public Player getPlayerByName(String name) {
 		return null;
 	}
 
-	public static MapNode getNodeByName(String name) {
+	public MapNode getNodeByName(String name) {
 		return null;
 	}
-	public static void includeScript(String name) {
-		//TODO
+
+	
+
+	public ScriptableDatabase getDb() {
+		return db;
 	}
+
+	public MossScriptEnv(ScriptableDatabase db, NodeCache nc) {
+		this.db = db;
+		this.nc = nc;
+	}
+
 
 }
