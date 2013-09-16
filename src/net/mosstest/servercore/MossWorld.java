@@ -2,6 +2,7 @@ package net.mosstest.servercore;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
@@ -18,7 +19,6 @@ public class MossWorld {
 	private NodeCache nc;
 	private MossScriptEnv mossEnv;
 	private ScriptEnv sEnv;
-	private RenderPreparator rp;
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
 	@SuppressWarnings("nls")
@@ -51,10 +51,14 @@ public class MossWorld {
 					"An error has occured when opening the database. It is likely inaccessible, on a full disk, or corrupt.");
 		}
 		this.nc = new NodeCache(this.db);
-		this.rp = new RenderPreparator(this.nc);
+		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.mossEnv=new MossScriptEnv(this.sdb, this.nc);
-		
-		//CRITICAL to run all game scripts here.
-		this.evp = new EventProcessor(mossEnv);
+		this.sEnv = new ScriptEnv(this.mossEnv);
+		ArrayList<MossScript> scripts=this.game.getScripts();
+		for(MossScript sc: scripts) {
+			this.sEnv.runScript(sc);
+		}
+		this.evp = new EventProcessor(this.mossEnv);
+		evp.hashCode(); //keep builder from throwing a frivolous warning
 	}
 }

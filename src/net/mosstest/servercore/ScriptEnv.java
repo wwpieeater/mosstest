@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -24,7 +25,7 @@ import org.mozilla.javascript.*;
  * @author rarkenin
  */
 public class ScriptEnv {
-
+	ScriptableObject globalScope;
 	private static class ScriptClassShutter implements ClassShutter {
 		public ScriptClassShutter() {
 
@@ -63,7 +64,14 @@ public class ScriptEnv {
 	 *         result.
 	 */
 	public ScriptResult runScript(MossScript script) {
-		return null;
+		try {
+			this.cx.evaluateReader(globalScope, script.getReader(), script.file.toString(), 0, null);
+		} catch (IOException e) {
+			return ScriptResult.RESULT_ERROR;
+		} catch (MossWorldLoadException e) {
+			return ScriptResult.RESULT_ERROR;
+		}
+		return ScriptResult.RESULT_EXECUTED;
 	}
 
 	public Future<ScriptResult> runScriptAsync(MossScript script) {
@@ -132,7 +140,7 @@ public class ScriptEnv {
 	public ScriptEnv(MossScriptEnv ev) {
 		ContextFactory.initGlobal(new SandboxContextFactory());
 		this.cx = ContextFactory.getGlobal().enterContext();
-		ScriptableObject globalScope=this.cx.initStandardObjects();
+		globalScope=this.cx.initStandardObjects();
 		globalScope.put("moss", globalScope, ev);
 	}
 
