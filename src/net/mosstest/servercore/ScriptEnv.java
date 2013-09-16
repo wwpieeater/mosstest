@@ -26,6 +26,7 @@ import org.mozilla.javascript.*;
  */
 public class ScriptEnv {
 	ScriptableObject globalScope;
+
 	private static class ScriptClassShutter implements ClassShutter {
 		public ScriptClassShutter() {
 
@@ -39,7 +40,6 @@ public class ScriptEnv {
 				return false;
 		}
 	}
-
 
 	private ScriptableDatabase localDb;
 
@@ -63,58 +63,21 @@ public class ScriptEnv {
 	 * @return A {@link ScriptEnv.ScriptResult} constant representing the
 	 *         result.
 	 */
-	public ScriptResult runScript(MossScript script) {
+	public ScriptResult runScript(MossScript script) throws MossWorldLoadException{
 		try {
-			this.cx.evaluateReader(globalScope, script.getReader(), script.file.toString(), 0, null);
+			this.cx.evaluateReader(globalScope, script.getReader(),
+					script.file.toString(), 0, null);
 		} catch (IOException e) {
 			return ScriptResult.RESULT_ERROR;
-		} catch (MossWorldLoadException e) {
-			return ScriptResult.RESULT_ERROR;
+		} catch (RhinoException e) {
+			throw new MossWorldLoadException("Script error has occured. Wrapped exception: \r\n"+e.getMessage()+"\r\n"+e.getScriptStackTrace()); //$NON-NLS-1$
 		}
 		return ScriptResult.RESULT_EXECUTED;
 	}
 
-	public Future<ScriptResult> runScriptAsync(MossScript script) {
-		return new Future<ScriptEnv.ScriptResult>() {
+	
 
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public ScriptResult get() throws InterruptedException,
-					ExecutionException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public ScriptResult get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException,
-					TimeoutException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		};
-	}
-
-	public ScriptResult runScriptSuper(MossScript script) {
-		return null;
-	}
+	
 
 	protected static class SandboxWrapFactory extends WrapFactory {
 		@Override
@@ -125,7 +88,7 @@ public class ScriptEnv {
 	}
 
 	protected static class SandboxContextFactory extends ContextFactory {
-		
+
 		@Override
 		protected Context makeContext() {
 			Context cx = super.makeContext();
@@ -140,7 +103,7 @@ public class ScriptEnv {
 	public ScriptEnv(MossScriptEnv ev) {
 		ContextFactory.initGlobal(new SandboxContextFactory());
 		this.cx = ContextFactory.getGlobal().enterContext();
-		globalScope=this.cx.initStandardObjects();
+		globalScope = this.cx.initStandardObjects();
 		globalScope.put("moss", globalScope, ev);
 	}
 

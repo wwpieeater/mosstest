@@ -19,14 +19,14 @@ public class MossGame {
 			throw new MossWorldLoadException("Game directory or configuration file not found.");
 		}
 		try {
-			this.gameCfg=new XMLConfiguration(cfgFile);
+			this.gameCfg=new XMLConfiguration(this.cfgFile);
 		} catch (ConfigurationException e) {
 			throw new MossWorldLoadException("Error in loading the configuration file.");
 		}
-		scripts=new ArrayList<>();
+		this.scripts=new ArrayList<>();
 		String[] scNames=this.gameCfg.getStringArray("plugins");
 		for(String scName: scNames) {
-			scripts.add(new MossScript(new File("data/scripts"), scName));
+			this.scripts.add(new MossScript(new File("data/scripts"), scName));
 		}
 	}
 	private File baseDir;
@@ -34,6 +34,6 @@ public class MossGame {
 	private File cfgFile;
 	private ArrayList<MossScript> scripts;
 	public ArrayList<MossScript> getScripts() {
-		return scripts;
+		return this.scripts;
 	}
 }

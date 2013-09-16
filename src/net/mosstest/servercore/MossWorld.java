@@ -21,8 +21,9 @@ public class MossWorld {
 	private ScriptEnv sEnv;
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
+	private ServerNetworkingManager snv;
 	@SuppressWarnings("nls")
-	public MossWorld(String name) throws MossWorldLoadException {
+	public MossWorld(String name, int port) throws MossWorldLoadException {
 		this.baseDir = new File("data/worlds/" + name); //$NON-NLS-1$
 		if (!this.baseDir.exists()) {
 			this.baseDir.mkdirs();
@@ -59,6 +60,16 @@ public class MossWorld {
 			this.sEnv.runScript(sc);
 		}
 		this.evp = new EventProcessor(this.mossEnv);
-		evp.hashCode(); //keep builder from throwing a frivolous warning
+		this.evp.hashCode(); //keep builder from throwing a frivolous warning
+		try {
+			this.snv=new ServerNetworkingManager(port, this);
+		} catch (IOException e) {
+			throw new MossWorldLoadException("Failure in opening server socket for listening!");
+		}
+		
 	}
+	public void enqueueEvent(MossEvent e) throws InterruptedException {
+		this.evp.eventQueue.put(e);
+	}
+	
 }
