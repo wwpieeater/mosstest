@@ -125,7 +125,7 @@ public class EventProcessor {
 						try {
 							Thread.sleep(lSampleInterval);
 						} catch (InterruptedException e) {
-							// manager awoken, no problem
+							// manager awoke, no problem
 						}
 					}
 				}
@@ -142,7 +142,7 @@ public class EventProcessor {
 				MossEvent myEvent = this.eventQueue.take();
 				{// Section for actually handling the events
 					if (myEvent.type == EvtType.EVT_THREADSTOP) {
-						currentThreads.decrementAndGet();
+						this.currentThreads.decrementAndGet();
 						return;
 					}
 					ArrayList<MossEventHandler> evtHandlerList = this.ev
@@ -164,7 +164,7 @@ public class EventProcessor {
 				// thread struck, shut down the operation.
 			}
 			System.out.println("Reached end of thread code"); //$NON-NLS-1$
-			currentThreads.decrementAndGet();
+			this.currentThreads.decrementAndGet();
 		}
 
 	}
@@ -177,7 +177,7 @@ public class EventProcessor {
 	 */
 	public EventProcessor(MossScriptEnv ev) {
 		this.ev = ev;
-
+		this.manager.start();
 	}
 
 }

@@ -2,7 +2,7 @@ package net.mosstest.servercore;
 
 public class Entity {
 	int id;
-	String name;
+	public String name;
 	int hp;
 	int maxHealth;
 	public void destroy() {

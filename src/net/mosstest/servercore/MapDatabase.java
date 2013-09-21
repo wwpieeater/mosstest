@@ -1,17 +1,12 @@
 package net.mosstest.servercore;
 
+import static org.fusesource.leveldbjni.JniDBFactory.factory;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Timer;
 
-import org.fusesource.leveldbjni.internal.NativeDB;
-import org.iq80.leveldb.*;
-
-import static org.fusesource.leveldbjni.JniDBFactory.*;
-
-import java.io.*;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
 
 public class MapDatabase {
 	DB map;
@@ -21,6 +16,7 @@ public class MapDatabase {
 	DB landclaims;
 	DB players;
 
+	@SuppressWarnings("nls")
 	public MapDatabase(File basedir) throws MapDatabaseException,
 			MossWorldLoadException {
 		File dbDir=new File(basedir, "db");
@@ -53,7 +49,7 @@ public class MapDatabase {
 			throw new MapDatabaseException(
 					MapDatabaseException.SEVERITY_UNKNOWN
 							| MapDatabaseException.SEVERITY_FATAL_TRANSIENT,
-					"Database shutdown failed!");
+					"Database shutdown failed!"); //$NON-NLS-1$
 		}
 	}
 

@@ -22,6 +22,20 @@ public class MossWorld {
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
 	private ServerNetworkingManager snv;
+
+	/**
+	 * Initializes a server world. This will start the server once the world is
+	 * initialized, loaded, and passes basic consistency checks. This
+	 * constructor will not initialize load-balancing.
+	 * 
+	 * @param name
+	 *            A string that names the world.
+	 * @param port
+	 *            The port number on which to run the server.
+	 * @throws MossWorldLoadException
+	 *             Thrown if the world cannot be loaded, due to inconsistency,
+	 *             missing files, or lack of system resources.
+	 */
 	@SuppressWarnings("nls")
 	public MossWorld(String name, int port) throws MossWorldLoadException {
 		this.baseDir = new File("data/worlds/" + name); //$NON-NLS-1$
@@ -53,23 +67,25 @@ public class MossWorld {
 		}
 		this.nc = new NodeCache(this.db);
 		this.sdb = new ScriptableDatabase(this.baseDir);
-		this.mossEnv=new MossScriptEnv(this.sdb, this.nc);
+		this.mossEnv = new MossScriptEnv(this.sdb, this.nc);
 		this.sEnv = new ScriptEnv(this.mossEnv);
-		ArrayList<MossScript> scripts=this.game.getScripts();
-		for(MossScript sc: scripts) {
+		ArrayList<MossScript> scripts = this.game.getScripts();
+		for (MossScript sc : scripts) {
 			this.sEnv.runScript(sc);
 		}
 		this.evp = new EventProcessor(this.mossEnv);
-		this.evp.hashCode(); //keep builder from throwing a frivolous warning
+		this.evp.hashCode(); // keep builder from throwing a frivolous warning
 		try {
-			this.snv=new ServerNetworkingManager(port, this);
+			this.snv = new ServerNetworkingManager(port, this);
 		} catch (IOException e) {
-			throw new MossWorldLoadException("Failure in opening server socket for listening!");
+			throw new MossWorldLoadException(
+					"Failure in opening server socket for listening!");
 		}
-		
+
 	}
+
 	public void enqueueEvent(MossEvent e) throws InterruptedException {
 		this.evp.eventQueue.put(e);
 	}
-	
+
 }
