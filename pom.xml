@@ -24,8 +24,20 @@
           <target>1.7</target>
         </configuration>
       </plugin>
+      <plugin>
+      <artifactId>maven-assembly-plugin</artifactId>
+      <configuration>
+        <descriptors>
+          <descriptor>build/cfg/assembly-client.xml</descriptor>
+        </descriptors>
+        <archive>
+          <manifestFile>build/resources-client/META-INF/MANIFEST.MF</manifestFile>
+        </archive>
+      </configuration>
+    </plugin>
     </plugins>
   </build>
+  
   <url>https://github.com/mosstest/mosstest</url>
   <issueManagement>
   	<system>Launchpad</system>
@@ -106,4 +118,5 @@
   		<version>1.9</version>
   	</dependency>
   </dependencies>
+  
 </project>
