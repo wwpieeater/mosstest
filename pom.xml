@@ -35,41 +35,65 @@
   	<system>Travis-CI</system>
   </ciManagement>
   
-  <dependencies>
   
-  	<dependency>
-  		<groupId>org.fusesource.leveldbjni</groupId>
-  		<artifactId>leveldbjni-all</artifactId>
-  		<version>1.7</version>
-  	</dependency>
+  
+  <dependencies>
   	<dependency>
   		<groupId>commons-lang</groupId>
   		<artifactId>commons-lang</artifactId>
   		<version>2.6</version>
   	</dependency>
   	<dependency>
-  		<groupId>org.mozilla</groupId>
-  		<artifactId>rhino</artifactId>
-  		<version>1.7R4</version>
-  	</dependency>
-  	<dependency>
   		<groupId>org.apache.commons</groupId>
   		<artifactId>commons-lang3</artifactId>
   		<version>3.1</version>
   	</dependency>
-
   	<dependency>
-  		<groupId>org.apache.maven.surefire</groupId>
-  		<artifactId>surefire-junit47</artifactId>
-  		<version>2.15</version>
+  		<groupId>commons-collections</groupId>
+  		<artifactId>commons-collections</artifactId>
+  		<version>3.2.1</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.fusesource.leveldbjni</groupId>
+  		<artifactId>leveldbjni</artifactId>
+  		<version>1.7</version>
+  		<type>zip</type>
+  		<classifier>native-src</classifier>
   	</dependency>
   	<dependency>
   		<groupId>org.lwjgl.lwjgl</groupId>
-  		<artifactId>lwjgl-platform</artifactId>
+  		<artifactId>lwjgl</artifactId>
   		<version>2.9.0</version>
-  		<type>pom</type>
+  	</dependency>
+  	<dependency>
+  		<groupId>net.java.jinput</groupId>
+  		<artifactId>jinput</artifactId>
+  		<version>2.0.5</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jme3</groupId>
+  		<artifactId>jme3-desktop</artifactId>
+  		<version>3.1.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jme3</groupId>
+  		<artifactId>jme3-lwjgl</artifactId>
+  		<version>3.1.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jme3</groupId>
+  		<artifactId>jme3-lwjgl-natives</artifactId>
+  		<version>3.1.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jme3</groupId>
+  		<artifactId>jme3-lwjgl-niftygui</artifactId>
+  		<version>3.1.0</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>jme3</groupId>
+  		<artifactId>niftygui</artifactId>
+  		<version>3.1.0</version>
   	</dependency>
   </dependencies>
-  
-  
 </project>
