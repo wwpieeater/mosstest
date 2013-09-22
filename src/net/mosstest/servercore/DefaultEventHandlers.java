@@ -5,33 +5,34 @@ import net.mosstest.scripting.MossScriptException;
 
 public class DefaultEventHandlers {
 
-	public static void processEvent(MossEvent myEvent) throws MossScriptException {
+	public static void processEvent(MossEvent myEvent, MossScriptEnv env) throws MossScriptException {
 		switch (myEvent.type) {
 		case EVT_CHATCOMMAND:
-			MossScriptEnv.sendChatMessage((Player) myEvent.actor, null,
+			env.sendChatMessage((Player) myEvent.actor, null,
 					"No such chat command");
 			break;
 		case EVT_CHATMESSAGE:
-			MossScriptEnv.sendChatAll((Player) myEvent.actor,
+			env.sendChatAll((Player) myEvent.actor,
 					myEvent.initiatingMessage);
 			break;
 		case EVT_DIEPLAYER:
-			MossScriptEnv.setHp(myEvent.actor, 64); // Max HP=64
-			// FIXME rarkenin MossScriptEnv.moveEntity(myEvent.actor,
+			env.setHp(myEvent.actor, 64); // Max HP=64
+			myEvent.actor.respawn();
+			// FIXME rarkenin env.moveEntity(myEvent.actor,
 			// Mapgen.getSpawnPoint);
 			break;
 		case EVT_DIGNODE:
 			try {
-				MossScriptEnv.damageTool((Player) myEvent.actor,
+				env.damageTool(myEvent.actor,
 						myEvent.nodeBefore);
-				MossScriptEnv.givePlayer((Player) myEvent.actor,
+				env.givePlayer(myEvent.actor,
 						new ItemStack(myEvent.nodeBefore.dropItem, 1));
 			} catch (MossScriptException e) {
 				//FIXME MossSecurityManager.log(e);
 			}
 			break;
 		case EVT_ENTITY_DEATH:
-			myEvent.actor.destroy();
+			myEvent.actor.respawn();
 			break;
 		case EVT_ENTITY_PUNCH:
 			//No default action

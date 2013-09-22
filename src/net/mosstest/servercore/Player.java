@@ -14,5 +14,9 @@ public class Player {
 		this.inventories.put(name,inv);
 		return inv;
 	}
+	public void respawn() {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

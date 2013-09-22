@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 
 import net.mosstest.servercore.Entity;
-import net.mosstest.servercore.EventProcessor;
 import net.mosstest.servercore.ItemStack;
 import net.mosstest.servercore.MapNode;
 import net.mosstest.servercore.MossEvent;
@@ -343,7 +342,7 @@ public class MossScriptEnv {
 	 *            An integer representing the amount of health to set, from 0 to
 	 *            {@link Entity#maxHealth()}.
 	 */
-	public void setHp(Entity ent, int health) {
+	public void setHp(Player p, int health) {
 		// TODO Once we have players doing stuff
 	}
 

@@ -1,7 +1,7 @@
 package net.mosstest.servercore;
 
 public class MossEvent {
-	public MossEvent(EvtType type, Entity actor, long posx, long posy,
+	public MossEvent(EvtType type, Player actor, long posx, long posy,
 			long posz, MapNode nodeBefore, MapNode nodeAfter,
 			Entity recvEntity, MossFormspec fspec, MossInventoryAction action, double damage,
 			String initiatingMessage, ScriptSandboxBorderToken tok) {
@@ -26,7 +26,7 @@ public class MossEvent {
 	}
 
 	MossEvent.EvtType type;
-	Entity actor; // Player extends entity
+	Player actor; // Player no longer extends entity
 	long posx;
 	long posy;
 	long posz;

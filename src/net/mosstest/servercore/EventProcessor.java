@@ -153,7 +153,7 @@ public class EventProcessor {
 						for (MossEventHandler ourHandler : evtHandlerList) {
 							ourHandler.processEvent(myEvent);
 						}
-						DefaultEventHandlers.processEvent(myEvent);
+						DefaultEventHandlers.processEvent(myEvent, this.ev);
 					} catch (EventProcessingCompletedSignal
 							| MossScriptException e) {
 						// Event processing complete, pass
