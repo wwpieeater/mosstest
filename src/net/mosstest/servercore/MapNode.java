@@ -3,45 +3,54 @@ package net.mosstest.servercore;
 import net.mosstest.scripting.NodeParams;
 
 public class MapNode {
-	short nodeId = 0;
+	private short nodeId = 0;
 	public final NodeParams nodeparams;
-	private final String[] textureSpace;
+	private final String[] textureNames;
+	private final MossTexture[] tex;
 	public String nodeName;
 	public String userFacingName;
 	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
 
-	public MapNode(NodeParams nodeparams, String[] tex, String nodeName,
+	public MapNode(NodeParams nodeparams, String[] texs, String nodeName,
 			String userFacingName, boolean isLiquid, int lightEmission) {
 		this.nodeparams = nodeparams;
-		this.textureSpace = tex;
+		this.textureNames = texs;
 		this.nodeName = nodeName;
 
 		try {
-			nodeId = NodeManager.putNode(this);
+			setNodeId(NodeManager.putNode(this));
 		} catch (MossWorldLoadException e) {
-
+			//pass
 		}
 
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
+		tex=new MossTexture[texs.length];
+		for(int i=0; i<tex.length; i++) {
+			tex[i]=MossTextureManager.get(texs[i]);
+		}
 	}
 
-	public MapNode(String [] tex, String nodeName,
+	public MapNode(String [] texs, String nodeName,
 			String userFacingName, boolean isLiquid, int lightEmission) {
 		this.nodeparams = getDefaultParams();
-		this.textureSpace = tex;
+		this.textureNames = texs;
 		try {
-			nodeId = NodeManager.putNode(this);
+			setNodeId(NodeManager.putNode(this));
 		} catch (MossWorldLoadException e) {
-
+			//pass
 		}
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
+		tex=new MossTexture[texs.length];
+		for(int i=0; i<tex.length; i++) {
+			tex[i]=MossTextureManager.get(texs[i]);
+		}
 	}
 
 	private static NodeParams getDefaultParams() {
@@ -115,6 +124,40 @@ public class MapNode {
 				return 0;
 			}
 		};
+	}
+
+	public short getNodeId() {
+		return this.nodeId;
+	}
+
+	void setNodeId(short nodeId) {
+		this.nodeId = nodeId;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.nodeId;
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof MapNode)) {
+			return false;
+		}
+		MapNode other = (MapNode) obj;
+		if (this.nodeId != other.nodeId) {
+			return false;
+		}
+		return true;
 	}
 
 }

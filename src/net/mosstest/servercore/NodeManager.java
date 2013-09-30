@@ -15,14 +15,18 @@ public class NodeManager {
 		if (definedNodes.size() > 16384)
 			throw new MossWorldLoadException("Too many nodedefs"); //$NON-NLS-1$
 		if (!definedNodes.contains(node)) {
-			node.nodeId = (short) definedNodes.size();
+			node.setNodeId((short) definedNodes.size());
 			definedNodes.add(node);
+			
 			defNodeByName.put(node.nodeName, node);
 		} else
 			ExceptionHandler.registerException(new DuplicateNodedefException());
-		return node.nodeId;
+		return node.getNodeId();
 	}
-
+	public static void putNodeAlias(String alias, String dst) {
+		MapNode dstNode=defNodeByName.get(dst);
+		defNodeByName.put(alias, dstNode);
+	}
 	public static MapNode getNode(String string, boolean isModified) {
 		return defNodeByName.get(string);
 	}

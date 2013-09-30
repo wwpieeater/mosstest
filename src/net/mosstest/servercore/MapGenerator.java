@@ -10,61 +10,18 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 
-public class MapGenerator {
-	static Geometry vorDiagram;
-	static final int minX=-65536;
-	static final int maxX=65536;
-	static final int minY=-65536;
-	static final int maxY=65536;
-	static ArrayList<Coordinate> generatorPoints;
-	static ArrayList<PolygonWrapper> annotatedPolygons;  
-	static void init(long seed, int points){
-		Random rand=new Random();
-		rand.setSeed(seed);
-		generatorPoints=new ArrayList<>();
-		for(int i=0; i<points; i++){
-			generatorPoints.add(new Coordinate(minX+rand.nextDouble()*(maxX-minX),minY+rand.nextDouble()*(maxY-minY)));
-
-		}
-		VoronoiDiagramBuilder vor=new VoronoiDiagramBuilder();
-		vor.setSites(generatorPoints);
-		vorDiagram=vor.getDiagram(new GeometryFactory());
-		System.out.println(vorDiagram.getNumGeometries());
-		for (int i = 0; i < vorDiagram.getNumGeometries(); i++) {
-			String pat1=Pattern.compile("POLYGON ((", Pattern.LITERAL).matcher(vorDiagram.getGeometryN(i).toText()).replaceFirst("Graphics[{Opacity[0.4], Polygon[{{");
-			pat1=Pattern.compile("))", Pattern.LITERAL).matcher(pat1).replaceFirst("}}]}],");
-			pat1=Pattern.compile("[0-9],").matcher(pat1).replaceAll("},{");
-			pat1=Pattern.compile("([0-9])\\s([0-9-])").matcher(pat1).replaceAll("$1,$2");
-
-			System.out.println(pat1);
-			//OK, now we do some O(n^2) black magic with these. Perhaps this could be optimized?
-
-		}
-	}
+public interface MapGenerator {
 	
-	public static void main(String[] args) {
-		init(6, 4);
-	}
+	void init(long seed, Object... params) throws MapGeneratorException;
+	
+	public MapChunk generateChunk(Position pos) throws MapGeneratorException;
 
-	public static MapChunk generateChunk(Position pos) {
-		int fillNode=(pos.z)>0?NodeManager.getNode("builtin:air").nodeId:NodeManager.getNode("default:stone").nodeId;
-		int[][][] nodes=new int[16][16][16];
-		boolean[][][] edited=new boolean[16][16][16];
-		for (int x = 0; x < 16; x++) {
-			for (int y = 0; y < 16; y++) {
-				for (int z = 0; z < 16; z++) {
-					nodes[x][y][z]=fillNode;
-					edited[x][y][z]=false;
-				}
-			}
-		}
-		MapChunk chunk=new MapChunk(pos, nodes, edited);
-		return chunk;
-	}
-
-	public static void fillInChunk(int[][][] lightNodes, Position pos) {
-		// TODO Auto-generated method stub
-		
-	}
+	/**
+	 * Fills in a chunk as an array of light nodes, where 
+	 * @param lightNodes
+	 * @param pos
+	 * @throws MapGeneratorException
+	 */
+	public void fillInChunk(int[][][] lightNodes, Position pos) throws MapGeneratorException;
 	
 }

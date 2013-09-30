@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import net.mosstest.scripting.MapGenerators;
+
 public class MapChunk {
 	Position pos;
 	int[][][] lightNodes = new int[16][16][16];
@@ -47,7 +49,7 @@ public class MapChunk {
 			loadHeavies();
 		}
 		this.compressed = (((flags & 0x04)) != 0);
-		if (compressed) {
+		if (this.compressed) {
 			int cursor = 0;
 			int[] lightTmp = new int[16 * 16 * 16];
 			while (lightStreamIn.available() > 0) {
@@ -64,13 +66,18 @@ public class MapChunk {
 					}
 				}
 			}
-			MapGenerator.fillInChunk(lightNodes, pos);
+			try {
+				MapGenerators.getDefaultMapgen().fillInChunk(this.lightNodes,
+						pos);
+			} catch (MapGeneratorException e) {
+				// pass, we'll deal with a bad chunk later in the pipeline
+			}
 			// throw new NotImplementedException();
 		} else {
 			for (int x = 0; x < 16; x++) {
 				for (int y = 0; y < 16; y++) {
 					for (int z = 0; z < 16; z++) {
-						lightNodes[x][y][z] = lightStreamIn.readShort();
+						this.lightNodes[x][y][z] = lightStreamIn.readShort();
 					}
 				}
 			}
@@ -85,21 +92,30 @@ public class MapChunk {
 
 	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
 		this.pos = pos2;
-		lightNodes = Arrays.copyOf(nodes, nodes.length);
+		this.lightNodes = Arrays.copyOf(nodes, nodes.length);
 		this.modified = Arrays.copyOf(modified, modified.length);
 	}
 
 	public int getNodeId(byte x, byte y, byte z) {
-		return lightNodes[x][y][z];
+		return this.lightNodes[x][y][z];
 	}
 
-	public byte[] writeLight(boolean compressed) {
+	public byte[] writeLight(boolean compressed1) {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
 		try (DataOutputStream dos = new DataOutputStream(bos);) {
-			dos.writeShort(13);
+			dos.writeShort(0);
+			dos.writeShort(MAPCHUNK_SERIALIZATION_VERSION);
+			for (int[][] nodelvl : this.lightNodes) {
+				for (int[] nodelvl2 : nodelvl) {
+					for (int node : nodelvl2) {
+						dos.writeShort(node);
+					}
+				}
+			}
 			dos.flush();
+			bos.flush();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
