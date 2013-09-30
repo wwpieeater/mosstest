@@ -5,6 +5,8 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
 import java.io.File;
 import java.io.IOException;
 
+import net.mosstest.scripting.MapGenerator;
+
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 

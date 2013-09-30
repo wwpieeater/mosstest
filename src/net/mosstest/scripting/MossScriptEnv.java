@@ -8,7 +8,9 @@ import net.mosstest.servercore.ItemStack;
 import net.mosstest.servercore.MapNode;
 import net.mosstest.servercore.MossEvent;
 import net.mosstest.servercore.MossInventory;
+import net.mosstest.servercore.MossWorldLoadException;
 import net.mosstest.servercore.NodeCache;
+import net.mosstest.servercore.NodeManager;
 import net.mosstest.servercore.NodePosition;
 import net.mosstest.servercore.Player;
 import net.mosstest.servercore.Position;
@@ -408,10 +410,14 @@ public class MossScriptEnv {
 	}
 
 	public MapNode registerNode(String sysname, String userFacingName,
-			NodeParams params, String[] textures, boolean isLiquid, int light) {
+			NodeParams params, String[] textures, boolean isLiquid, int light) throws MossWorldLoadException {
 		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
 				isLiquid, light);
+		NodeManager.putNode(nd);
 		return nd;
+	}
+	public void registerNodeAlias(String alias, String dst){
+		NodeManager.putNodeAlias(alias, dst);
 	}
 
 	public MapNode registerNodeDefParams(String sysname, String userFacingName,

@@ -1,7 +1,6 @@
 package net.mosstest.scripting;
 
 import net.mosstest.servercore.MapChunk;
-import net.mosstest.servercore.MapGenerator;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.NodeManager;
 import net.mosstest.servercore.Position;

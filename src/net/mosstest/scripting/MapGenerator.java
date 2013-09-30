@@ -1,13 +1,8 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.regex.Pattern;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
+import net.mosstest.servercore.MapChunk;
+import net.mosstest.servercore.MapGeneratorException;
+import net.mosstest.servercore.Position;
 
 
 public interface MapGenerator {

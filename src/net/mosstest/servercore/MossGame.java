@@ -26,7 +26,7 @@ public class MossGame {
 		this.scripts=new ArrayList<>();
 		String[] scNames=this.gameCfg.getStringArray("plugins");
 		for(String scName: scNames) {
-			this.scripts.add(new MossScript(new File("data/scripts"), scName));
+			this.scripts.add(new MossScript(new File("data/scripts"), scName)); //TODO directory structure and proper iteration
 		}
 	}
 	private File baseDir;
