@@ -7,8 +7,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 public class NodePosition {
-	byte xl, yl, zl;
-	Position chunk;
+	public final byte xl, yl, zl;
+	public final Position chunk;
 
 	public NodePosition(int x, int y, int z, int realm, byte xl, byte yl,
 			byte zl) {

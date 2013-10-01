@@ -112,7 +112,7 @@ public class EventProcessor {
 								EventProcessor.this.eventQueue
 										.add(new MossEvent(
 												MossEvent.EvtType.EVT_THREADSTOP,
-												null, 0, 0, 0, null, null,
+												null, null, null, null,
 												null, null, null, 0, null,
 												new ScriptSandboxBorderToken(
 														84,

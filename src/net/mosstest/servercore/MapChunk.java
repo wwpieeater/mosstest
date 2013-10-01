@@ -100,6 +100,19 @@ public class MapChunk {
 		return this.lightNodes[x][y][z];
 	}
 
+	/**
+	 * Updates the chunk to set a node. The chunk is not written to the database
+	 * or committed across the network.
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param node
+	 */
+	public void setNode(byte x, byte y, byte z, short node) {
+		this.lightNodes[x][y][z] = node;
+	}
+
 	public byte[] writeLight(boolean compressed1) {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();

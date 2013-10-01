@@ -7,7 +7,7 @@ public class NodeManager {
 	private static ArrayList<MapNode> definedNodes = new ArrayList<>();
 	private static HashMap<String, MapNode> defNodeByName = new HashMap<>();
 
-	static MapNode getNode(short nodeId) {
+	public static MapNode getNode(short nodeId) {
 		return definedNodes.get(nodeId);
 	}
 

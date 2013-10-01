@@ -1,17 +1,14 @@
 package net.mosstest.servercore;
 
 public class MossEvent {
-	public MossEvent(EvtType type, Player actor, long posx, long posy,
-			long posz, MapNode nodeBefore, MapNode nodeAfter,
+	public MossEvent(EvtType type, Player actor, NodePosition pos, MapNode nodeBefore, MapNode nodeAfter,
 			Entity recvEntity, MossFormspec fspec, MossInventoryAction action, double damage,
 			String initiatingMessage, ScriptSandboxBorderToken tok) {
 		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
 			throw new SecurityException("Attempt to access controlled resources in the script DMZ.");
 		this.type = type;
 		this.actor = actor;
-		this.posx = posx;
-		this.posy = posy;
-		this.posz = posz;
+		this.pos=pos;
 		this.nodeBefore = nodeBefore;
 		this.nodeAfter = nodeAfter;
 		this.recvEntity = recvEntity;
@@ -27,9 +24,7 @@ public class MossEvent {
 
 	MossEvent.EvtType type;
 	Player actor; // Player no longer extends entity
-	long posx;
-	long posy;
-	long posz;
+	NodePosition pos;
 	MapNode nodeBefore;
 	MapNode nodeAfter;
 	Entity recvEntity;

@@ -3,6 +3,7 @@ package net.mosstest.scripting;
 import net.mosstest.servercore.MapChunk;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MapNode;
+import net.mosstest.servercore.NodeCache;
 import net.mosstest.servercore.Position;
 
 public interface MapGenerator {
@@ -49,25 +50,5 @@ public interface MapGenerator {
 	public void registerOre(MapNode oreNode, double minDepth, double rarity,
 			double clumping, Object... params);
 
-	/**
-	 * Register an aboveground structure such as a tree for generation.
-	 * 
-	 * @param structure
-	 *            The structure to generate.
-	 * @param minDepth
-	 *            The minimum depth(as a positive integer number of nodes below
-	 *            sea level.
-	 * @param rarity
-	 *            How rare the ore should be. Rarity 1 corresponds to virtually
-	 *            every ore-containing node, and rarity 100 would correspond to
-	 *            approximately one out of 100 nodes being this ore.
-	 * @param clumping
-	 *            Defines how clumped the ore should be. Generally corresponds
-	 *            to 0=uniform and 1=most strongly clumped(solid spheres of ore
-	 *            clumps to meet rarity goal)
-	 * @param params
-	 *            Miscellaneous params for the map generator.
-	 */
-	public void registerTree(MapStructure structure, double minElev,
-			double maxElev, double rarity, double clumping, Object... params);
+	
 }

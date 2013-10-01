@@ -6,18 +6,19 @@ import net.mosstest.scripting.NodeParams;
 public class MapNode {
 	private short nodeId = 0;
 	public final NodeParams nodeparams;
-	private final String[] textureNames;
-	private final MossTexture[] tex;
+	public final String texture;
+
 	public String nodeName;
 	public String userFacingName;
 	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
-	public boolean isBuildableTo=true;
-	public MapNode(NodeParams nodeparams, String[] texs, String nodeName,
+	public boolean isBuildableTo = true;
+
+	public MapNode(NodeParams nodeparams, String texture, String nodeName,
 			String userFacingName, boolean isLiquid, int lightEmission) {
 		this.nodeparams = nodeparams;
-		this.textureNames = texs;
+		this.texture = texture;
 		this.nodeName = nodeName;
 
 		try {
@@ -29,16 +30,13 @@ public class MapNode {
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
-		tex = new MossTexture[texs.length];
-		for (int i = 0; i < tex.length; i++) {
-			tex[i] = MossTextureManager.get(texs[i]);
-		}
+
 	}
 
-	public MapNode(String[] texs, String nodeName, String userFacingName,
+	public MapNode(String textures, String nodeName, String userFacingName,
 			boolean isLiquid, int lightEmission) {
 		this.nodeparams = new DefaultNodeParams();
-		this.textureNames = texs;
+		this.texture = textures;
 		try {
 			setNodeId(NodeManager.putNode(this));
 		} catch (MossWorldLoadException e) {
@@ -48,34 +46,31 @@ public class MapNode {
 		this.userFacingName = userFacingName;
 		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
-		tex = new MossTexture[texs.length];
-		for (int i = 0; i < tex.length; i++) {
-			tex[i] = MossTextureManager.get(texs[i]);
-		}
+
 	}
 
-	public static class AirNodeParams implements NodeParams{
+	public static class AirNodeParams implements NodeParams {
 
 		@Override
 		public void onPunch(Player player, GenericTool tool,
 				NodePosition target, Face punchedFace)
 				throws EventProcessingCompletedSignal {
-			//pass
-			
+			// pass
+
 		}
 
 		@Override
 		public void onDig(Player player, GenericTool tool, NodePosition target,
 				Face punchedFace) throws EventProcessingCompletedSignal {
 			// pass
-			
+
 		}
 
 		@Override
 		public void onPlaceNextTo(Player player, NodePosition target,
 				NodePosition placed) throws EventProcessingCompletedSignal {
 			// pass
-			
+
 		}
 
 		@Override
@@ -83,7 +78,7 @@ public class MapNode {
 				NodePosition target, Face clickedFace)
 				throws EventProcessingCompletedSignal {
 			// pass
-			
+
 		}
 
 		@Override
@@ -132,9 +127,9 @@ public class MapNode {
 		public boolean shouldContinueFall(Player player, double height) {
 			return true;
 		}
-		
+
 	}
-	
+
 	public static class DefaultNodeParams implements NodeParams {
 
 		@Override
@@ -209,7 +204,7 @@ public class MapNode {
 		public boolean shouldContinueFall(Player player, double height) {
 			return false;
 		}
-	};
+	}
 
 	public short getNodeId() {
 		return this.nodeId;

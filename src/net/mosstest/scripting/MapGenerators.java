@@ -2,6 +2,7 @@ package net.mosstest.scripting;
 
 import net.mosstest.servercore.MapChunk;
 import net.mosstest.servercore.MapGeneratorException;
+import net.mosstest.servercore.MapNode;
 import net.mosstest.servercore.NodeManager;
 import net.mosstest.servercore.Position;
 
@@ -74,6 +75,16 @@ public class MapGenerators {
 			}
 
 		}
+
+		@Override
+		public void registerOre(MapNode oreNode, double minDepth,
+				double rarity, double clumping, Object... params) {
+			// TODO Auto-generated method stub
+			
+		}
+
+	
+		
 
 	}
 }
