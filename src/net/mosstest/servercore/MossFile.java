@@ -1,9 +1,15 @@
 package net.mosstest.servercore;
 
-import java.io.InputStream;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.File;
 
 public interface MossFile {
-	public InputStream getReadStream();
+	/**
+	 * Get a local copy of the file. This may be either a direct local file or a
+	 * cached file.
+	 * 
+	 * @return A valid input stream.
+	 */
+	public File getLocalCopy();
+
+	public int getSize();
 }
