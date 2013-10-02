@@ -400,7 +400,7 @@ public class MossScriptEnv {
 	 *            The node to place at that position.
 	 */
 	public void setNode(NodePosition pos, MapNode node) {
-		MapChunk chk=nc.getChunk(pos.chunk);
+		MapChunk chk = nc.getChunk(pos.chunk);
 		chk.setNode(pos.xl, pos.yl, pos.zl, node.getNodeId());
 	}
 
@@ -409,17 +409,54 @@ public class MossScriptEnv {
 	 * with an existing solid node.
 	 * 
 	 * @param pos
-	 *            The position at which to remove the node.
+	 *            The NodePosition at which to remove the node.
 	 */
 	public void removeNode(NodePosition pos) {
-		// TODO stub
+		MapChunk chk = nc.getChunk(pos.chunk);
+		chk.setNode(pos.xl, pos.yl, pos.zl, NodeManager.getNode("mg:air")
+				.getNodeId());
+		nc.setChunk(pos.chunk, chk);
 	}
 
+	/**
+	 * Get the MapNode at a certain location
+	 * 
+	 * @param pos
+	 *            The location at which to get the node
+	 * @return
+	 */
 	public MapNode getNode(NodePosition pos) {
-		return NodeManager.getNode((short) this.nc.getChunk(pos.chunk).getNodeId(pos.xl, pos.yl, pos.zl));
+		return NodeManager.getNode((short) this.nc.getChunk(pos.chunk)
+				.getNodeId(pos.xl, pos.yl, pos.zl));
 
 	}
 
+	/**
+	 * Register a new MapNode in the node manager.
+	 * 
+	 * @param sysname
+	 *            The name such as default:dirt to set. The prefix mg: is used
+	 *            for mapgen-specific nodes, and should be done by creating a
+	 *            node with a different prefix and aliasing mg:foo to it.
+	 * @param userFacingName
+	 *            The name to display in the UI, such as Dirt or Iron Ore
+	 * @param params
+	 *            An implementation of the {@link NodeParams} interface
+	 *            detailing the action of the node. {@link AirNodeParams} and
+	 *            {@link DefaultNodeParams} are valid for air-like(display only)
+	 *            and standard solid blocks, respectively.
+	 * @param textures
+	 *            A string stating the filename of the textures image.
+	 * @param isLiquid
+	 *            A boolean of whether the node is liquid.
+	 * @param light
+	 *            The amount of light from 0 to 255 to be emitted.
+	 * @return The MapNode object that has been created and added to the
+	 *         manager.
+	 * @throws MossWorldLoadException
+	 *             If an exception occurs during the execution of the
+	 *             registering.
+	 */
 	public static MapNode registerNode(String sysname, String userFacingName,
 			NodeParams params, String textures, boolean isLiquid, int light)
 			throws MossWorldLoadException {
@@ -429,12 +466,45 @@ public class MossScriptEnv {
 		return nd;
 	}
 
+	/**
+	 * Registers a node alias. Since the map generator and scripts work via
+	 * string names, registering an alias of mg:dirt to myscript:specialdirt
+	 * will cause a mapgen that recognizes mg:dirt as a generated element to use
+	 * specialdirt for that.
+	 * 
+	 * @param alias
+	 *            The alias to create, i.e. mg:dirt
+	 * @param dst
+	 *            The existing node to set as the alias target, i.e
+	 *            myscript:specialdirt. This element must already exist.
+	 */
 	public static void registerNodeAlias(String alias, String dst) {
 		NodeManager.putNodeAlias(alias, dst);
 	}
 
-	public static MapNode registerNodeDefParams(String sysname, String userFacingName,
-			String textures, boolean isLiquid, int light) {
+	/**
+	 * Register a new MapNode in the node manager.
+	 * 
+	 * @param sysname
+	 *            The name such as default:dirt to set. The prefix mg: is used
+	 *            for mapgen-specific nodes, and should be done by creating a
+	 *            node with a different prefix and aliasing mg:foo to it.
+	 * @param userFacingName
+	 *            The name to display in the UI, such as Dirt or Iron Ore
+	 * @param textures
+	 *            A string stating the filename of the textures image.
+	 * @param isLiquid
+	 *            A boolean of whether the node is liquid.
+	 * @param light
+	 *            The amount of light from 0 to 255 to be emitted.
+	 * @return The MapNode object that has been created and added to the
+	 *         manager.
+	 * @throws MossWorldLoadException
+	 *             If an exception occurs during the execution of the
+	 *             registering.
+	 */
+	public static MapNode registerNodeDefParams(String sysname,
+			String userFacingName, String textures, boolean isLiquid, int light) {
 		MapNode nd = new MapNode(textures, sysname, userFacingName, isLiquid,
 				light);
 		return nd;

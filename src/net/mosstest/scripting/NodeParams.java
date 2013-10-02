@@ -185,5 +185,13 @@ public interface NodeParams {
 	 *         health of 64 units.
 	 */
 	public abstract double calcFallDamage(Player player, double height);
+	
+	/**
+	 * Calculate whether a ray aimed from the crosshairs should stop at this node.
+	 * @param player The player.
+	 * @param distance The distance from the camera to the node.
+	 * @return
+	 */
+	public abstract boolean shouldHitAimRay(Player player, double distance);
 
 }
