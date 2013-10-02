@@ -63,7 +63,7 @@ public class RenderProcessor extends SimpleApplication {
 						int nVal = ((MossRenderChunkEvent) myEvent).getNodeId(i, j, k);
 						Material mat = getMaterial((short)nVal);
 						switch (nVal) {
-						case 0: System.out.println("NOPE"); break;
+						case 0: break;
 						case 1:
 							Vector3f loc = new Vector3f(home.x+i*(blockSize), home.y-j*(blockSize)-40, home.z+k*(blockSize));
 						    RenderNode geom = new RenderNode (mat, loc, blockSize, /*NodeManager.getNode((short) nVal)*/ null);

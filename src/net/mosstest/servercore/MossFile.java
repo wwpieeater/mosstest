@@ -1,18 +1,15 @@
 package net.mosstest.servercore;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.io.File;
 
-public class MossFile {
-	byte[] sha512;
-	byte[] data;
-	String name;
-	AtomicBoolean isReady=new AtomicBoolean(false);
-	public MossFile(byte[] sha512, String name) throws InterruptedException {
-		
-		this.sha512 = Arrays.copyOf(sha512, sha512.length);
-		this.name = name;
-		FileManager.resolutionQueue.put(this);
-	}
-	
+public interface MossFile {
+	/**
+	 * Get a local copy of the file. This may be either a direct local file or a
+	 * cached file.
+	 * 
+	 * @return A valid input stream.
+	 */
+	public File getLocalCopy();
+
+	public int getSize();
 }

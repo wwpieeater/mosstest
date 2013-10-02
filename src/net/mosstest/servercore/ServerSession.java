@@ -1,6 +1,9 @@
 package net.mosstest.servercore;
 
+import java.net.DatagramSocket;
+import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * The ServerSession class unifies a session on a server. Each incoming connection has a different session.
@@ -12,9 +15,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 public class ServerSession {
     public Player player;
     public String authChallenge;
-    public ArrayBlockingQueue<MossNetPacket> bulk;
-    public ArrayBlockingQueue<MossNetPacket> fast;
-    public ArrayBlockingQueue<MossNetPacket> dgram;
+    public ArrayBlockingQueue<MossNetPacket> packets;
+    public volatile Socket bulkSocket;
+    public volatile Socket fastSocket;
+    public volatile DatagramSocket dgramSocket;
+    public AtomicBoolean isValid=new AtomicBoolean(true);
     public ServerSession.State state;
     public volatile long quenchedSince=0;
     public static enum State{

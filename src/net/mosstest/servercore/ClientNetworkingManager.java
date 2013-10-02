@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class ClientNetworkingManager {
 	// There's a potential DoS attack here but it can only be mounted by the
 	// server, so you might as well just not use that server. No security
-	// threat, won't fix.
+	// threat except small client hang, won't fix.
 	protected AtomicBoolean runThreads = new AtomicBoolean(true);
 	protected Socket bulkDataSocket = new Socket();
 	protected Socket lowLatencyStreamSocket = new Socket();
@@ -241,7 +241,7 @@ public class ClientNetworkingManager {
 	}
 
 	/**
-	 * Send a packet, dispatching to the correct
+	 * Send a packet, dispatching to the correct socket.
 	 * 
 	 * @param commandId
 	 *            Byte representing command ID.

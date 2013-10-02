@@ -21,3 +21,5 @@
 *.so
 COMMIT_EDITMSG
 .DS_Store
+/target
+/build/output

@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -7,6 +8,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import javax.script.Invocable;
+
+import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.scripting.ScriptableDatabase;
 
 import org.mozilla.javascript.*;
 
@@ -21,6 +25,7 @@ import org.mozilla.javascript.*;
  * @author rarkenin
  */
 public class ScriptEnv {
+	ScriptableObject globalScope;
 
 	private static class ScriptClassShutter implements ClassShutter {
 		public ScriptClassShutter() {
@@ -36,8 +41,7 @@ public class ScriptEnv {
 		}
 	}
 
-	private HashMap<String, Script> scriptMap = new HashMap<>();
-	private boolean localDb;
+	private ScriptableDatabase localDb;
 
 	public enum ScriptResult {
 		RESULT_EXECUTED, RESULT_EXECUTNG_BACKGROUND, RESULT_ERROR, RESULT_SECURITY_EXCEPTION, RESULT_SECURITY_ELEVATABLE
@@ -59,67 +63,48 @@ public class ScriptEnv {
 	 * @return A {@link ScriptEnv.ScriptResult} constant representing the
 	 *         result.
 	 */
-	public static ScriptResult runScript(String script) {
-		return null;
+	public ScriptResult runScript(MossScript script) throws MossWorldLoadException{
+		try {
+			this.cx.evaluateReader(globalScope, script.getReader(),
+					script.file.toString(), 0, null);
+		} catch (IOException e) {
+			return ScriptResult.RESULT_ERROR;
+		} catch (RhinoException e) {
+			throw new MossWorldLoadException("Script error has occured. Wrapped exception: \r\n"+e.getMessage()+"\r\n"+e.getScriptStackTrace()); //$NON-NLS-1$
+		}
+		return ScriptResult.RESULT_EXECUTED;
 	}
 
-	public static Future<ScriptResult> runScriptAsync(String script) {
-		return new Future<ScriptEnv.ScriptResult>() {
+	
 
-			@Override
-			public boolean cancel(boolean mayInterruptIfRunning) {
-				// TODO Auto-generated method stub
-				return false;
-			}
+	
 
-			@Override
-			public ScriptResult get() throws InterruptedException,
-					ExecutionException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public ScriptResult get(long timeout, TimeUnit unit)
-					throws InterruptedException, ExecutionException,
-					TimeoutException {
-				// TODO Auto-generated method stub
-				return null;
-			}
-
-			@Override
-			public boolean isCancelled() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-
-			@Override
-			public boolean isDone() {
-				// TODO Auto-generated method stub
-				return false;
-			}
-		};
-	}
-
-	public static ScriptResult runScriptSuper(String script) {
-		return null;
-	}
-
-	private static class SandboxWrapFactory extends WrapFactory {
+	protected static class SandboxWrapFactory extends WrapFactory {
 		@Override
 		public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
-				Object javaObject, Class staticType) {
+				Object javaObject, Class<?> staticType) {
 			return new SandboxNativeJavaObject(scope, javaObject, staticType);
 		}
 	}
 
-	private static class SandboxContextFactory extends ContextFactory {
+	protected static class SandboxContextFactory extends ContextFactory {
+
 		@Override
 		protected Context makeContext() {
 			Context cx = super.makeContext();
+			cx.setClassShutter(new ScriptClassShutter());
 			cx.setWrapFactory(new SandboxWrapFactory());
 			return cx;
 		}
+	}
+
+	private Context cx;
+
+	public ScriptEnv(MossScriptEnv ev) {
+		ContextFactory.initGlobal(new SandboxContextFactory());
+		this.cx = ContextFactory.getGlobal().enterContext();
+		globalScope = this.cx.initStandardObjects();
+		globalScope.put("moss", globalScope, ev);
 	}
 
 	public static class SandboxNativeJavaObject extends NativeJavaObject {
@@ -127,13 +112,13 @@ public class ScriptEnv {
 		private static final long serialVersionUID = 4829780635666396547L;
 
 		public SandboxNativeJavaObject(Scriptable scope, Object javaObject,
-				Class staticType) {
+				Class<?> staticType) {
 			super(scope, javaObject, staticType);
 		}
 
 		@Override
 		public Object get(String name, Scriptable start) {
-			if (name.equals("getClass")) {
+			if (name.equals("getClass")) { //$NON-NLS-1$
 				return NOT_FOUND;
 			}
 
