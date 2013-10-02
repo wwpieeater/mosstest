@@ -95,7 +95,10 @@ public class RenderProcessor extends SimpleApplication {
 			worldNode.attachChild(geom);
 			System.out.println("ADDED A NODE");
 		}
-			//Add more events
+		else if (myEvent instanceof MossRenderAddAssetPath) {
+			String path = ((MossRenderAddAssetPath) myEvent).getPath();
+			assetManager.registerLocator(path, com.jme3.asset.plugins.FileLocator.class);
+		}
 	}
 	
 	/**
