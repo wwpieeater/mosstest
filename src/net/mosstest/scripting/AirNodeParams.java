@@ -84,4 +84,9 @@ public class AirNodeParams implements NodeParams {
 		return true;
 	}
 
+	@Override
+	public boolean shouldHitAimRay(Player player, double distance) {
+		return false;
+	}
+
 }

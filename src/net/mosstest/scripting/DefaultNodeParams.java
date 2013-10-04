@@ -65,18 +65,21 @@ public class DefaultNodeParams implements NodeParams {
 
 	@Override
 	public double calcBounceHeight(Player player, double fallheight) {
-		// TODO Auto-generated method stub
 		return 0.125;
 	}
 
 	@Override
 	public double calcFallDamage(Player player, double height) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	@Override
 	public boolean shouldContinueFall(Player player, double height) {
+		return false;
+	}
+
+	@Override
+	public boolean shouldHitAimRay(Player player, double distance) {
 		return false;
 	}
 }
