@@ -10,13 +10,12 @@ public class MapNode {
 
 	public String nodeName;
 	public String userFacingName;
-	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
 	public boolean isBuildableTo = true;
 
 	public MapNode(NodeParams nodeparams, String texture, String nodeName,
-			String userFacingName, boolean isLiquid, int lightEmission) {
+			String userFacingName, int lightEmission) {
 		this.nodeparams = nodeparams;
 		this.texture = texture;
 		this.nodeName = nodeName;
@@ -28,13 +27,12 @@ public class MapNode {
 		}
 
 		this.userFacingName = userFacingName;
-		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
 
 	}
 
 	public MapNode(String textures, String nodeName, String userFacingName,
-			boolean isLiquid, int lightEmission) {
+			int lightEmission) {
 		this.nodeparams = new DefaultNodeParams();
 		this.texture = textures;
 		try {
@@ -44,7 +42,6 @@ public class MapNode {
 		}
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
-		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
 
 	}
