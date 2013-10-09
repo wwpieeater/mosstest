@@ -201,7 +201,9 @@ public class RenderProcessor extends SimpleApplication {
 	public static void main (String [] args) {
 		RenderProcessor.init();
 	}
-	public static void init () {
+
+	
+	public static RenderProcessor init () {
 		RenderProcessor app = new RenderProcessor ();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
@@ -209,6 +211,7 @@ public class RenderProcessor extends SimpleApplication {
 		app.setSettings(settings);
 		app.setShowSettings(false);
 		app.start();
+		return app;
 	}
 	
 	/**
