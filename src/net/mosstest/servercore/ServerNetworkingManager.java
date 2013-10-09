@@ -48,8 +48,7 @@ public class ServerNetworkingManager {
 					}
 
 				} catch (IOException | InterruptedException e) {
-					ServerManager
-							.error("IOError or interrupt accepting connection");
+					//pass
 				}
 			}
 		}

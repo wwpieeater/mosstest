@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
 public class RenderPreparator {
-
+	private RenderProcessor rp;
 	private ArrayBlockingQueue<Position> chunkRequests = new ArrayBlockingQueue<>(
 			1024);
 	private HashMap<Position, Position> outstandingChunks = new HashMap<>();
@@ -20,10 +20,10 @@ public class RenderPreparator {
 
 	public void recvOutstandingChunk(Position pos, MapChunk chk) {
 		if (outstandingChunks.get(pos) != null)
-			RenderProcessor.renderEventQueue.offer(new MossRenderEvent()); // TODO
-																			// based
-																			// on
-																			// params
+			rp.renderEventQueue.offer(new MossRenderEvent()); // TODO
+																// based
+																// on
+																// params
 	}
 
 	// TODO: Handle player movement, other server->client events affecting
@@ -31,5 +31,6 @@ public class RenderPreparator {
 
 	public RenderPreparator(NodeCache cache) {
 		this.cache = cache;
+		rp = RenderProcessor.init();
 	}
 }
