@@ -73,6 +73,8 @@ public class MossRemoteFile extends MossFile {
 		RandomAccessFile rf = new RandomAccessFile(this.file, "rwd");
 		rf.seek(chk*CHUNK_LENGTH);
 		rf.write(data);
+		this.chunksDone.set(chk, true);
+		rf.close();
 	}
 
 	@Override
