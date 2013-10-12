@@ -30,7 +30,7 @@ public class RenderMapChunk {
 	}
 	
 	public Vector3f getNodeLoc (int i, int j, int k, float size) {
-		Vector3f loc = new Vector3f(x*i*size, y-j*size-40, z+k*size);
+		Vector3f loc = new Vector3f(x*i*size, y-j*size, z+k*size);
 		return loc;
 	}
 }

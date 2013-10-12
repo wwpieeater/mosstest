@@ -24,9 +24,11 @@ import com.jme3.math.ColorRGBA;
 import java.util.Arrays;
 public class RenderProcessor extends SimpleApplication {
 	
-	private float speed = (float) 0.5;
-	private final float blockSize = 15f;
+	private float speed = 3f;
+	private final float blockSize = 10f;
 	private float[] locChanges = {0,0,0};
+	private final float playerHeight = 25;
+	private double lastTime;
 	private boolean invertY = false;
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk> ();
 	private Vector3f initialUpVec;
@@ -42,7 +44,11 @@ public class RenderProcessor extends SimpleApplication {
 	 * Looks for new events in the renderEventQueue, moves if necessary.
 	 */
 	public void simpleUpdate (float tpf) {
-		moveWorld(locChanges[0], locChanges[1], locChanges[2]);
+		if (lastTime + 10 < System.currentTimeMillis()) {
+			moveWorld(locChanges[0], locChanges[1], locChanges[2]);
+			lastTime = System.currentTimeMillis();
+		}
+		
 		
 		inputManager.setCursorVisible(false); 
 		MossRenderEvent myEvent = renderEventQueue.poll();
@@ -53,7 +59,7 @@ public class RenderProcessor extends SimpleApplication {
 			int x = ((MossRenderChunkEvent) myEvent).getX();
 			int y = ((MossRenderChunkEvent) myEvent).getY();
 			int z = ((MossRenderChunkEvent) myEvent).getZ();
-			
+			double offset = 16*blockSize - blockSize;
 			Vector3f home = new Vector3f (x, y, z);
 			RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 			
@@ -65,7 +71,10 @@ public class RenderProcessor extends SimpleApplication {
 						switch (nVal) {
 						case 0: break;
 						case 1:
-							Vector3f loc = new Vector3f(home.x+i*(blockSize), home.y-j*(blockSize)-40, home.z+k*(blockSize));
+							float xLocation = (float)((home.x-offset) + (i * 2 * blockSize));
+							float yLocation = (float)((home.y-playerHeight) - (j * 2 * blockSize));
+							float zLocation = (float)((home.z-offset) + (k * 2 * blockSize));
+							Vector3f loc = new Vector3f(xLocation, yLocation, zLocation);
 						    RenderNode geom = new RenderNode (mat, loc, blockSize, /*NodeManager.getNode((short) nVal)*/ null);
 						    nodesInChunk[i][j][k] = geom;
 						    worldNode.attachChild(geom);
@@ -106,35 +115,32 @@ public class RenderProcessor extends SimpleApplication {
 	 */
 	public void testChunkEvents () {
 		Position pos = null;
-		for(int i=0; i<2; i++) {
-			for(int j=0; j<2; j++) {
-				pos = new Position(-16+(i*8), 0, -16+(j*8), 0);
-				boolean[][][] testModified = new boolean[16][16][16];
-				for(boolean[][] l1 : testModified) {
-					for(boolean[] l2 : l1) {
-						Arrays.fill(l2, false);
-					}
-				}
-				
-				int[][][] testNodes = new int[16][16][16];
-				for(int[][] l1 : testNodes) {
-					for(int[] l2 : l1) {
-						Arrays.fill(l2, 1);
-					}
-				}
-				
-				testNodes[0][0][0] = 0;
-				//testNodes[0][0][1] = 0;
-				testNodes[0][0][2] = 0;
-				//testNodes[0][0][3] = 0;
-				testNodes[0][0][4] = 0;
-				
-				MapChunk ch = new MapChunk(pos, testNodes, testModified);
-				MossRenderChunkEvent evt = new MossRenderChunkEvent (ch);
-				renderEventQueue.add(evt);
+		pos = new Position(0, 0, 0, 0);
+		boolean[][][] testModified = new boolean[16][16][16];
+		for(boolean[][] l1 : testModified) {
+			for(boolean[] l2 : l1) {
+				Arrays.fill(l2, false);
 			}
 		}
-		renderEventQueue.add(new MossNodeAddEvent(0, 0, 2, new Position(-16, 0, -16, 0), (short) 1));
+				
+		int[][][] testNodes = new int[16][16][16];
+		for(int[][] l1 : testNodes) {
+			for(int[] l2 : l1) {
+				Arrays.fill(l2, 1);
+			}
+		}
+		
+		testNodes[0][0][0] = 0;
+		testNodes[0][0][1] = 0;
+		//testNodes[0][0][2] = 0;
+		testNodes[0][0][3] = 0;
+		testNodes[0][0][5] = 0;
+		
+		MapChunk ch = new MapChunk(pos, testNodes, testModified);
+		MossRenderChunkEvent evt = new MossRenderChunkEvent (ch);
+		renderEventQueue.add(evt);
+
+		renderEventQueue.add(new MossNodeAddEvent(0, 0, 0, new Position(0, 0, 0, 0), (short) 1));
 		GeometryBatchFactory.optimize(worldNode);
 	}
 	public Material getMaterial (short nVal) {
@@ -199,6 +205,7 @@ public class RenderProcessor extends SimpleApplication {
 	 * Allows the rendering processor to run independently 
 	 */
 	public static void main (String [] args) {
+		
 		RenderProcessor.init();
 	}
 
@@ -219,6 +226,7 @@ public class RenderProcessor extends SimpleApplication {
 	 */
 	@Override
 	public void simpleInitApp() {
+		lastTime = 0;
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
 		spot.setSpotRange(150f);
@@ -232,7 +240,6 @@ public class RenderProcessor extends SimpleApplication {
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
-		
 	}
 	
 	/**
