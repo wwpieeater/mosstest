@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Arrays;
 
 import net.mosstest.scripting.MapGenerators;
@@ -13,8 +12,6 @@ import net.mosstest.scripting.MapGenerators;
 public class MapChunk {
 	Position pos;
 	int[][][] lightNodes = new int[16][16][16];
-	private byte[] light;
-	private byte[] heavy;
 	boolean[][][] modified = new boolean[16][16][16];
 	boolean compressed;
 	transient MapDatabase db;
@@ -32,7 +29,7 @@ public class MapChunk {
 			throws IOException {
 		this.db = db;
 		this.pos = pos;
-		this.light = Arrays.copyOf(light, light.length);
+		Arrays.copyOf(light, light.length);
 		DataInputStream lightStreamIn = new DataInputStream(
 				new ByteArrayInputStream(light));
 		int flags = lightStreamIn.readUnsignedShort();
@@ -45,7 +42,7 @@ public class MapChunk {
 		 * (not implemented yet) 8...=reserved
 		 */
 		if (((flags & 0x01)) != 0) {
-			this.heavy = db.getHeavy(pos);
+			db.getHeavy(pos);
 			loadHeavies();
 		}
 		this.compressed = (((flags & 0x04)) != 0);

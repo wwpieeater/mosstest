@@ -5,7 +5,7 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
 import java.io.File;
 import java.io.IOException;
 
-import net.mosstest.scripting.MapGenerator;
+import net.mosstest.scripting.MapGenerators;
 
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
@@ -55,11 +55,11 @@ public class MapDatabase {
 		}
 	}
 
-	public MapChunk getChunk(final Position pos) {
+	public MapChunk getChunk(final Position pos) throws MapGeneratorException {
 
 		byte[] chunk = this.map.get(pos.toBytes());
 		if (chunk == null)
-			return MapGenerator.generateChunk(pos);
+			return MapGenerators.getDefaultMapgen().generateChunk(pos);
 		try {
 			return new MapChunk(pos, chunk, this);
 		} catch (IOException e) {

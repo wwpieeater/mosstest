@@ -1,10 +1,9 @@
 package net.mosstest.servercore;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-
-import org.apache.commons.lang.NotImplementedException;
 
 public abstract class MossFile {
 	/**
@@ -41,5 +40,7 @@ public abstract class MossFile {
 		this.dirName=dirName;
 		this.resourceName = resourceName;
 	}
+
+	public abstract File getFile() throws IOException;
 
 }

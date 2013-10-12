@@ -3,7 +3,6 @@ package net.mosstest.scripting;
 import net.mosstest.servercore.MapChunk;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MapNode;
-import net.mosstest.servercore.NodeCache;
 import net.mosstest.servercore.Position;
 
 public interface MapGenerator {

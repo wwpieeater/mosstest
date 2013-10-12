@@ -5,40 +5,48 @@ import net.mosstest.scripting.MossScriptException;
 
 public class DefaultEventHandlers {
 
-	public static void processEvent(MossEvent myEvent, MossScriptEnv env) throws MossScriptException {
-		switch (myEvent.type) {
+public static void processEvent(final MossEvent evt, MossScriptEnv env) throws MossScriptException {
+		switch (evt.type) {
 		case EVT_CHATCOMMAND:
-			env.sendChatMessage((Player) myEvent.actor, null,
+			env.sendChatMessage((Player) evt.actor, null,
 					"No such chat command");
 			break;
 		case EVT_CHATMESSAGE:
-			env.sendChatAll((Player) myEvent.actor,
-					myEvent.initiatingMessage);
+			env.sendChatAll((Player) evt.actor,
+					evt.initiatingMessage);
 			break;
 		case EVT_DIEPLAYER:
-			env.setHp(myEvent.actor, 64); // Max HP=64
-			myEvent.actor.respawn();
+			env.setHp(evt.actor, 64); // Max HP=64
+			evt.actor.respawn();
 			// FIXME rarkenin env.moveEntity(myEvent.actor,
 			// Mapgen.getSpawnPoint);
 			break;
 		case EVT_DIGNODE:
 			try {
-				env.damageTool(myEvent.actor,
-						myEvent.nodeBefore);
-				env.givePlayer(myEvent.actor,
-						new ItemStack(myEvent.nodeBefore.dropItem, 1));
+				env.damageTool(evt.actor,
+						evt.nodeBefore);
+				env.givePlayer(evt.actor,
+						new ItemStack(evt.nodeBefore.dropItem, 1));
+				env.removeNode(evt.pos);
 			} catch (MossScriptException e) {
 				//FIXME MossSecurityManager.log(e);
 			}
 			break;
 		case EVT_ENTITY_DEATH:
-			myEvent.actor.respawn();
+			env.getFuturesProcessor().runOnce(8000, new Runnable() {
+				
+				@Override
+				public void run() {
+					evt.actor.respawn();
+					
+				}
+			});
 			break;
 		case EVT_ENTITY_PUNCH:
 			//No default action
 			break;
 		case EVT_FSPEC_INVACTION:
-			myEvent.action.clearAsOriginal();
+			evt.action.acceptAsStated();
 			break;
 		case EVT_FSPEC_OPEN:
 			break;
@@ -53,6 +61,7 @@ public class DefaultEventHandlers {
 		case EVT_NODEMOVE:
 			break;
 		case EVT_PLACENODE:
+			env.setNode(evt.pos, evt.nodeAfter);
 			break;
 		case EVT_QUITPLAYER:
 			break;

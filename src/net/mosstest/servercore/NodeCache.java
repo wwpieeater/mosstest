@@ -8,7 +8,7 @@ public class NodeCache {
 
 	private HashMap<Position, SoftReference<MapChunk>> chunks = new HashMap<>();
 	private MapDatabase db ;
-	public MapChunk getChunk(Position pos) {
+	public MapChunk getChunk(Position pos) throws MapGeneratorException {
 		synchronized (this.chunks) {
 			synchronized (MapDatabase.class) {
 				MapChunk ourChunk = null;

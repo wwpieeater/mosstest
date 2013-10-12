@@ -28,6 +28,7 @@ public class MapNode {
 
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;
+		this.dropItem=ItemManager.getForNode(this);
 
 	}
 
@@ -43,7 +44,7 @@ public class MapNode {
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;
-
+		this.dropItem=ItemManager.getForNode(this);
 	}
 
 	public short getNodeId() {
