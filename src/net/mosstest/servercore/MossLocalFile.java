@@ -8,22 +8,11 @@ import java.io.RandomAccessFile;
 public class MossLocalFile extends MossFile {
 	public static final int CHUNK_LENGTH = 65536;
 
-	// public final String author;
-	//
-	// /**
-	// * String denoting the name of the plugin.
-	// *
-	// */
-	// public final String plugin;
-	//
-	// /**
-	// * String denoting name of resource.
-	// */
-	// public final String resourceName;
-
-	public MossLocalFile(File baseDir, String dirName, String resourceName) {
+	public MossLocalFile(File baseDir, String dirName, String resourceName) throws FileNotFoundException {
 		// super call to establish fields.
 		super(dirName, resourceName);
+		//ensure filename is valid.
+		if(!(dirName.matches("[a-zA-Z0-9]*")&&resourceName.matches("[a-zA-Z0-9]*"))) throw new FileNotFoundException(); 
 		this.file = new File(baseDir, dirName);
 		this.file = new File(this.file, resourceName);
 	}

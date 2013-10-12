@@ -22,6 +22,7 @@ public class MossWorld {
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
 	private ServerNetworkingManager snv;
+	volatile boolean run=true;
 
 	/**
 	 * Initializes a server world. This will start the server once the world is
@@ -74,13 +75,16 @@ public class MossWorld {
 			this.sEnv.runScript(sc);
 		}
 		this.evp = new EventProcessor(this.mossEnv);
-		this.evp.hashCode(); // keep builder from throwing a frivolous warning
 		try {
 			this.snv = new ServerNetworkingManager(port, this);
 		} catch (IOException e) {
 			throw new MossWorldLoadException(
 					"Failure in opening server socket for listening!");
 		}
+		while(this.run) {
+			//hold loop for game to run.
+		}
+		System.exit(0);
 
 	}
 
@@ -88,4 +92,8 @@ public class MossWorld {
 		this.evp.eventQueue.put(e);
 	}
 
+	public static void main(String[] args) throws MossWorldLoadException {
+		MossWorld m=new MossWorld("test", 16511);
+		
+	}
 }
