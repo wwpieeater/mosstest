@@ -1,5 +1,6 @@
 package net.mosstest.scripting;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import net.mosstest.sandbox.SandboxClass;
@@ -10,6 +11,7 @@ import net.mosstest.sandbox.SandboxClass;
  *
  */
 public class JavaApi {
+	
 	private static final HashMap<String, SandboxClass> qualifiedClasses=new HashMap<String, SandboxClass>(){{
 		put("java.lang.Object", new SandboxClass(java.lang.Object.class, true, true, false, false));
 		put("java.lang.String", new SandboxClass(java.lang.String.class, true, true, false, false));
@@ -20,4 +22,15 @@ public class JavaApi {
 		put("java.lang.ClassLoader", new SandboxClass(java.lang.ClassLoader.class, false, false, true, false));
 		put("java.lang.System", new SandboxClass(net.mosstest.sandbox.lang.System.class, true, false, true, false));
 	}};
+	
+	public static Object getInstance(String clazz, Object... constructorParams) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		SandboxClass<?> sc=qualifiedClasses.get(clazz);
+		return sc.getInstance(constructorParams);
+	}
+	
+	public static Object invokeStatic(String clazz, String method,
+			Object... parameters) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
+		SandboxClass<?> sc=qualifiedClasses.get(clazz);
+		return sc.invokeStatic(method, parameters);
+	}
 }

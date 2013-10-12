@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 
 import net.mosstest.servercore.Entity;
+import net.mosstest.servercore.FuturesProcessor;
 import net.mosstest.servercore.ItemStack;
+import net.mosstest.servercore.LiquidNode;
 import net.mosstest.servercore.MapChunk;
+import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MapNode;
 import net.mosstest.servercore.MossEvent;
 import net.mosstest.servercore.MossInventory;
@@ -54,6 +57,7 @@ public class MossScriptEnv {
 			MossEvent.EvtType.class);
 	private ScriptableDatabase db;
 	private NodeCache nc;
+	private FuturesProcessor fp;
 
 	/**
 	 * Registers an event hander to fire on a player death. This will be run in
@@ -398,9 +402,10 @@ public class MossScriptEnv {
 	 *            The position at which to set a node.
 	 * @param node
 	 *            The node to place at that position.
+	 * @throws MapGeneratorException 
 	 */
-	public void setNode(NodePosition pos, MapNode node) {
-		MapChunk chk = nc.getChunk(pos.chunk);
+	public void setNode(NodePosition pos, MapNode node) throws MapGeneratorException {
+		MapChunk chk = this.nc.getChunk(pos.chunk);
 		chk.setNode(pos.xl, pos.yl, pos.zl, node.getNodeId());
 	}
 
@@ -410,12 +415,13 @@ public class MossScriptEnv {
 	 * 
 	 * @param pos
 	 *            The NodePosition at which to remove the node.
+	 * @throws MapGeneratorException 
 	 */
-	public void removeNode(NodePosition pos) {
-		MapChunk chk = nc.getChunk(pos.chunk);
+	public void removeNode(NodePosition pos) throws MapGeneratorException {
+		MapChunk chk = this.nc.getChunk(pos.chunk);
 		chk.setNode(pos.xl, pos.yl, pos.zl, NodeManager.getNode("mg:air")
 				.getNodeId());
-		nc.setChunk(pos.chunk, chk);
+		this.nc.setChunk(pos.chunk, chk);
 	}
 
 	/**
@@ -424,8 +430,9 @@ public class MossScriptEnv {
 	 * @param pos
 	 *            The location at which to get the node
 	 * @return
+	 * @throws MapGeneratorException 
 	 */
-	public MapNode getNode(NodePosition pos) {
+	public MapNode getNode(NodePosition pos) throws MapGeneratorException {
 		return NodeManager.getNode((short) this.nc.getChunk(pos.chunk)
 				.getNodeId(pos.xl, pos.yl, pos.zl));
 
@@ -441,14 +448,12 @@ public class MossScriptEnv {
 	 * @param userFacingName
 	 *            The name to display in the UI, such as Dirt or Iron Ore
 	 * @param params
-	 *            An implementation of the {@link NodeParams} interface
-	 *            detailing the action of the node. {@link AirNodeParams} and
-	 *            {@link DefaultNodeParams} are valid for air-like(display only)
-	 *            and standard solid blocks, respectively.
+	 *            An implementation of the {@link LiquidNodeParams} interface
+	 *            detailing the action of the node.
+	 *            {@link DefaultLiquidNodeParams} is a default that is
+	 *            applicable to most liquids with near-water viscosity.
 	 * @param textures
 	 *            A string stating the filename of the textures image.
-	 * @param isLiquid
-	 *            A boolean of whether the node is liquid.
 	 * @param light
 	 *            The amount of light from 0 to 255 to be emitted.
 	 * @return The MapNode object that has been created and added to the
@@ -461,7 +466,40 @@ public class MossScriptEnv {
 			NodeParams params, String textures, boolean isLiquid, int light)
 			throws MossWorldLoadException {
 		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
-				isLiquid, light);
+				light);
+		NodeManager.putNode(nd);
+		return nd;
+	}
+
+	/**
+	 * Register a new MapNode in the node manager.
+	 * 
+	 * @param sysname
+	 *            The name such as default:lava to set. The prefix mg: is used
+	 *            for mapgen-specific nodes, and should be done by creating a
+	 *            node with a different prefix and aliasing mg:foo to it.
+	 * @param userFacingName
+	 *            The name to display in the UI, such as Lava or Iron Ore
+	 * @param params
+	 *            An implementation of the {@link NodeParams} interface
+	 *            detailing the action of the node. {@link AirNodeParams} and
+	 *            {@link DefaultNodeParams} are valid for air-like(display only)
+	 *            and standard solid blocks, respectively.
+	 * @param textures
+	 *            A string stating the filename of the textures image.
+	 * @param light
+	 *            The amount of light from 0 to 255 to be emitted.
+	 * @return The MapNode object that has been created and added to the
+	 *         manager.
+	 * @throws MossWorldLoadException
+	 *             If an exception occurs during the execution of the
+	 *             registering.
+	 */
+	public static MapNode registerLiquid(String sysname, String userFacingName,
+			NodeParams params, String textures, int light)
+			throws MossWorldLoadException {
+		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
+				light);
 		NodeManager.putNode(nd);
 		return nd;
 	}
@@ -493,20 +531,42 @@ public class MossScriptEnv {
 	 *            The name to display in the UI, such as Dirt or Iron Ore
 	 * @param textures
 	 *            A string stating the filename of the textures image.
-	 * @param isLiquid
-	 *            A boolean of whether the node is liquid.
 	 * @param light
 	 *            The amount of light from 0 to 255 to be emitted.
 	 * @return The MapNode object that has been created and added to the
 	 *         manager.
 	 * @throws MossWorldLoadException
-	 *             If an exception occurs during the execution of the
-	 *             registering.
+	 *             If an exception occurs during node registration.
 	 */
 	public static MapNode registerNodeDefParams(String sysname,
-			String userFacingName, String textures, boolean isLiquid, int light) {
-		MapNode nd = new MapNode(textures, sysname, userFacingName, isLiquid,
-				light);
+			String userFacingName, String textures, int light) {
+		MapNode nd = new MapNode(new DefaultNodeParams(), textures, sysname,
+				userFacingName, light);
+		return nd;
+	}
+
+	/**
+	 * Register a new liquid in the node manager.
+	 * 
+	 * @param sysname
+	 *            The name such as default:lava to set. The prefix mg: is used
+	 *            for mapgen-specific nodes, and should be done by creating a
+	 *            node with a different prefix and aliasing mg:foo to it.
+	 * @param userFacingName
+	 *            The name to display in the UI, such as Dirt or Iron Ore
+	 * @param textures
+	 *            A string stating the filename of the textures image.
+	 * @param light
+	 *            The amount of light from 0 to 255 to be emitted.
+	 * @return The LiquidNode object that has been created and added to the
+	 *         manager.
+	 * @throws MossWorldLoadException
+	 *             If an exception occurs during node registration.
+	 */
+	public static LiquidNode registerLiquidDefParams(String sysname,
+			String userFacingName, String textures, int light) {
+		LiquidNode nd = new LiquidNode(new DefaultLiquidNodeParams(), textures,
+				sysname, userFacingName, light);
 		return nd;
 	}
 
@@ -535,9 +595,15 @@ public class MossScriptEnv {
 		return this.db;
 	}
 
-	public MossScriptEnv(ScriptableDatabase db, NodeCache nc) {
+	public MossScriptEnv(ScriptableDatabase db, NodeCache nc,
+			FuturesProcessor fp) {
 		this.db = db;
 		this.nc = nc;
+		this.fp = fp;
+	}
+
+	public FuturesProcessor getFuturesProcessor() {
+		return this.fp;
 	}
 
 }

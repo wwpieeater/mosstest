@@ -4,7 +4,7 @@ public class MossInventoryAction {
 	MossInventory from;
 	MossInventory to;
 	ItemStack moved;
-	public void clearAsOriginal() {
+	public void acceptAsStated() {
 		// TODO Auto-generated method stub
 		
 	}

@@ -7,7 +7,7 @@ public class ItemStack {
 	public ItemStack(MossItem item, int amount) {
 		this.item = item;
 		this.amount = amount;
-		mayStack=true;
+		this.mayStack=true;
 	}
 	public ItemStack(MossItem item, int amount, boolean mayStack) {
 		this.item = item;

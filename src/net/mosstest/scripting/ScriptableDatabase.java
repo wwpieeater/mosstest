@@ -1,11 +1,12 @@
 package net.mosstest.scripting;
 
+import static org.fusesource.leveldbjni.JniDBFactory.asString;
+import static org.fusesource.leveldbjni.JniDBFactory.bytes;
+import static org.fusesource.leveldbjni.JniDBFactory.factory;
+
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Random;
 
-import static org.fusesource.leveldbjni.JniDBFactory.*;
 import net.mosstest.servercore.NodePosition;
 import net.mosstest.servercore.Player;
 import net.mosstest.servercore.Position;
@@ -17,8 +18,6 @@ import org.iq80.leveldb.Options;
 public class ScriptableDatabase {
 
 	File baseDir;
-	private HashMap<String, ScriptableDatabase.DBase> databases = new HashMap<>();
-
 	public ScriptableDatabase(File baseDir) {
 		this.baseDir = baseDir;
 

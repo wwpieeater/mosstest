@@ -30,6 +30,9 @@ public class ServerNetworkingManager {
 		public void run() {
 			acLoop: while (ServerNetworkingManager.this.runConnections.get()) {
 				try {
+					@SuppressWarnings("resource")
+					// To be closed from other side or explcitly. We don't want
+					// to implicitly close on clients.
 					Socket sock = ServerNetworkingManager.this.sSock.accept();
 					if (ServerNetworkingManager.this.currentConnections.get() >= ServerNetworkingManager.this.maxConnections) {
 						writeTcpPacket(sock.getOutputStream(), 0x03,
@@ -48,7 +51,7 @@ public class ServerNetworkingManager {
 					}
 
 				} catch (IOException | InterruptedException e) {
-					//pass
+					// pass
 				}
 			}
 		}
@@ -57,7 +60,6 @@ public class ServerNetworkingManager {
 
 	public ServerNetworkingManager(int port, MossWorld world)
 			throws IOException {
-		this.w = world;
 		this.bindingIdentifiers = new HashMap<>();
 		this.acceptThread.start();
 		this.maxConnections = EngineSettings.getInt("net.maxConnections", 255) * 2 + 1;
@@ -70,7 +72,6 @@ public class ServerNetworkingManager {
 		this.acceptThread.start();
 	}
 
-	private MossWorld w;
 	private HashMap<Long, ServerSession> bindingIdentifiers;
 	private final int maxConnections;
 	private ThreadGroup svrNetGroup = new ThreadGroup("SvrNetGroup");
@@ -89,6 +90,7 @@ public class ServerNetworkingManager {
 
 	protected class SocketSendRunnable implements Runnable {
 		ServerSession sess;
+
 		@Override
 		public void run() {
 			this.sess = ServerNetworkingManager.this.sendThreadFormQueue.poll();
@@ -103,7 +105,8 @@ public class ServerNetworkingManager {
 						continue pLoop;
 
 					if (p.needsFast) {
-						if ((p.payload.length < 250) && this.sess.dgramSocket!=null)
+						if ((p.payload.length < 250)
+								&& this.sess.dgramSocket != null)
 							sendPacketUdp(p.commandId, p.payload, p.needsAck);
 						else {
 							sendPacketLowLatency(p.commandId, p.payload);
@@ -119,43 +122,51 @@ public class ServerNetworkingManager {
 
 		}
 
-		private void sendPacketDefault(int commandId, byte[] payload) throws IOException {
+		private void sendPacketDefault(int commandId, byte[] payload)
+				throws IOException {
 			sendImpl(commandId, payload, this.sess.bulkSocket);
-			
+
 		}
 
 		@SuppressWarnings("resource")
-		private void sendPacketLowLatency(int commandId, byte[] payload) throws IOException {
-			Socket targetSocket=(this.sess.fastSocket==null)?this.sess.bulkSocket:this.sess.fastSocket;
-			sendImpl(commandId, payload, targetSocket);			
+		private void sendPacketLowLatency(int commandId, byte[] payload)
+				throws IOException {
+			Socket targetSocket = (this.sess.fastSocket == null) ? this.sess.bulkSocket
+					: this.sess.fastSocket;
+			sendImpl(commandId, payload, targetSocket);
 		}
 
-		private void sendImpl(int commandId, byte[] payload, Socket targetSocket) throws IOException {
-			
-			OutputStream os=targetSocket.getOutputStream();
-			DataOutputStream dos=new DataOutputStream(os);
+		private void sendImpl(int commandId, byte[] payload, Socket targetSocket)
+				throws IOException {
+
+			OutputStream os = targetSocket.getOutputStream();
+			DataOutputStream dos = new DataOutputStream(os);
 			dos.writeInt(CommonNetworking.magic);
 			dos.writeInt(payload.length);
 			dos.writeByte(commandId);
 			dos.write(payload);
 			dos.flush();
 			os.flush();
-			
+			dos.close();
+			os.close();
+
 		}
 
 		private void sendPacketUdp(int commandId, byte[] payload,
 				boolean needsAck) throws IOException {
-			if(this.sess.dgramSocket==null) throw new NullPointerException("Null datagram socket!"); //$NON-NLS-1$
-			ByteArrayOutputStream bos=new ByteArrayOutputStream();
-			DataOutputStream dos=new DataOutputStream(bos);
+			if (this.sess.dgramSocket == null)
+				throw new NullPointerException("Null datagram socket!"); //$NON-NLS-1$
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
+			DataOutputStream dos = new DataOutputStream(bos);
 			dos.writeInt(CommonNetworking.magicNoAck);
 			dos.writeByte(commandId);
 			dos.writeByte(payload.length);
 			dos.flush();
 			bos.write(payload);
-			DatagramPacket pc=new DatagramPacket(bos.toByteArray(), bos.toByteArray().length);
-			sess.dgramSocket.send(pc);
-			
+			DatagramPacket pc = new DatagramPacket(bos.toByteArray(),
+					bos.toByteArray().length);
+			this.sess.dgramSocket.send(pc);
+
 		}
 
 	}
@@ -203,10 +214,11 @@ public class ServerNetworkingManager {
 							if (commandId == 254) {
 								// FIXME 0.1
 								sess.isValid.set(false);
-								sess=bindingIdentifiers.get(Long.valueOf(dataIn.readLong()));
-								sess.fastSocket=sock;
+								sess = ServerNetworkingManager.this.bindingIdentifiers.get(Long
+										.valueOf(dataIn.readLong()));
+								sess.fastSocket = sock;
 								sock.setTcpNoDelay(true);
-								
+
 							}
 
 						}

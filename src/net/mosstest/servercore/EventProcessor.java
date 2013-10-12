@@ -131,10 +131,8 @@ public class EventProcessor {
 	private MossScriptEnv ev;
 
 	void processEvents() {
-
-		// GIANT TODO
 		System.out.println("Worker thread entered"); //$NON-NLS-1$
-		boolean run = true; // Not synchronized as only used internally
+		boolean run = true; // Not synchronized as only used locally
 		while (run) {
 			try {
 				MossEvent myEvent = this.eventQueue.take();

@@ -21,8 +21,10 @@ public class MossWorld {
 	private ScriptEnv sEnv;
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
+	@SuppressWarnings("unused")
 	private ServerNetworkingManager snv;
-	volatile boolean run=true;
+	volatile boolean run = true;
+	private FuturesProcessor fp;
 
 	/**
 	 * Initializes a server world. This will start the server once the world is
@@ -68,7 +70,8 @@ public class MossWorld {
 		}
 		this.nc = new NodeCache(this.db);
 		this.sdb = new ScriptableDatabase(this.baseDir);
-		this.mossEnv = new MossScriptEnv(this.sdb, this.nc);
+		this.fp = new FuturesProcessor();
+		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp);
 		this.sEnv = new ScriptEnv(this.mossEnv);
 		ArrayList<MossScript> scripts = this.game.getScripts();
 		for (MossScript sc : scripts) {
@@ -81,8 +84,8 @@ public class MossWorld {
 			throw new MossWorldLoadException(
 					"Failure in opening server socket for listening!");
 		}
-		while(this.run) {
-			//hold loop for game to run.
+		while (this.run) {
+			// hold loop for game to run.
 		}
 		System.exit(0);
 
@@ -93,7 +96,7 @@ public class MossWorld {
 	}
 
 	public static void main(String[] args) throws MossWorldLoadException {
-		MossWorld m=new MossWorld("test", 16511);
-		
+		MossWorld m = new MossWorld("test", 16511);
+
 	}
 }
