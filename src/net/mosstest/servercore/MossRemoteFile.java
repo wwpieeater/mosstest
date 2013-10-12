@@ -16,27 +16,16 @@ public class MossRemoteFile extends MossFile {
 
 	public static final int CHUNK_LENGTH = 65536;
 
-	// public final String author;
-	//
-	// /**
-	// * String denoting the name of the plugin.
-	// *
-	// */
-	// public final String plugin;
-	//
-	// /**
-	// * String denoting name of resource.
-	// */
-	// public final String resourceName;
-
 	public final int numChunks;
 	public final int length;
 	private BitSet chunksDone;
 
 	public MossRemoteFile(File cacheDir, String dirName, String resourceName,
-			int length) {
+			int length) throws FileNotFoundException {
 		// super call to establish fields.
 		super(dirName, resourceName);
+		//ensure filename is valid.
+		if(!(dirName.matches("[a-zA-Z0-9]*")&&resourceName.matches("[a-zA-Z0-9]*"))) throw new FileNotFoundException(); 
 		this.file = new File(cacheDir, dirName);
 		this.file = new File(this.file, resourceName);
 		this.length = length;
