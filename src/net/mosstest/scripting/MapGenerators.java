@@ -94,7 +94,7 @@ public class MapGenerators {
 		public static final int HEIGHT_JITTER = 100;
 		public static final double SIMPLEX_SCALE_FACTOR = 1;
 		public static final double SIMPLEX_LOCAL_SCALE_FACTOR = 10 * SIMPLEX_SCALE_FACTOR;
-		public static final double SIMPLEX_ROOT_DEGREE = 0;
+		public static final double SIMPLEX_ROOT_DEGREE = 2;
 		public static final int SEA_LEVEL = 0;
 		// todo tweak parameters
 		// TODO finish simplex generator including ores
@@ -142,7 +142,7 @@ public class MapGenerators {
 							x * SIMPLEX_SCALE_FACTOR, // scale
 							y * SIMPLEX_SCALE_FACTOR, // scale
 							this.elevationSeed, this.elevationSeed), // seed
-							1.0 / SIMPLEX_ROOT_DEGREE) // emphasize peaks
+							SIMPLEX_ROOT_DEGREE) // emphasize peaks
 					- 0.5))); // center on average height
 					int dirtelevation = (int) (elevation - // max possible
 															// height
