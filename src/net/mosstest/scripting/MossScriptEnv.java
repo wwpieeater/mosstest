@@ -402,10 +402,12 @@ public class MossScriptEnv {
 	 *            The position at which to set a node.
 	 * @param node
 	 *            The node to place at that position.
-	 * @throws MapGeneratorException 
+	 * @throws MapGeneratorException
 	 */
-	public void setNode(NodePosition pos, MapNode node) throws MapGeneratorException {
-		MapChunk chk = this.nc.getChunk(pos.chunk);
+	public void setNode(NodePosition pos, MapNode node) {
+		MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
+		if (chk == null)
+			return;
 		chk.setNode(pos.xl, pos.yl, pos.zl, node.getNodeId());
 	}
 
@@ -415,10 +417,12 @@ public class MossScriptEnv {
 	 * 
 	 * @param pos
 	 *            The NodePosition at which to remove the node.
-	 * @throws MapGeneratorException 
+	 * @throws MapGeneratorException
 	 */
-	public void removeNode(NodePosition pos) throws MapGeneratorException {
-		MapChunk chk = this.nc.getChunk(pos.chunk);
+	public void removeNode(NodePosition pos) {
+		MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
+		if (chk == null)
+			return;
 		chk.setNode(pos.xl, pos.yl, pos.zl, NodeManager.getNode("mg:air")
 				.getNodeId());
 		this.nc.setChunk(pos.chunk, chk);
@@ -430,7 +434,7 @@ public class MossScriptEnv {
 	 * @param pos
 	 *            The location at which to get the node
 	 * @return
-	 * @throws MapGeneratorException 
+	 * @throws MapGeneratorException
 	 */
 	public MapNode getNode(NodePosition pos) throws MapGeneratorException {
 		return NodeManager.getNode((short) this.nc.getChunk(pos.chunk)

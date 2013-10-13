@@ -60,4 +60,10 @@ public class NodeCache {
 		this.db =db;
 	}
 
+	public MapChunk getChunkNoGenerate(Position chunk) {
+		synchronized (this.chunks) {
+			 return this.chunks.get(chunk).get();
+		}
+	}
+
 }
