@@ -47,7 +47,7 @@ public interface MapGenerator {
 	 *            Miscellaneous params for the map generator.
 	 */
 	public void registerOre(MapNode oreNode, double minDepth, double rarity,
-			double clumping, Object... params);
+			double clumping, int seed, Object... params);
 
 	
 }
