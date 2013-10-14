@@ -13,7 +13,7 @@ public class MapNode {
 	public int lightEmission;
 	public MossItem dropItem;
 	public boolean isBuildableTo = true;
-
+	public DrawType drawType=DrawType.DRAW_BLOCK;
 	public float boxOriginX = 0, boxOriginY = 0, boxOriginZ = 0;
 	/**
 	 * Each of these is 0.5 for the unit box, since each vertex is +/-0.5 from
@@ -27,15 +27,14 @@ public class MapNode {
 		this.texture = texture;
 		this.nodeName = nodeName;
 
-
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;
 		this.dropItem = ItemManager.getForNode(this);
 
 	}
 
-	public void setByBounds(float x1, float x2, float y1, float y2,
-			float z1, float z2) {
+	public void setByBounds(float x1, float x2, float y1, float y2, float z1,
+			float z2) {
 		this.boxOriginX = (x1 + x2) / 2;
 		this.boxOriginY = (y1 + y2) / 2;
 		this.boxOriginZ = (z1 + z2) / 2;
@@ -102,6 +101,28 @@ public class MapNode {
 	protected MapNode() {
 		this.texture = null;
 		this.nodeparams = null;
+	}
+
+	public enum DrawType {
+		/**
+		 * Standard appearance for blocks
+		 */
+		DRAW_BLOCK,
+		/**
+		 * Drawtype for liquids
+		 */
+		DRAW_LIQUID,
+		/**
+		 * Drawtype for plantlike materials. In this draw, two planes with the
+		 * item texture(which should be symmetrical for this) are drawn
+		 * intersecting in an X-pattern.
+		 */
+		DRAW_PLANTLIKE, 
+		
+		/**
+		 * Do not draw the node at all.
+		 */
+		DRAW_NONE
 	}
 
 }

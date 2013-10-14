@@ -126,15 +126,14 @@ public interface NodeParams {
 	public abstract double calcBounceHeight(Player player, double fallheight);
 
 	/**
-	 * Calculates how far a player will sink in after landing on this node.
+	 * Calculates at which rate a player will sink in after landing on this node.
 	 * 
 	 * @param player
 	 *            The player to calculate sink for.
 	 * @param fallheight
 	 *            The height from which they have fallen. 0 if the player walks
 	 *            onto the node without jumping or falling.
-	 * @return The distance for the player to sink. If grater than or equal to
-	 *         1, the player will fall through the node fully.
+	 * @return The rate for the player to sink.
 	 */
 	public abstract double calcSinkIn(Player player, double fallheight);
 
