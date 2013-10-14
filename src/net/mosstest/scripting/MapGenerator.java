@@ -3,11 +3,12 @@ package net.mosstest.scripting;
 import net.mosstest.servercore.MapChunk;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MapNode;
+import net.mosstest.servercore.NodeManager;
 import net.mosstest.servercore.Position;
 
 public interface MapGenerator {
 
-	void init(long seed, Object... params) throws MapGeneratorException;
+	void init(long seed, NodeManager nm, Object... params) throws MapGeneratorException;
 
 	public MapChunk generateChunk(Position pos) throws MapGeneratorException;
 
