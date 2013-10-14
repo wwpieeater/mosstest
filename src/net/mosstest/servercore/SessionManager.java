@@ -4,6 +4,6 @@ import java.util.HashMap;
 
 public class SessionManager {
 
-	HashMap<Player, ServerSession> playerSessions=new HashMap<>();
+	public HashMap<Player, ServerSession> playerSessions=new HashMap<>();
 	volatile long gameTicks; 
 }
