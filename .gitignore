@@ -23,4 +23,4 @@ COMMIT_EDITMSG
 .DS_Store
 /target
 /build/output
-/data
+/data/worlds
