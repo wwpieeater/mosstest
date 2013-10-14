@@ -1,39 +1,39 @@
 package net.mosstest.servercore;
 
+import static org.fusesource.leveldbjni.JniDBFactory.factory;
+
 import java.io.File;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.util.List;
-import java.util.Timer;
 
-import org.fusesource.leveldbjni.internal.NativeDB;
-import org.iq80.leveldb.*;
+import net.mosstest.scripting.MapGenerators;
 
-import static org.fusesource.leveldbjni.JniDBFactory.*;
-
-import java.io.*;
+import org.iq80.leveldb.DB;
+import org.iq80.leveldb.Options;
 
 public class MapDatabase {
-	static DB map;
-	static DB entities;
-	static DB metadata;
-	static DB mapHeavies;
-	static DB landclaims;
-	public static void init(String name, boolean create)
-			throws MapDatabaseException, MossWorldLoadException {
-		if (!name.matches("^[A-Z[a-z[0-9[ ]]]]+$")) {
-			throw new MossWorldLoadException(
-					"World name contains invalid characters");
-		}
+	DB map;
+	DB entities;
+	DB metadata;
+	DB mapHeavies;
+	DB landclaims;
+	DB players;
 
+	@SuppressWarnings("nls")
+	public MapDatabase(File basedir) throws MapDatabaseException,
+			MossWorldLoadException {
+		File dbDir=new File(basedir, "db");
+		dbDir.mkdirs();
 		try {
 			Options options = new Options();
 			options.createIfMissing(true);
-			map = factory.open(new File("worlds/" + name + "/map.db"), options);
-			mapHeavies=factory.open(new File("worlds/" + name + "/mapHeavies.db"), options);
-			entities = factory.open(new File("worlds/" + name + "/entities.db"),
+			this.map = factory.open(new File(dbDir, "map.db"), options);
+			this.mapHeavies = factory.open(new File(dbDir, "mapHeavies.db"),
 					options);
-			metadata = factory.open(new File("worlds/" + name + "/metadata.db"),
+			this.entities = factory.open(new File(dbDir, "entities.db"),
+					options);
+			this.metadata = factory.open(new File(dbDir, "metadata.db"),
+					options);
+			this.players = factory.open(new File(dbDir, "players.db"),
 					options);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -42,23 +42,26 @@ public class MapDatabase {
 
 	}
 
-	public static void close() throws  MapDatabaseException {
+	public void close() throws MapDatabaseException {
 		try {
-			map.close();
-			entities.close();
-			metadata.close();
+			this.map.close();
+			this.entities.close();
+			this.metadata.close();
 		} catch (IOException e) {
-			throw new MapDatabaseException(MapDatabaseException.SEVERITY_UNKNOWN|MapDatabaseException.SEVERITY_FATAL_TRANSIENT, "Database shutdown failed!");
+			throw new MapDatabaseException(
+					MapDatabaseException.SEVERITY_UNKNOWN
+							| MapDatabaseException.SEVERITY_FATAL_TRANSIENT,
+					"Database shutdown failed!"); //$NON-NLS-1$
 		}
 	}
 
-	public static MapChunk getChunk(final Position pos)
-			{
-		
-		byte[] chunk=map.get(pos.toBytes());
-		if(chunk==null) return MapGenerator.generateChunk(pos);
+	public MapChunk getChunk(final Position pos) throws MapGeneratorException {
+
+		byte[] chunk = this.map.get(pos.toBytes());
+		if (chunk == null)
+			return MapGenerators.getDefaultMapgen().generateChunk(pos);
 		try {
-			return new MapChunk(pos, chunk);
+			return new MapChunk(pos, chunk, this);
 		} catch (IOException e) {
 			ExceptionHandler.registerException(e);
 			return null;
@@ -72,15 +75,13 @@ public class MapDatabase {
 	 * @throws MapDatabaseException
 	 */
 
-	static void addMapChunk(Position pos, MapChunk mapChunk) {
-		map.put(pos.toBytes(),mapChunk.writeLight(true));
+	void addMapChunk(Position pos, MapChunk mapChunk) {
+		this.map.put(pos.toBytes(), mapChunk.writeLight(true));
 
 	}
 
-	public static byte[] getHeavy(Position pos) {
-		return mapHeavies.get(pos.toBytes());
+	public byte[] getHeavy(Position pos) {
+		return this.mapHeavies.get(pos.toBytes());
 	}
-
-
 
 }

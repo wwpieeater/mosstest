@@ -1,128 +1,84 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.DefaultNodeParams;
 import net.mosstest.scripting.NodeParams;
 
 public class MapNode {
-	short nodeId = 0;
+	private short nodeId = 0;
 	public final NodeParams nodeparams;
-	private final String[] textureSpace;
+	public final String texture;
+
 	public String nodeName;
 	public String userFacingName;
-	public boolean isLiquid;
 	public int lightEmission;
 	public MossItem dropItem;
+	public boolean isBuildableTo = true;
 
-	public MapNode(NodeParams nodeparams, String[] tex, String nodeName,
-			String userFacingName, boolean isLiquid, int lightEmission) {
+	public MapNode(NodeParams nodeparams, String texture, String nodeName,
+			String userFacingName, int lightEmission) {
 		this.nodeparams = nodeparams;
-		this.textureSpace = tex;
+		this.texture = texture;
 		this.nodeName = nodeName;
 
 		try {
-			nodeId = NodeManager.putNode(this);
+			setNodeId(NodeManager.putNode(this));
 		} catch (MossWorldLoadException e) {
-
+			// pass
 		}
 
 		this.userFacingName = userFacingName;
-		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
+		this.dropItem=ItemManager.getForNode(this);
+
 	}
 
-	public MapNode(String [] tex, String nodeName,
-			String userFacingName, boolean isLiquid, int lightEmission) {
-		this.nodeparams = getDefaultParams();
-		this.textureSpace = tex;
+	public MapNode(String textures, String nodeName, String userFacingName,
+			int lightEmission) {
+		this.nodeparams = new DefaultNodeParams();
+		this.texture = textures;
 		try {
-			nodeId = NodeManager.putNode(this);
+			setNodeId(NodeManager.putNode(this));
 		} catch (MossWorldLoadException e) {
-
+			// pass
 		}
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
-		this.isLiquid = isLiquid;
 		this.lightEmission = lightEmission;
+		this.dropItem=ItemManager.getForNode(this);
 	}
 
-	private static NodeParams getDefaultParams() {
-		return new NodeParams() {
-
-			@Override
-			public boolean onStepOn(Player player, NodePosition pos) {
-				return true;
-			}
-
-			@Override
-			public void onRightClick(Player player, GenericTool tool,
-					NodePosition target, Face clickedFace) {
-				return;
-
-			}
-
-			@Override
-			public void onPunch(Player player, GenericTool tool,
-					NodePosition target, Face punchedFace) {
-				return;
-
-			}
-
-			@Override
-			public void onPlaceNextTo(Player player, NodePosition target,
-					NodePosition placed) {
-				return;
-			}
-
-			@Override
-			public void onDig(Player player, GenericTool tool,
-					NodePosition target, Face punchedFace) {
-				return;
-			}
-
-			@Override
-			public double jumpOffHeight(Player player) {
-				return 1.125;
-			}
-
-			@Override
-			public double calcWalkSpeed(Player player) {
-				return 1;
-			}
-
-			@Override
-			public double calcSprintSpeed(Player player) {
-				return 4;
-			}
-
-			@Override
-			public double calcSinkIn(Player player, double fallheight) {
-				return 0;
-			}
-
-			@Override
-			public double calcSinkEscape(Player player, double fallheight) {
-				return 1;
-			}
-
-			@Override
-			public double calcBounceHeight(Player player, double fallheight) {
-				// TODO Auto-generated method stub
-				return 0.125;
-			}
-
-			@Override
-			public double calcFallDamage(Player player, double height) {
-				// TODO Auto-generated method stub
-				return 0;
-			}
-		};
+	public short getNodeId() {
+		return this.nodeId;
 	}
 
-	public void draw(DrawableWorld world, NodePosition pos) {
-		world.addBlockMesh(this, pos);
+	void setNodeId(short nodeId) {
+		this.nodeId = nodeId;
 	}
 
-	public ItemStack getDrop() {
-		// TODO Auto-generated method stub
-		return new ItemStack(dropItem, 1);
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.nodeId;
+		return result;
 	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof MapNode)) {
+			return false;
+		}
+		MapNode other = (MapNode) obj;
+		if (this.nodeId != other.nodeId) {
+			return false;
+		}
+		return true;
+	}
+
 }

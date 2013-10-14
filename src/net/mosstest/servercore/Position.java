@@ -19,21 +19,21 @@ public class Position {
 		this.y = y;
 		this.z = z;
 		this.realm = realm;
-		isValid = true;
+		this.isValid = true;
 	}
 
 	public Position(byte[] bytes) throws IOException {
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bis);
-		x = dis.readInt();
-		y = dis.readInt();
-		z = dis.readInt();
-		realm = dis.readInt();
-		isValid = true;
+		this.x = dis.readInt();
+		this.y = dis.readInt();
+		this.z = dis.readInt();
+		this.realm = dis.readInt();
+		this.isValid = true;
 	}
 
 	public Position() {
-		isValid = false;
+		this.isValid = false;
 	}
 
 	static final long serialVersionUID = 1128980133700001337L;
@@ -50,16 +50,16 @@ public class Position {
 			return false;
 		}
 		Position other = (Position) obj;
-		if (realm != other.realm) {
+		if (this.realm != other.realm) {
 			return false;
 		}
-		if (x != other.x) {
+		if (this.x != other.x) {
 			return false;
 		}
-		if (y != other.y) {
+		if (this.y != other.y) {
 			return false;
 		}
-		if (z != other.z) {
+		if (this.z != other.z) {
 			return false;
 		}
 		return true;
@@ -67,28 +67,45 @@ public class Position {
 
 	@Override
 	public int hashCode() {
-		return Integer.reverseBytes(x) ^ Integer.reverseBytes(y)
-				^ Integer.reverseBytes(z);
-		// Needs to be better
-
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + this.realm;
+		result = prime * result + this.x;
+		result = prime * result + this.y;
+		result = prime * result + this.z;
+		return result;
 	}
 
 	public byte[] toBytes() {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 		try {
-			dos.writeInt(x);
-			dos.writeInt(y);
-			dos.writeInt(z);
-			dos.writeInt(realm);
+			dos.writeInt(this.x);
+			dos.writeInt(this.y);
+			dos.writeInt(this.z);
+			dos.writeInt(this.realm);
 			dos.flush();
 			bos.flush();
 			return bos.toByteArray();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			isValid = false;
+			this.isValid = false;
 		}
 		return new byte[] {};
 	}
+
+	public int getX() {
+		return this.x;
+	}
+
+	public int getY() {
+		return this.y;
+	}
+
+
+	public int getZ() {
+		return this.z;
+	}
+
 
 }

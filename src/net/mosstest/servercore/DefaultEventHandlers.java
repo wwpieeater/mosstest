@@ -5,39 +5,48 @@ import net.mosstest.scripting.MossScriptException;
 
 public class DefaultEventHandlers {
 
-	public static void processEvent(MossEvent myEvent) throws MossScriptException {
-		switch (myEvent.type) {
+public static void processEvent(final MossEvent evt, MossScriptEnv env) throws MossScriptException {
+		switch (evt.type) {
 		case EVT_CHATCOMMAND:
-			MossScriptEnv.sendChatMessage((Player) myEvent.actor, null,
+			env.sendChatMessage((Player) evt.actor, null,
 					"No such chat command");
 			break;
 		case EVT_CHATMESSAGE:
-			MossScriptEnv.sendChatAll((Player) myEvent.actor,
-					myEvent.initiatingMessage);
+			env.sendChatAll((Player) evt.actor,
+					evt.initiatingMessage);
 			break;
 		case EVT_DIEPLAYER:
-			MossScriptEnv.setHp(myEvent.actor, 64); // Max HP=64
-			// FIXME rarkenin MossScriptEnv.moveEntity(myEvent.actor,
+			env.setHp(evt.actor, 64); // Max HP=64
+			evt.actor.respawn();
+			// FIXME rarkenin env.moveEntity(myEvent.actor,
 			// Mapgen.getSpawnPoint);
 			break;
 		case EVT_DIGNODE:
 			try {
-				MossScriptEnv.damageTool((Player) myEvent.actor,
-						myEvent.nodeBefore);
-				MossScriptEnv.givePlayer((Player) myEvent.actor,
-						myEvent.nodeBefore.getDrop());
+				env.damageTool(evt.actor,
+						evt.nodeBefore);
+				env.givePlayer(evt.actor,
+						new ItemStack(evt.nodeBefore.dropItem, 1));
+				env.removeNode(evt.pos);
 			} catch (MossScriptException e) {
 				//FIXME MossSecurityManager.log(e);
 			}
 			break;
 		case EVT_ENTITY_DEATH:
-			myEvent.actor.destroy();
+			env.getFuturesProcessor().runOnce(8000, new Runnable() {
+				
+				@Override
+				public void run() {
+					evt.actor.respawn();
+					
+				}
+			});
 			break;
 		case EVT_ENTITY_PUNCH:
 			//No default action
 			break;
 		case EVT_FSPEC_INVACTION:
-			myEvent.action.clearAsOriginal();
+			evt.action.acceptAsStated();
 			break;
 		case EVT_FSPEC_OPEN:
 			break;
@@ -52,6 +61,7 @@ public class DefaultEventHandlers {
 		case EVT_NODEMOVE:
 			break;
 		case EVT_PLACENODE:
+			env.setNode(evt.pos, evt.nodeAfter);
 			break;
 		case EVT_QUITPLAYER:
 			break;
