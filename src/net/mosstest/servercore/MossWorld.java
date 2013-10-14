@@ -25,7 +25,7 @@ public class MossWorld {
 	private ServerNetworkingManager snv;
 	volatile boolean run = true;
 	private FuturesProcessor fp;
-
+	private NodeManager nm;
 	/**
 	 * Initializes a server world. This will start the server once the world is
 	 * initialized, loaded, and passes basic consistency checks. This
@@ -71,7 +71,8 @@ public class MossWorld {
 		this.nc = new NodeCache(this.db);
 		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.fp = new FuturesProcessor();
-		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp);
+		this.nm=new NodeManager(this.db.nodes);
+		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp, this.nm);
 		this.sEnv = new ScriptEnv(this.mossEnv);
 		ArrayList<MossScript> scripts = this.game.getScripts();
 		for (MossScript sc : scripts) {

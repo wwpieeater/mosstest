@@ -13,11 +13,11 @@ import toxi.math.noise.SimplexNoise;
 public class MapGenerators {
 	private static volatile MapGenerator mg;
 
-	public static void setDefaultMapGenerator(MapGenerator g, long seed,
+	public static void setDefaultMapGenerator(MapGenerator g, NodeManager nm, long seed,
 			Object... params) throws MapGeneratorException {
 		synchronized (MapGenerators.class) {
 			mg = g;
-			mg.init(seed, params);
+			mg.init(seed, nm, params);
 		}
 	}
 
@@ -27,11 +27,12 @@ public class MapGenerators {
 
 	public static class FlatMapGenerator implements MapGenerator {
 		long seed;
-
+		NodeManager nm;
 		@Override
-		public void init(long seed, Object... params)
+		public void init(long seed, NodeManager nm, Object... params)
 				throws MapGeneratorException {
 			this.seed = seed;
+			this.nm=nm;
 		}
 
 		@Override
@@ -39,8 +40,8 @@ public class MapGenerators {
 				throws MapGeneratorException {
 			int[][][] nodes = new int[16][16][16];
 			try {
-				int fillNode = (pos.getZ() >= 0) ? NodeManager.getNode(
-						"mg:air", false).getNodeId() : NodeManager.getNode(
+				int fillNode = (pos.getZ() >= 0) ? this.nm.getNode(
+						"mg:air", false).getNodeId() : this.nm.getNode(
 						"mg:ground", false).getNodeId();
 
 				for (int x = 0; x < 16; x++) {
@@ -61,8 +62,8 @@ public class MapGenerators {
 		@Override
 		public void fillInChunk(int[][][] lightNodes, Position pos)
 				throws MapGeneratorException {
-			int fillNode = (pos.getZ() >= 0) ? NodeManager.getNode("mg:air",
-					false).getNodeId() : NodeManager
+			int fillNode = (pos.getZ() >= 0) ? this.nm.getNode("mg:air",
+					false).getNodeId() : this.nm
 					.getNode("mg:ground", false).getNodeId();
 
 			for (int x = 0; x < 16; x++) {
@@ -103,10 +104,11 @@ public class MapGenerators {
 		double dirtSeed;
 		SimplexNoise elevationNoise = new SimplexNoise();
 		ArrayList<Ore> ores = new ArrayList<>();
-
+		NodeManager nm;
 		@Override
-		public void init(long seed, Object... params)
+		public void init(long seed, NodeManager nm,Object... params)
 				throws MapGeneratorException {
+			this.nm=nm;
 			this.baseSeed = seed;
 			Random rand = new Random(seed);
 
@@ -128,10 +130,10 @@ public class MapGenerators {
 		public void fillInChunk(int[][][] lightNodes, Position pos)
 				throws MapGeneratorException {
 			//TODO make trees
-			short grass = NodeManager.getNode("mg:grass", false).getNodeId();
-			short dirt = NodeManager.getNode("mg:dirt", false).getNodeId();
-			short stone = NodeManager.getNode("mg:stone", false).getNodeId();
-			short air = NodeManager.getNode("mg:air", false).getNodeId();
+			short grass = nm.getNode("mg:grass", false).getNodeId();
+			short dirt = nm.getNode("mg:dirt", false).getNodeId();
+			short stone = nm.getNode("mg:stone", false).getNodeId();
+			short air = nm.getNode("mg:air", false).getNodeId();
 			for (int x = 0; x < 16; x++) {
 				long globalx = pos.getX() * 16 + x;
 				for (int y = 0; y < 16; y++) {

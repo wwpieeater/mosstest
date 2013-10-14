@@ -3,6 +3,8 @@ package net.mosstest.scripting;
 import java.util.ArrayList;
 import java.util.EnumMap;
 
+import org.iq80.leveldb.DB;
+
 import net.mosstest.servercore.Entity;
 import net.mosstest.servercore.FuturesProcessor;
 import net.mosstest.servercore.ItemStack;
@@ -58,6 +60,7 @@ public class MossScriptEnv {
 	private ScriptableDatabase db;
 	private NodeCache nc;
 	private FuturesProcessor fp;
+	private NodeManager nm;
 
 	/**
 	 * Registers an event hander to fire on a player death. This will be run in
@@ -423,7 +426,7 @@ public class MossScriptEnv {
 		MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
 		if (chk == null)
 			return;
-		chk.setNode(pos.xl, pos.yl, pos.zl, NodeManager.getNode("mg:air")
+		chk.setNode(pos.xl, pos.yl, pos.zl, this.nm.getNode("mg:air")
 				.getNodeId());
 		this.nc.setChunk(pos.chunk, chk);
 	}
@@ -437,8 +440,8 @@ public class MossScriptEnv {
 	 * @throws MapGeneratorException
 	 */
 	public MapNode getNode(NodePosition pos) throws MapGeneratorException {
-		return NodeManager.getNode((short) this.nc.getChunk(pos.chunk)
-				.getNodeId(pos.xl, pos.yl, pos.zl));
+		return this.nm.getNode((short) this.nc.getChunk(pos.chunk).getNodeId(
+				pos.xl, pos.yl, pos.zl));
 
 	}
 
@@ -466,12 +469,12 @@ public class MossScriptEnv {
 	 *             If an exception occurs during the execution of the
 	 *             registering.
 	 */
-	public static MapNode registerNode(String sysname, String userFacingName,
+	public MapNode registerNode(String sysname, String userFacingName,
 			NodeParams params, String textures, boolean isLiquid, int light)
 			throws MossWorldLoadException {
 		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
 				light);
-		NodeManager.putNode(nd);
+		this.nm.putNode(nd);
 		return nd;
 	}
 
@@ -499,12 +502,12 @@ public class MossScriptEnv {
 	 *             If an exception occurs during the execution of the
 	 *             registering.
 	 */
-	public static MapNode registerLiquid(String sysname, String userFacingName,
+	public MapNode registerLiquid(String sysname, String userFacingName,
 			NodeParams params, String textures, int light)
 			throws MossWorldLoadException {
 		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
 				light);
-		NodeManager.putNode(nd);
+		this.nm.putNode(nd);
 		return nd;
 	}
 
@@ -520,8 +523,8 @@ public class MossScriptEnv {
 	 *            The existing node to set as the alias target, i.e
 	 *            myscript:specialdirt. This element must already exist.
 	 */
-	public static void registerNodeAlias(String alias, String dst) {
-		NodeManager.putNodeAlias(alias, dst);
+	public void registerNodeAlias(String alias, String dst) {
+		this.nm.putNodeAlias(alias, dst);
 	}
 
 	/**
@@ -542,10 +545,11 @@ public class MossScriptEnv {
 	 * @throws MossWorldLoadException
 	 *             If an exception occurs during node registration.
 	 */
-	public static MapNode registerNodeDefParams(String sysname,
-			String userFacingName, String textures, int light) {
+	public MapNode registerNodeDefParams(String sysname, String userFacingName,
+			String textures, int light) throws MossWorldLoadException {
 		MapNode nd = new MapNode(new DefaultNodeParams(), textures, sysname,
 				userFacingName, light);
+		this.nm.putNode(nd);
 		return nd;
 	}
 
@@ -567,10 +571,12 @@ public class MossScriptEnv {
 	 * @throws MossWorldLoadException
 	 *             If an exception occurs during node registration.
 	 */
-	public static LiquidNode registerLiquidDefParams(String sysname,
-			String userFacingName, String textures, int light) {
+	public LiquidNode registerLiquidDefParams(String sysname,
+			String userFacingName, String textures, int light)
+			throws MossWorldLoadException {
 		LiquidNode nd = new LiquidNode(new DefaultLiquidNodeParams(), textures,
 				sysname, userFacingName, light);
+		this.nm.putNode(nd);
 		return nd;
 	}
 
@@ -600,10 +606,11 @@ public class MossScriptEnv {
 	}
 
 	public MossScriptEnv(ScriptableDatabase db, NodeCache nc,
-			FuturesProcessor fp) {
+			FuturesProcessor fp, NodeManager nm) {
 		this.db = db;
 		this.nc = nc;
 		this.fp = fp;
+		this.nm = nm;
 	}
 
 	public FuturesProcessor getFuturesProcessor() {

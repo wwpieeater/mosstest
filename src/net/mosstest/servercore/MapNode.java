@@ -27,11 +27,6 @@ public class MapNode {
 		this.texture = texture;
 		this.nodeName = nodeName;
 
-		try {
-			setNodeId(NodeManager.putNode(this));
-		} catch (MossWorldLoadException e) {
-			// pass
-		}
 
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;
@@ -63,11 +58,7 @@ public class MapNode {
 			int lightEmission) {
 		this.nodeparams = new DefaultNodeParams();
 		this.texture = textures;
-		try {
-			setNodeId(NodeManager.putNode(this));
-		} catch (MossWorldLoadException e) {
-			// pass
-		}
+
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;

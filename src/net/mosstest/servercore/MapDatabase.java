@@ -17,11 +17,12 @@ public class MapDatabase {
 	DB mapHeavies;
 	DB landclaims;
 	DB players;
+	public DB nodes;
 
 	@SuppressWarnings("nls")
 	public MapDatabase(File basedir) throws MapDatabaseException,
 			MossWorldLoadException {
-		File dbDir=new File(basedir, "db");
+		File dbDir = new File(basedir, "db");
 		dbDir.mkdirs();
 		try {
 			Options options = new Options();
@@ -33,8 +34,8 @@ public class MapDatabase {
 					options);
 			this.metadata = factory.open(new File(dbDir, "metadata.db"),
 					options);
-			this.players = factory.open(new File(dbDir, "players.db"),
-					options);
+			this.players = factory.open(new File(dbDir, "players.db"), options);
+			this.nodes = factory.open(new File(dbDir, "nodes.db"), options);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new MossWorldLoadException("Database loading failed.");
