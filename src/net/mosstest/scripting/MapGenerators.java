@@ -102,6 +102,7 @@ public class MapGenerators {
 		long baseSeed;
 		double elevationSeed;
 		double dirtSeed;
+		double humiditySeed;
 		SimplexNoise elevationNoise = new SimplexNoise();
 		ArrayList<Ore> ores = new ArrayList<>();
 		NodeManager nm;
@@ -116,7 +117,7 @@ public class MapGenerators {
 			// simplex. I'm guessing 2^32 is enough variation.
 			this.elevationSeed = rand.nextInt();
 			this.dirtSeed = rand.nextInt();
-
+			this.humiditySeed = rand.nextInt();
 		}
 
 		@Override
@@ -130,10 +131,11 @@ public class MapGenerators {
 		public void fillInChunk(int[][][] lightNodes, Position pos)
 				throws MapGeneratorException {
 			//TODO make trees
-			short grass = nm.getNode("mg:grass", false).getNodeId();
-			short dirt = nm.getNode("mg:dirt", false).getNodeId();
-			short stone = nm.getNode("mg:stone", false).getNodeId();
-			short air = nm.getNode("mg:air", false).getNodeId();
+			short grass = this.nm.getNode("mg:grass", false).getNodeId();
+			short dirt = this.nm.getNode("mg:dirt", false).getNodeId();
+			short stone = this.nm.getNode("mg:stone", false).getNodeId();
+			short air = this.nm.getNode("mg:air", false).getNodeId();
+			short sand = this.nm.getNode("mg:sand", false).getNodeId();
 			for (int x = 0; x < 16; x++) {
 				long globalx = pos.getX() * 16 + x;
 				for (int y = 0; y < 16; y++) {
@@ -155,6 +157,7 @@ public class MapGenerators {
 							this.dirtSeed, this.elevationSeed), // seed
 							1.0 / SIMPLEX_ROOT_DEGREE) // emphasize peaks
 					)));
+					double humidity = this.elevationNoise.noise(this.elevationSeed, pos.getY()*16+y, this.humiditySeed, pos.getX()*16+x);
 					inner: for (int z = 0; z < 16; z++) {
 						long globalz = pos.getZ() * 16 + z;
 						if (lightNodes[x][y][z] != 0)
@@ -164,11 +167,11 @@ public class MapGenerators {
 							continue inner;
 						}
 						if (globalz == elevation) {
-							lightNodes[x][y][z] = grass;
+							lightNodes[x][y][z] = (humidity>=0.5)?grass:sand;
 							continue inner;
 						}
 						if (globalz > dirtelevation) {
-							lightNodes[x][y][z] = dirt;
+							lightNodes[x][y][z] = (humidity>=0.5)?dirt:sand;
 						}
 
 						oreLoop: for (Ore ore : this.ores) {
