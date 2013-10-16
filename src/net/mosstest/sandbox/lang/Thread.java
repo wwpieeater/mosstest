@@ -1,5 +1,9 @@
 package net.mosstest.sandbox.lang;
 
+import net.mosstest.scripting.ScriptRunnable;
+
 public class Thread {
-	//todo sandbox
+	static void spawnThread(ScriptRunnable r) {
+		//todo todo
+	}
 }
