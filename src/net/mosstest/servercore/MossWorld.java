@@ -26,6 +26,9 @@ public class MossWorld {
 	volatile boolean run = true;
 	private FuturesProcessor fp;
 	private NodeManager nm;
+	private RenderPreparator rp;
+	private RenderProcessor rend;
+
 	/**
 	 * Initializes a server world. This will start the server once the world is
 	 * initialized, loaded, and passes basic consistency checks. This
@@ -34,13 +37,15 @@ public class MossWorld {
 	 * @param name
 	 *            A string that names the world.
 	 * @param port
-	 *            The port number on which to run the server.
+	 *            The port number on which to run the server. If negative a
+	 *            singleplayer stack is created.
 	 * @throws MossWorldLoadException
 	 *             Thrown if the world cannot be loaded, due to inconsistency,
 	 *             missing files, or lack of system resources.
+	 * @throws MapDatabaseException 
 	 */
 	@SuppressWarnings("nls")
-	public MossWorld(String name, int port) throws MossWorldLoadException {
+	public MossWorld(String name, int port) throws MossWorldLoadException, MapDatabaseException {
 		this.baseDir = new File("data/worlds/" + name); //$NON-NLS-1$
 		if (!this.baseDir.exists()) {
 			this.baseDir.mkdirs();
@@ -51,27 +56,29 @@ public class MossWorld {
 			try {
 				this.cfgFile.createNewFile();
 				this.worldCfg = new XMLConfiguration(this.cfgFile);
+
+				if (!this.worldCfg.containsKey("gameid")) { //$NON-NLS-1$
+					throw new MossWorldLoadException(
+							"The game ID is not specified. The game ID must be specified in game.xml as <gameid>game</gameid> "
+									+ "where data/games/game is a directory with a valid game.");
+				}
+				this.game = new MossGame(this.worldCfg.getString("gameid"));
+				try {
+					this.db = new MapDatabase(this.baseDir);
+				} catch (MapDatabaseException e) {
+					throw new MossWorldLoadException(
+							"An error has occured when opening the database. It is likely inaccessible, on a full disk, or corrupt.");
+				}
 			} catch (IOException | ConfigurationException e) {
 				throw new MossWorldLoadException(
 						"Error in creating configuration for game " + name
 								+ ". The error wrapped was: " + e.getMessage());
 			}
-		if (!this.worldCfg.containsKey("gameid")) { //$NON-NLS-1$
-			throw new MossWorldLoadException(
-					"The game ID is not specified. The game ID must be specified in game.xml as <gameid>game</gameid> "
-							+ "where data/games/game is a directory with a valid game.");
-		}
-		this.game = new MossGame(this.worldCfg.getString("gameid"));
-		try {
-			this.db = new MapDatabase(this.baseDir);
-		} catch (MapDatabaseException e) {
-			throw new MossWorldLoadException(
-					"An error has occured when opening the database. It is likely inaccessible, on a full disk, or corrupt.");
-		}
 		this.nc = new NodeCache(this.db);
+		this.db = new MapDatabase(new File(this.baseDir, "data/worlds/"+name));
 		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.fp = new FuturesProcessor();
-		this.nm=new NodeManager(this.db.nodes);
+		this.nm = new NodeManager(this.db.nodes);
 		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp, this.nm);
 		this.sEnv = new ScriptEnv(this.mossEnv);
 		ArrayList<MossScript> scripts = this.game.getScripts();
@@ -79,11 +86,16 @@ public class MossWorld {
 			this.sEnv.runScript(sc);
 		}
 		this.evp = new EventProcessor(this.mossEnv);
-		try {
-			this.snv = new ServerNetworkingManager(port, this);
-		} catch (IOException e) {
-			throw new MossWorldLoadException(
-					"Failure in opening server socket for listening!");
+		if (port >= 0) {
+			try {
+				this.snv = new ServerNetworkingManager(port, this);
+			} catch (IOException e) {
+				throw new MossWorldLoadException(
+						"Failure in opening server socket for listening!");
+			}
+		} else {
+			this.rp = new RenderPreparator(this.nc);
+			this.rend = RenderProcessor.init();
 		}
 		while (this.run) {
 			// hold loop for game to run.
@@ -96,8 +108,8 @@ public class MossWorld {
 		this.evp.eventQueue.put(e);
 	}
 
-	public static void main(String[] args) throws MossWorldLoadException {
-		MossWorld m = new MossWorld("test", 16511);
+	public static void main(String[] args) throws MossWorldLoadException, MapDatabaseException {
+		MossWorld m = new MossWorld("test", -1);
 
 	}
 }
