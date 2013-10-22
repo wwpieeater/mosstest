@@ -11,6 +11,8 @@ import net.mosstest.scripting.ScriptableDatabase;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
+import com.jme3.system.AppSettings;
+
 public class MossWorld {
 	private MossGame game;
 	private File baseDir;
@@ -98,18 +100,16 @@ public class MossWorld {
 						"Failure in opening server socket for listening!");
 			}
 		} else {
-			this.rp = new RenderPreparator(this.nc);
-			this.rend = RenderProcessor.init();
+			this.rend = new RenderProcessor();
+			AppSettings settings = new AppSettings(true);
+			settings.setResolution(800, 600);
+			settings.setFullscreen(false);
+			settings.setVSync(true);
+			settings.setSamples(2);
+			this.rend.setSettings(settings);
+			this.rend.setShowSettings(false);
+			this.rend.start();
 		}
-		while (this.run) {
-			try {
-				Thread.sleep(100000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		System.exit(0);
 
 	}
 
