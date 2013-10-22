@@ -1,13 +1,14 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.MossEvent;
-
 public interface MossEventHandler {
-	/*
-	 * void processEvent(Entity actor, long posx, long posy, long posz,
-	 * MapNode nodeBefore, MapNode nodeAfter, Entity recvEntity,
-	 * MossFormspec fspec, MossInventoryAction action, String
-	 * initiatingMessage) throws NullPointerException;
+	/**
+	 * Process an event
+	 * 
+	 * @param myEvent
+	 *            The event
+	 * @return `true` to skip all future handlers for this event, false to run
+	 *         the next handler.
+	 * @throws MossScriptException
 	 */
-	void processEvent(MossEvent myEvent) throws EventProcessingCompletedSignal, MossScriptException;
+	boolean processEvent(MossEvent myEvent) throws MossScriptException;
 }

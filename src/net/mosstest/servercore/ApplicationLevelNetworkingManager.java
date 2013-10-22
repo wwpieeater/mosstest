@@ -1,5 +1,7 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.Position;
+
 public class ApplicationLevelNetworkingManager {
 	ClientNetworkingManager net;
 	static final int PROTOCOL_VERSION_MAJOR = 1;

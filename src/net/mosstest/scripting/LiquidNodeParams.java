@@ -1,6 +1,5 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.NodePosition;
 
 public interface LiquidNodeParams extends NodeParams {
 

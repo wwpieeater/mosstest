@@ -2,6 +2,9 @@ package net.mosstest.servercore;
 
 import java.util.HashMap;
 
+import net.mosstest.scripting.MapNode;
+import net.mosstest.scripting.MossItem;
+
 public class ItemManager {
 
 	private static HashMap<MapNode, MossItem> itemsForNode = new HashMap<>();

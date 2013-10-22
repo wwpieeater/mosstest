@@ -1,5 +1,8 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.MapNode;
+import net.mosstest.scripting.Position;
+
 
 public class DrawableWorld {
 

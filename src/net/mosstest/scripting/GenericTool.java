@@ -1,4 +1,4 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
 public abstract class GenericTool {
 

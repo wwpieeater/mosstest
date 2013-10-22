@@ -1,7 +1,6 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
-import net.mosstest.scripting.DefaultNodeParams;
-import net.mosstest.scripting.NodeParams;
+import net.mosstest.servercore.ItemManager;
 
 public class MapNode {
 	private short nodeId = 0;
@@ -13,7 +12,7 @@ public class MapNode {
 	public int lightEmission;
 	public MossItem dropItem;
 	public boolean isBuildableTo = true;
-	public DrawType drawType=DrawType.DRAW_BLOCK;
+	public DrawType drawType = DrawType.DRAW_BLOCK;
 	public float boxOriginX = 0, boxOriginY = 0, boxOriginZ = 0;
 	/**
 	 * Each of these is 0.5 for the unit box, since each vertex is +/-0.5 from
@@ -68,7 +67,13 @@ public class MapNode {
 		return this.nodeId;
 	}
 
-	void setNodeId(short nodeId) {
+	/**
+	 * Sets node ID. Scripts should not call this except under special
+	 * circumstances.
+	 * 
+	 * @param nodeId
+	 */
+	public void setNodeId(short nodeId) {
 		this.nodeId = nodeId;
 	}
 
@@ -117,8 +122,8 @@ public class MapNode {
 		 * item texture(which should be symmetrical for this) are drawn
 		 * intersecting in an X-pattern.
 		 */
-		DRAW_PLANTLIKE, 
-		
+		DRAW_PLANTLIKE,
+
 		/**
 		 * Do not draw the node at all.
 		 */

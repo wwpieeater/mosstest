@@ -1,7 +1,10 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.ItemStack;
+import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
+import net.mosstest.scripting.Player;
 
 public class DefaultEventHandlers {
 

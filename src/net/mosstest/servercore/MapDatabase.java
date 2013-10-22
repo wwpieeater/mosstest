@@ -2,12 +2,18 @@ package net.mosstest.servercore;
 
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
 
+
+
+//import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 import java.io.File;
 import java.io.IOException;
 
+import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.MapGenerators;
+import net.mosstest.scripting.Position;
 
 import org.iq80.leveldb.DB;
+import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.Options;
 
 public class MapDatabase {
@@ -25,17 +31,18 @@ public class MapDatabase {
 		File dbDir = new File(basedir, "db");
 		dbDir.mkdirs();
 		try {
+			
 			Options options = new Options();
-			options.createIfMissing(true);
-			this.map = factory.open(new File(dbDir, "map.db"), options);
-			this.mapHeavies = factory.open(new File(dbDir, "mapHeavies.db"),
+			options.comparator(null);
+			this.map =factory.open(new File(dbDir, "map"), options);
+			this.mapHeavies = factory.open(new File(dbDir, "mapHeavies"),
 					options);
-			this.entities = factory.open(new File(dbDir, "entities.db"),
+			this.entities = factory.open(new File(dbDir, "entities"),
 					options);
-			this.metadata = factory.open(new File(dbDir, "metadata.db"),
+			this.metadata = factory.open(new File(dbDir, "metadata"),
 					options);
-			this.players = factory.open(new File(dbDir, "players.db"), options);
-			this.nodes = factory.open(new File(dbDir, "nodes.db"), options);
+			this.players = factory.open(new File(dbDir, "players"), options);
+			this.nodes = factory.open(new File(dbDir, "nodes"), options);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new MossWorldLoadException("Database loading failed.");

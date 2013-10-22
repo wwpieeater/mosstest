@@ -1,5 +1,8 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.Position;
+
 public class MossRenderChunkEvent extends MossRenderEvent {
 	private MapChunk myChunk;
 	private Position myPos;

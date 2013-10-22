@@ -1,5 +1,7 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.Position;
+
 public class ChunkNotFoundException extends Exception {
 long x, y, z;
 

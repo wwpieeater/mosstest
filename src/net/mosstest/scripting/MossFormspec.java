@@ -1,7 +1,7 @@
 /**
  *  TODO
  */
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
 
 public class MossFormspec {

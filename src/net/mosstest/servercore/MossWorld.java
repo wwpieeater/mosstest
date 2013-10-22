@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
 
@@ -43,17 +44,19 @@ public class MossWorld {
 	 *             Thrown if the world cannot be loaded, due to inconsistency,
 	 *             missing files, or lack of system resources.
 	 * @throws MapDatabaseException 
+	 * @throws IOException 
+	 * @throws ConfigurationException 
 	 */
 	@SuppressWarnings("nls")
-	public MossWorld(String name, int port) throws MossWorldLoadException, MapDatabaseException {
+	public MossWorld(String name, int port) throws MossWorldLoadException, MapDatabaseException, IOException, ConfigurationException {
 		this.baseDir = new File("data/worlds/" + name); //$NON-NLS-1$
 		if (!this.baseDir.exists()) {
 			this.baseDir.mkdirs();
 
 		}
-		this.cfgFile = new File(this.baseDir, "game.xml"); //$NON-NLS-1$
+		this.cfgFile = new File(this.baseDir, "world.xml"); //$NON-NLS-1$
 		if (!this.cfgFile.isFile())
-			try {
+		//	try {
 				this.cfgFile.createNewFile();
 				this.worldCfg = new XMLConfiguration(this.cfgFile);
 
@@ -63,19 +66,20 @@ public class MossWorld {
 									+ "where data/games/game is a directory with a valid game.");
 				}
 				this.game = new MossGame(this.worldCfg.getString("gameid"));
+				
 				try {
 					this.db = new MapDatabase(this.baseDir);
 				} catch (MapDatabaseException e) {
 					throw new MossWorldLoadException(
 							"An error has occured when opening the database. It is likely inaccessible, on a full disk, or corrupt.");
 				}
-			} catch (IOException | ConfigurationException e) {
+			/*} catch (IOException | ConfigurationException e) {
 				throw new MossWorldLoadException(
 						"Error in creating configuration for game " + name
 								+ ". The error wrapped was: " + e.getMessage());
-			}
+			}*/
 		this.nc = new NodeCache(this.db);
-		this.db = new MapDatabase(new File(this.baseDir, "data/worlds/"+name));
+		//this.db = new MapDatabase(this.baseDir);
 		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.fp = new FuturesProcessor();
 		this.nm = new NodeManager(this.db.nodes);
@@ -108,7 +112,7 @@ public class MossWorld {
 		this.evp.eventQueue.put(e);
 	}
 
-	public static void main(String[] args) throws MossWorldLoadException, MapDatabaseException {
+	public static void main(String[] args) throws MossWorldLoadException, MapDatabaseException, ConfigurationException, IOException {
 		MossWorld m = new MossWorld("test", -1);
 
 	}

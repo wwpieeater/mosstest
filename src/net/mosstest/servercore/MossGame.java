@@ -23,10 +23,10 @@ public class MossGame {
 					"Error in loading the configuration file.");
 		}
 		this.scripts = new ArrayList<>();
-		String[] scNames = this.gameCfg.getStringArray("plugins");
+		String[] scNames = this.gameCfg.getStringArray("plugin");
 		for (String scName : scNames) {
 			try {
-				this.scripts.add(new MossScript(new MossLocalFile(this.baseDir,
+				this.scripts.add(new MossScript(new MossLocalFile(new File("data/scripts/"),
 						scName, "init.js")));
 			} catch (FileNotFoundException e) {
 				throw new MossWorldLoadException("file not found: " + scName);

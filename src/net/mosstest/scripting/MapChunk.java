@@ -1,4 +1,4 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -7,10 +7,14 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 
-import net.mosstest.scripting.MapGenerators;
+import net.mosstest.servercore.ExceptionHandler;
+import net.mosstest.servercore.MapDatabase;
+import net.mosstest.servercore.MapGeneratorException;
+import net.mosstest.servercore.Messages;
+import net.mosstest.servercore.MossWorldLoadException;
 
 public class MapChunk {
-	Position pos;
+	public Position pos;
 	int[][][] lightNodes = new int[16][16][16];
 	boolean[][][] modified = new boolean[16][16][16];
 	boolean compressed;

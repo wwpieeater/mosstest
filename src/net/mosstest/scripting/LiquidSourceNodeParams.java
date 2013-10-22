@@ -1,7 +1,5 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.NodePosition;
-import net.mosstest.servercore.Player;
 
 public class LiquidSourceNodeParams extends DefaultNodeParams implements
 		LiquidNodeParams {
