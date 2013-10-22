@@ -131,7 +131,6 @@
 			<groupId>org.fusesource.leveldbjni</groupId>
 			<artifactId>leveldbjni-all</artifactId>
 			<version>1.7</version>
-			<type>bundle</type>
 		</dependency>
 	</dependencies>
 
