@@ -7,10 +7,6 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
 import java.io.File;
 import java.io.IOException;
 
-import net.mosstest.servercore.NodePosition;
-import net.mosstest.servercore.Player;
-import net.mosstest.servercore.Position;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;

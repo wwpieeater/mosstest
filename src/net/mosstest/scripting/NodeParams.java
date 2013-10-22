@@ -1,9 +1,5 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.Face;
-import net.mosstest.servercore.GenericTool;
-import net.mosstest.servercore.NodePosition;
-import net.mosstest.servercore.Player;
 
 /**
  * Interface to specify handlers to be called when various actions are taken by

@@ -1,4 +1,4 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
 public class Entity {
 	int id;

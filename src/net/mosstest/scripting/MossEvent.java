@@ -1,4 +1,6 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
+
+import net.mosstest.servercore.ScriptSandboxBorderToken;
 
 public class MossEvent {
 	public MossEvent(EvtType type, Player actor, NodePosition pos, MapNode nodeBefore, MapNode nodeAfter,
@@ -22,14 +24,14 @@ public class MossEvent {
 		EVT_DIEPLAYER, EVT_DIGNODE, EVT_GENERATE, EVT_JOINPLAYER, EVT_QUITPLAYER, EVT_NEWPLAYER, EVT_PLACENODE, EVT_FSPEC_OPEN, EVT_FSPEC_SUBMIT, EVT_FSPEC_INVACTION, EVT_THREADSTOP, EVT_ENTITY_PUNCH, EVT_ENTITY_DEATH, EVT_CHATMESSAGE, EVT_SHUTDOWN, EVT_CHATCOMMAND, EVT_NODEMOVE, EVT_PLAYERDAMAGE
 	}
 
-	MossEvent.EvtType type;
-	Player actor; // Player no longer extends entity
-	NodePosition pos;
-	MapNode nodeBefore;
-	MapNode nodeAfter;
-	Entity recvEntity;
-	double damage;
-	MossFormspec fspec;
-	MossInventoryAction action;
-	String initiatingMessage;
+	public final MossEvent.EvtType type;
+	public final Player actor; // Player no longer extends entity
+	public final NodePosition pos;
+	public final MapNode nodeBefore;
+	public final MapNode nodeAfter;
+	public final Entity recvEntity;
+	public final double damage;
+	public final MossFormspec fspec;
+	public final MossInventoryAction action;
+	public final String initiatingMessage;
 }

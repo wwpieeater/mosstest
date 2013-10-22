@@ -3,6 +3,9 @@ package net.mosstest.servercore;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
+import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.Position;
+
 public class RenderPreparator {
 	private RenderProcessor rp;
 	public ArrayBlockingQueue<Position> chunkRequests = new ArrayBlockingQueue<>(

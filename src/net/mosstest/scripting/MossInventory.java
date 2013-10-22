@@ -1,4 +1,4 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
 import java.util.ArrayList;
 

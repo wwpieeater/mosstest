@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import net.mosstest.servercore.Player;
 import net.mosstest.servercore.SessionManager;
 
 public class AntiCheatController {

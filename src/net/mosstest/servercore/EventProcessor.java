@@ -6,10 +6,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.mosstest.scripting.EventProcessingCompletedSignal;
+import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossEventHandler;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
-import net.mosstest.servercore.MossEvent.EvtType;
+import net.mosstest.scripting.MossEvent.EvtType;
 
 /**
  * 
@@ -110,8 +111,8 @@ public class EventProcessor {
 								EventProcessor.this.eventQueue
 										.add(new MossEvent(
 												MossEvent.EvtType.EVT_THREADSTOP,
-												null, null, null, null,
-												null, null, null, 0, null,
+												null, null, null, null, null,
+												null, null, 0, null,
 												new ScriptSandboxBorderToken(
 														84,
 														EventProcessor.class)));
@@ -133,7 +134,7 @@ public class EventProcessor {
 	void processEvents() {
 		System.out.println("Worker thread entered"); //$NON-NLS-1$
 		boolean run = true; // Not synchronized as only used locally
-		while (run) {
+		queueLoop: while (run) {
 			try {
 				MossEvent myEvent = this.eventQueue.take();
 				{// Section for actually handling the events
@@ -147,11 +148,11 @@ public class EventProcessor {
 											EventProcessor.class));
 					try {
 						for (MossEventHandler ourHandler : evtHandlerList) {
-							ourHandler.processEvent(myEvent);
+							if (ourHandler.processEvent(myEvent))
+								continue queueLoop;
 						}
 						DefaultEventHandlers.processEvent(myEvent, this.ev);
-					} catch (EventProcessingCompletedSignal
-							| MossScriptException e) {
+					} catch (MossScriptException e) {
 						// Event processing complete, pass
 					}
 				}

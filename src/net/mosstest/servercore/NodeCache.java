@@ -3,6 +3,9 @@ package net.mosstest.servercore;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 
+import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.Position;
+
 
 public class NodeCache {
 

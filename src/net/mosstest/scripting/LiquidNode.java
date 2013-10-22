@@ -1,6 +1,5 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
-import net.mosstest.scripting.LiquidNodeParams;
 
 public class LiquidNode extends MapNode {
 	public final LiquidNodeParams nodeParams;

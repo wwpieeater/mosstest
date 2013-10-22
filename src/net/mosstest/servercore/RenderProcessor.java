@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 
 import jme3tools.optimize.GeometryBatchFactory;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -21,7 +22,12 @@ import com.jme3.math.Vector3f;
 import com.jme3.scene.Node;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
+
 import java.util.Arrays;
+
+import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.MapNode;
+import net.mosstest.scripting.Position;
 public class RenderProcessor extends SimpleApplication {
 	
 	private float speed = 3f;

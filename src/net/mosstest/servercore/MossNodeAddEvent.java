@@ -1,5 +1,7 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.Position;
+
 public class MossNodeAddEvent extends MossRenderEvent {
 	private int x, y, z; //position in chunk
 	private short definition;

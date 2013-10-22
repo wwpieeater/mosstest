@@ -12,7 +12,7 @@ public class MossLocalFile extends MossFile {
 		// super call to establish fields.
 		super(dirName, resourceName);
 		//ensure filename is valid.
-		if(!(dirName.matches("[a-zA-Z0-9]*")&&resourceName.matches("[a-zA-Z0-9]*"))) throw new FileNotFoundException(); 
+		if(!(dirName.matches("[a-zA-Z0-9.]*")&&resourceName.matches("[a-zA-Z0-9.]*"))) throw new FileNotFoundException(); 
 		this.file = new File(baseDir, dirName);
 		this.file = new File(this.file, resourceName);
 	}

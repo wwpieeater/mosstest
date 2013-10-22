@@ -5,6 +5,8 @@ import java.net.Socket;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import net.mosstest.scripting.Player;
+
 /**
  * The ServerSession class unifies a session on a server. Each incoming connection has a different session.
  * When a connection is determined to be associated with an existing session,  

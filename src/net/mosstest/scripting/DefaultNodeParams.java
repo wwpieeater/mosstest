@@ -1,9 +1,5 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.Face;
-import net.mosstest.servercore.GenericTool;
-import net.mosstest.servercore.NodePosition;
-import net.mosstest.servercore.Player;
 
 public class DefaultNodeParams implements NodeParams {
 

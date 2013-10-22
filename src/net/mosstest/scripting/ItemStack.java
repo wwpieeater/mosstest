@@ -1,4 +1,5 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
+
 
 public class ItemStack {
 	MossItem item;

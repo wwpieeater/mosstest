@@ -1,4 +1,4 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -8,10 +8,10 @@ import java.io.IOException;
 
 public class Position {
 
-	int x;
-	int y;
-	int z;
-	int realm;
+	public int x;
+	public int y;
+	public int z;
+	public int realm;
 	transient boolean isValid = true;
 
 	public Position(int x, int y, int z, int realm) {

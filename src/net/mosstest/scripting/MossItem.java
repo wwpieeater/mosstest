@@ -1,4 +1,6 @@
-package net.mosstest.servercore;
+package net.mosstest.scripting;
+
+import net.mosstest.servercore.MossFile;
 
 
 public class MossItem {

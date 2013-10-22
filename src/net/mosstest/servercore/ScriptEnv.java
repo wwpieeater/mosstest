@@ -69,6 +69,7 @@ public class ScriptEnv {
 		} catch (IOException e) {
 			return ScriptResult.RESULT_ERROR;
 		} catch (RhinoException e) {
+			System.out.println(e.getMessage());
 			throw new MossWorldLoadException(
 					"Script error has occured. Wrapped exception: \r\n" + e.getMessage() + "\r\n" + e.getScriptStackTrace()); //$NON-NLS-1$
 		}
