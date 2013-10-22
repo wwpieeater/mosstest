@@ -102,7 +102,12 @@ public class MossWorld {
 			this.rend = RenderProcessor.init();
 		}
 		while (this.run) {
-			// hold loop for game to run.
+			try {
+				Thread.sleep(100000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		System.exit(0);
 
