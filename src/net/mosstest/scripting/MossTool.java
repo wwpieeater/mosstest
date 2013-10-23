@@ -1,6 +1,15 @@
 package net.mosstest.scripting;
 
+import net.mosstest.servercore.MossFile;
+
 public class MossTool extends MossItem {
+
+	public MossTool(MossFile invTex, MossFile wieldTex, double invWeight,
+			boolean mayStack, String displayName, String technicalName) {
+		super(invTex, wieldTex, invWeight, mayStack, displayName, technicalName);
+	}
+
+
 
 	public enum InteractType {
 		/**

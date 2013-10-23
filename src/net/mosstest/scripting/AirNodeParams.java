@@ -1,10 +1,12 @@
 package net.mosstest.scripting;
 
+import net.mosstest.scripting.MossTool.InteractType;
+
 
 public class AirNodeParams implements INodeParams {
 
 	@Override
-	public void onPunch(Player player, GenericTool tool,
+	public void onPunch(Player player, MossItem tool,
 			NodePosition target, Face punchedFace)
 			throws EventProcessingCompletedSignal {
 		// pass
@@ -12,7 +14,7 @@ public class AirNodeParams implements INodeParams {
 	}
 
 	@Override
-	public void onDig(Player player, GenericTool tool, NodePosition target,
+	public void onDig(Player player, MossItem tool, NodePosition target,
 			Face punchedFace) throws EventProcessingCompletedSignal {
 		// pass
 
@@ -26,7 +28,7 @@ public class AirNodeParams implements INodeParams {
 	}
 
 	@Override
-	public void onRightClick(Player player, GenericTool tool,
+	public void onRightClick(Player player, MossItem tool,
 			NodePosition target, Face clickedFace)
 			throws EventProcessingCompletedSignal {
 		// pass
@@ -83,6 +85,20 @@ public class AirNodeParams implements INodeParams {
 	@Override
 	public boolean shouldHitAimRay(Player player, double distance) {
 		return false;
+	}
+
+
+
+	@Override
+	public double calcSinkActive(Player player, double fallheight) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public double calcInteractProperties(InteractType key) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }

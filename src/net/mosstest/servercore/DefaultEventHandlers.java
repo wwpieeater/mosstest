@@ -1,7 +1,7 @@
 package net.mosstest.servercore;
 
-import net.mosstest.scripting.ItemStack;
 import net.mosstest.scripting.MossEvent;
+import net.mosstest.scripting.MossItem;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
 import net.mosstest.scripting.Player;
@@ -29,7 +29,7 @@ public static void processEvent(final MossEvent evt, MossScriptEnv env) throws M
 				env.damageTool(evt.actor,
 						evt.nodeBefore);
 				env.givePlayer(evt.actor,
-						new ItemStack(evt.nodeBefore.dropItem, 1));
+						new MossItem.Stack(evt.nodeBefore.dropItem, 1));
 				env.removeNode(evt.pos);
 			} catch (MossScriptException e) {
 				//FIXME MossSecurityManager.log(e);

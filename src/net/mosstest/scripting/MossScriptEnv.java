@@ -5,6 +5,7 @@ import java.util.EnumMap;
 
 import org.iq80.leveldb.DB;
 
+import net.mosstest.scripting.MossItem.Stack;
 import net.mosstest.servercore.FuturesProcessor;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MossWorldLoadException;
@@ -383,7 +384,7 @@ public class MossScriptEnv {
 	 * @return True if the item could be added, false if the item could not be
 	 *         added due to insufficient space.
 	 */
-	public boolean givePlayer(Player player, ItemStack item) {
+	public boolean givePlayer(Player player, MossItem.Stack item) {
 		return false;
 	}
 
@@ -591,10 +592,7 @@ public class MossScriptEnv {
 		return nd;
 	}
 
-	public ItemStack[] getInventory(MossInventory inv) {
-		return new ItemStack[] {};
-		// TODO
-	}
+
 
 	public MossInventory getInvByName(Player player, String name) {
 		return null;
