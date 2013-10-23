@@ -1,7 +1,7 @@
 package net.mosstest.scripting;
 
 
-public class AirNodeParams implements NodeParams {
+public class AirNodeParams implements INodeParams {
 
 	@Override
 	public void onPunch(Player player, GenericTool tool,

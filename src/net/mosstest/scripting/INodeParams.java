@@ -1,6 +1,5 @@
 package net.mosstest.scripting;
 
-
 /**
  * Interface to specify handlers to be called when various actions are taken by
  * players directed at a node. These handlers are called after the ones defined
@@ -11,7 +10,7 @@ package net.mosstest.scripting;
  * @author rarkenin
  * 
  */
-public interface NodeParams {
+public interface INodeParams {
 	/**
 	 * Function that is called when a node is punched.
 	 * 
@@ -24,15 +23,19 @@ public interface NodeParams {
 	 * @param punchedFace
 	 *            The face being punched.
 	 */
-	public abstract void onPunch(Player player, GenericTool tool,
+	public abstract void onPunch(Player player, MossItem tool,
 			NodePosition target, Face punchedFace)
 			throws EventProcessingCompletedSignal;
 
 	/**
 	 * Determines if a fall should continue
-	 * @param player The player.
-	 * @param height The height.
-	 * @return A boolean representing whether the fall should continue or be marked as a fall.
+	 * 
+	 * @param player
+	 *            The player.
+	 * @param height
+	 *            The height.
+	 * @return A boolean representing whether the fall should continue or be
+	 *         marked as a fall.
 	 */
 	public abstract boolean shouldContinueFall(Player player, double height);
 
@@ -52,7 +55,7 @@ public interface NodeParams {
 	 *            a different face than this handler.
 	 * @throws EventProcessingCompletedSignal
 	 */
-	public abstract void onDig(Player player, GenericTool tool,
+	public abstract void onDig(Player player, MossItem tool,
 			NodePosition target, Face punchedFace)
 			throws EventProcessingCompletedSignal;
 
@@ -84,7 +87,7 @@ public interface NodeParams {
 	 *            Face which was right-clicked.
 	 * @throws EventProcessingCompletedSignal
 	 */
-	public abstract void onRightClick(Player player, GenericTool tool,
+	public abstract void onRightClick(Player player, MossItem tool,
 			NodePosition target, Face clickedFace)
 			throws EventProcessingCompletedSignal;
 
@@ -122,7 +125,8 @@ public interface NodeParams {
 	public abstract double calcBounceHeight(Player player, double fallheight);
 
 	/**
-	 * Calculates at which rate a player will sink in after landing on this node.
+	 * Calculates at which rate a player will sink in after landing on this
+	 * node.
 	 * 
 	 * @param player
 	 *            The player to calculate sink for.
@@ -134,16 +138,31 @@ public interface NodeParams {
 	public abstract double calcSinkIn(Player player, double fallheight);
 
 	/**
+	 * Calculates at which rate a player will sink in if they are holding the
+	 * key to actively descend.
+	 * 
+	 * @param player
+	 *            The player to calculate sink for.
+	 * @param fallheight
+	 *            The height from which they have fallen. 0 if the player walks
+	 *            onto the node without jumping or falling(feet at surface), or
+	 *            negative if they have already sunk in partially.
+	 * @return The rate for the player to sink.
+	 */
+	public abstract double calcSinkActive(Player player, double fallheight);
+
+	/**
 	 * Calculates the rate at which a player will rise out of this node if they
-	 * have sunk in. If the player is in multiple node the lowermost node at the
-	 * player's horizontal center is considered.
+	 * have sunk in and are pressing the jump key. If the player is in multiple
+	 * node the lowermost node at the player's horizontal center is considered.
 	 * 
 	 * @param player
 	 *            The player to perform the calculation for.
 	 * @param sinkheight
-	 *            The depth to which the player has sunk. 1 corresponds to the
-	 *            player's's feet being at the bottom of the node, and 2 refers
-	 *            to the player being fully submerged in multiple nodes.
+	 *            The depth to which the player has sunk. 0 is the surface at
+	 *            the player's feet. 1 corresponds to the player's feet being at
+	 *            the bottom of the node, and 2 or more is if the player is
+	 *            submerged in multiple nodes.
 	 * @return The rate at which the player should rise when they hold the key
 	 *         corresponding to jumping, in nodes per second.
 	 */
@@ -180,13 +199,26 @@ public interface NodeParams {
 	 *         health of 64 units.
 	 */
 	public abstract double calcFallDamage(Player player, double height);
-	
+
 	/**
-	 * Calculate whether a ray aimed from the crosshairs should stop at this node.
-	 * @param player The player.
-	 * @param distance The distance from the camera to the node.
+	 * Calculate whether a ray aimed from the crosshairs should stop at this
+	 * node.
+	 * 
+	 * @param player
+	 *            The player.
+	 * @param distance
+	 *            The distance from the camera to the node.
 	 * @return
 	 */
 	public abstract boolean shouldHitAimRay(Player player, double distance);
+
+	/**
+	 * Calculate a dig property. These are generally 0 for inability to dig to 1
+	 * for digging the node in one second.
+	 * 
+	 * @param key
+	 * @return
+	 */
+	public abstract double calcInteractProperties(MossTool.InteractType key);
 
 }
