@@ -7,8 +7,6 @@
 *.db
 .svn
 .svn
-/.classpath
-.classpath
 .project
 /nbproject/private/
 /dist/
