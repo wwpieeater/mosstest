@@ -4,7 +4,7 @@ package net.mosstest.scripting;
 public class MossInventoryAction {
 	MossInventory from;
 	MossInventory to;
-	ItemStack moved;
+	MossItem.Stack moved;
 	public void acceptAsStated() {
 		// TODO Auto-generated method stub
 		

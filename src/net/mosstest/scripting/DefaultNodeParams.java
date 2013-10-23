@@ -1,5 +1,7 @@
 package net.mosstest.scripting;
 
+import net.mosstest.scripting.MossTool.InteractType;
+
 
 public class DefaultNodeParams implements INodeParams {
 
@@ -9,14 +11,14 @@ public class DefaultNodeParams implements INodeParams {
 	}
 
 	@Override
-	public void onRightClick(Player player, GenericTool tool,
+	public void onRightClick(Player player, MossItem tool,
 			NodePosition target, Face clickedFace) {
 		return;
 
 	}
 
 	@Override
-	public void onPunch(Player player, GenericTool tool,
+	public void onPunch(Player player, MossItem tool,
 			NodePosition target, Face punchedFace) {
 		return;
 
@@ -29,7 +31,7 @@ public class DefaultNodeParams implements INodeParams {
 	}
 
 	@Override
-	public void onDig(Player player, GenericTool tool, NodePosition target,
+	public void onDig(Player player, MossItem tool, NodePosition target,
 			Face punchedFace) {
 		return;
 	}
@@ -77,5 +79,16 @@ public class DefaultNodeParams implements INodeParams {
 	@Override
 	public boolean shouldHitAimRay(Player player, double distance) {
 		return false;
+	}
+
+	@Override
+	public double calcSinkActive(Player player, double fallheight) {
+		return 0;
+	}
+
+	//FIXME move to interact params
+	@Override
+	public double calcInteractProperties(InteractType key) {
+		return 1;
 	}
 }
