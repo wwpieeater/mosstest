@@ -1,7 +1,7 @@
 package net.mosstest.scripting;
 
 
-public interface LiquidNodeParams extends NodeParams {
+public interface LiquidNodeParams extends INodeParams {
 
 	/**
 	 * Calculates the liquid output from this liquid

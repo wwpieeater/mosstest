@@ -4,9 +4,8 @@ import net.mosstest.servercore.ItemManager;
 
 public class MapNode {
 	private short nodeId = 0;
-	public final transient NodeParams nodeparams;
+	public final transient INodeParams nodeparams;
 	public final transient String texture;
-
 	public String nodeName;
 	public String userFacingName;
 	public int lightEmission;
@@ -20,7 +19,7 @@ public class MapNode {
 	 */
 	public float lengthX = 0.5f, lengthY = 0.5f, lengthZ = 0.5f;
 
-	public MapNode(NodeParams nodeparams, String texture, String nodeName,
+	public MapNode(INodeParams nodeparams, String texture, String nodeName,
 			String userFacingName, int lightEmission) {
 		this.nodeparams = nodeparams;
 		this.texture = texture;

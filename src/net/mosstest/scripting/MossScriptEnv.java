@@ -461,7 +461,7 @@ public class MossScriptEnv {
 	 *             registering.
 	 */
 	public MapNode registerNode(String sysname, String userFacingName,
-			NodeParams params, String textures, boolean isLiquid, int light)
+			INodeParams params, String textures, boolean isLiquid, int light)
 			throws MossWorldLoadException {
 		MapNode nd = new MapNode(params, textures, sysname, userFacingName,
 				light);
@@ -479,7 +479,7 @@ public class MossScriptEnv {
 	 * @param userFacingName
 	 *            The name to display in the UI, such as Lava or Iron Ore
 	 * @param params
-	 *            An implementation of the {@link NodeParams} interface
+	 *            An implementation of the {@link INodeParams} interface
 	 *            detailing the action of the node. {@link AirNodeParams} and
 	 *            {@link DefaultNodeParams} are valid for air-like(display only)
 	 *            and standard solid blocks, respectively.

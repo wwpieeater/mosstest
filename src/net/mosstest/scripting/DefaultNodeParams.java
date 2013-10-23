@@ -1,7 +1,7 @@
 package net.mosstest.scripting;
 
 
-public class DefaultNodeParams implements NodeParams {
+public class DefaultNodeParams implements INodeParams {
 
 	@Override
 	public boolean onStepOn(Player player, NodePosition pos) {
