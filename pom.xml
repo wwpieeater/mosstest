@@ -67,11 +67,6 @@
 			<version>3.2.1</version>
 		</dependency>
 		<dependency>
-			<groupId>org.lwjgl.lwjgl</groupId>
-			<artifactId>lwjgl</artifactId>
-			<version>2.9.0</version>
-		</dependency>
-		<dependency>
 			<groupId>net.java.jinput</groupId>
 			<artifactId>jinput</artifactId>
 			<version>2.0.5</version>
@@ -131,6 +126,17 @@
 			<groupId>org.fusesource.leveldbjni</groupId>
 			<artifactId>leveldbjni-all</artifactId>
 			<version>1.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.lwjgl.lwjgl</groupId>
+			<artifactId>parent</artifactId>
+			<version>2.9.0</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>jme3</groupId>
+			<artifactId>lwjgl-workaround</artifactId>
+			<version>9.5.1</version>
 		</dependency>
 	</dependencies>
 
