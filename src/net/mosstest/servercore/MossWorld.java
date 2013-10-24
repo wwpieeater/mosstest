@@ -100,15 +100,7 @@ public class MossWorld {
 						"Failure in opening server socket for listening!");
 			}
 		} else {
-			this.rend = new RenderProcessor();
-			AppSettings settings = new AppSettings(true);
-			settings.setResolution(800, 600);
-			settings.setFullscreen(false);
-			settings.setVSync(true);
-			settings.setSamples(2);
-			this.rend.setSettings(settings);
-			this.rend.setShowSettings(false);
-			this.rend.start();
+			this.rend = RenderProcessor.init();
 		}
 
 	}
