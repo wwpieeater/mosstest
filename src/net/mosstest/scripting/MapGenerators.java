@@ -8,9 +8,9 @@ import net.mosstest.servercore.NodeManager;
 import toxi.math.noise.SimplexNoise;
 
 public class MapGenerators {
-	private static volatile MapGenerator mg;
+	private static volatile IMapGenerator mg;
 
-	public static void setDefaultMapGenerator(MapGenerator g, NodeManager nm, long seed,
+	public static void setDefaultMapGenerator(IMapGenerator g, NodeManager nm, long seed,
 			Object... params) throws MapGeneratorException {
 		synchronized (MapGenerators.class) {
 			mg = g;
@@ -18,11 +18,11 @@ public class MapGenerators {
 		}
 	}
 
-	public static MapGenerator getDefaultMapgen() {
+	public static IMapGenerator getDefaultMapgen() {
 		return mg;
 	}
 
-	public static class FlatMapGenerator implements MapGenerator {
+	public static class FlatMapGenerator implements IMapGenerator {
 		long seed;
 		NodeManager nm;
 		@Override
@@ -87,7 +87,7 @@ public class MapGenerators {
 
 	}
 
-	public static class SimplexMapGenerator implements MapGenerator {
+	public static class SimplexMapGenerator implements IMapGenerator {
 		public static final int HEIGHT_AVG = 0;
 		public static final int HEIGHT_JITTER = 100;
 		public static final double SIMPLEX_SCALE_FACTOR = 1;

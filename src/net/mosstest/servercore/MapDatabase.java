@@ -2,8 +2,6 @@ package net.mosstest.servercore;
 
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
 
-
-
 //import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 import java.io.File;
 import java.io.IOException;
@@ -31,16 +29,14 @@ public class MapDatabase {
 		File dbDir = new File(basedir, "db");
 		dbDir.mkdirs();
 		try {
-			
+
 			Options options = new Options();
 			options.comparator(null);
-			this.map =factory.open(new File(dbDir, "map"), options);
+			this.map = factory.open(new File(dbDir, "map"), options);
 			this.mapHeavies = factory.open(new File(dbDir, "mapHeavies"),
 					options);
-			this.entities = factory.open(new File(dbDir, "entities"),
-					options);
-			this.metadata = factory.open(new File(dbDir, "metadata"),
-					options);
+			this.entities = factory.open(new File(dbDir, "entities"), options);
+			this.metadata = factory.open(new File(dbDir, "metadata"), options);
 			this.players = factory.open(new File(dbDir, "players"), options);
 			this.nodes = factory.open(new File(dbDir, "nodes"), options);
 		} catch (Exception e) {
@@ -66,8 +62,11 @@ public class MapDatabase {
 	public MapChunk getChunk(final Position pos) throws MapGeneratorException {
 
 		byte[] chunk = this.map.get(pos.toBytes());
-		if (chunk == null)
-			return MapGenerators.getDefaultMapgen().generateChunk(pos);
+		if (chunk == null) {
+			MapChunk gen = MapGenerators.getDefaultMapgen().generateChunk(pos);
+			this.map.put(pos.toBytes(), gen.writeLight(true));
+			return gen;
+		}
 		try {
 			return new MapChunk(pos, chunk, this);
 		} catch (IOException e) {

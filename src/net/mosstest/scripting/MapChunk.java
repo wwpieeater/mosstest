@@ -114,7 +114,7 @@ public class MapChunk {
 		this.lightNodes[x][y][z] = node;
 	}
 
-	public byte[] writeLight(boolean compressed1) {
+	public byte[] writeLight(boolean compressed) {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 

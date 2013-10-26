@@ -4,12 +4,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.lang.NotImplementedException;
 
 import com.jme3.system.AppSettings;
 
@@ -29,7 +31,7 @@ public class MossWorld {
 	volatile boolean run = true;
 	private FuturesProcessor fp;
 	private NodeManager nm;
-	private RenderPreparator rp;
+	private IRenderPreparator rp;
 	private RenderProcessor rend;
 
 	/**
@@ -82,6 +84,12 @@ public class MossWorld {
 			}*/
 		this.nc = new NodeCache(this.db);
 		//this.db = new MapDatabase(this.baseDir);
+		try {
+			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 1337);
+		} catch (MapGeneratorException e) {
+			System.err.println("The map generator could not be seeded.");
+			System.exit(4);
+		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.fp = new FuturesProcessor();
 		this.nm = new NodeManager(this.db.nodes);
@@ -93,15 +101,17 @@ public class MossWorld {
 		}
 		this.evp = new EventProcessor(this.mossEnv);
 		if (port >= 0) {
-			try {
+			System.out.println("Networking cannot occur at this time");
+			/*try {
 				this.snv = new ServerNetworkingManager(port, this);
 			} catch (IOException e) {
 				throw new MossWorldLoadException(
 						"Failure in opening server socket for listening!");
-			}
-		} else {
-			this.rend = RenderProcessor.init();
-		}
+			}*/
+		} //else {
+		/*	*/this.rp = new LocalRenderPreparator(this.rend, this.nc);
+		/*	*/this.rend = RenderProcessor.init(this.nm, this.rp);
+		//}
 
 	}
 
