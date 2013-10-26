@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
@@ -83,6 +84,12 @@ public class MossWorld {
 			}*/
 		this.nc = new NodeCache(this.db);
 		//this.db = new MapDatabase(this.baseDir);
+		try {
+			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 1337);
+		} catch (MapGeneratorException e) {
+			System.err.println("The map generator could not be seeded.");
+			System.exit(4);
+		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.fp = new FuturesProcessor();
 		this.nm = new NodeManager(this.db.nodes);

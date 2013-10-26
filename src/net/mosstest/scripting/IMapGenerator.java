@@ -3,7 +3,7 @@ package net.mosstest.scripting;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.NodeManager;
 
-public interface MapGenerator {
+public interface IMapGenerator {
 
 	void init(long seed, NodeManager nm, Object... params) throws MapGeneratorException;
 
