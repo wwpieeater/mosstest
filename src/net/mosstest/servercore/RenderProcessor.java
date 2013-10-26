@@ -46,26 +46,26 @@ public class RenderProcessor extends SimpleApplication {
 	private SpotLight spot = new SpotLight();
 	
 	public NodeManager nManager;
-	public NodeCache nCache;
+	public RenderPreparator rPreparator;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(24000, false);
 	
 	
-	public static RenderProcessor init (NodeManager manager, NodeCache cache) {
+	public static RenderProcessor init (NodeManager manager, RenderPreparator prep) {
 		RenderProcessor app = new RenderProcessor ();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
 		settings.setSamples(2);
 		app.setSettings(settings);
 		app.setShowSettings(false);
-		app.initNodeThings(manager, cache);
+		app.initNodeThings(manager, prep);
 		app.start();
 		return app;
 	}
 	
 	
-	private void initNodeThings(NodeManager manager, NodeCache cache) {
+	private void initNodeThings(NodeManager manager, RenderPreparator prep) {
 		nManager = manager;
-		nCache = cache;
+		rPreparator = prep;
 	}
 	
 	@Override
