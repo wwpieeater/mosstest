@@ -24,19 +24,23 @@ public class NodeCache {
 			}
 		}
 	}
-
-	public MapChunk getChunkClient(Position pos) {
-		synchronized (this.chunks) {
-
-			MapChunk ourChunk = null;
-			ourChunk = this.chunks.get(pos).get();
-			if (ourChunk == null)
-				ClientManager.getApplicationLevelNetworkingManager().sendChunkRequest(pos);
-
-			return ourChunk;
-
-		}
+	
+	
+	public MapChunk getChunkFailFast(Position pos) {
+		return this.chunks.get(pos).get();
 	}
+	//public void requestMapChunk
+	
+	//public MapChunk getChunkClient(Position pos) {
+	//	synchronized (this.chunks) {
+	//
+	//		MapChunk ourChunk = null;
+	//		ourChunk = this.chunks.get(pos).get();
+	//		if (ourChunk == null)
+	//			ClientManager.getApplicationLevelNetworkingManager().sendChunkRequest(pos);
+	//		return ourChunk;
+	//	}
+	//}
 
 	public void setChunkClient(Position pos, MapChunk chunk) {
 		synchronized (this.chunks) {

@@ -30,7 +30,7 @@ public class MossWorld {
 	volatile boolean run = true;
 	private FuturesProcessor fp;
 	private NodeManager nm;
-	private RenderPreparator rp;
+	private IRenderPreparator rp;
 	private RenderProcessor rend;
 
 	/**
@@ -102,7 +102,8 @@ public class MossWorld {
 						"Failure in opening server socket for listening!");
 			}*/
 		} //else {
-		/*	*/this.rend = RenderProcessor.init();
+		/*	*/this.rp = new LocalRenderPreparator(this.rend, this.nc);
+		/*	*/this.rend = RenderProcessor.init(this.nm, this.nc);
 		//}
 
 	}
