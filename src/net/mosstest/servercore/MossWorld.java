@@ -10,6 +10,7 @@ import net.mosstest.scripting.ScriptableDatabase;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.commons.lang.NotImplementedException;
 
 import com.jme3.system.AppSettings;
 
@@ -93,15 +94,16 @@ public class MossWorld {
 		}
 		this.evp = new EventProcessor(this.mossEnv);
 		if (port >= 0) {
-			try {
+			System.out.println("Networking cannot occur at this time");
+			/*try {
 				this.snv = new ServerNetworkingManager(port, this);
 			} catch (IOException e) {
 				throw new MossWorldLoadException(
 						"Failure in opening server socket for listening!");
-			}
-		} else {
-			this.rend = RenderProcessor.init();
-		}
+			}*/
+		} //else {
+		/*	*/this.rend = RenderProcessor.init();
+		//}
 
 	}
 
