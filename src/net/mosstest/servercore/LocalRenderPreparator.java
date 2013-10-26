@@ -32,12 +32,12 @@ public class LocalRenderPreparator implements IRenderPreparator {
 	public ArrayBlockingQueue<Position> chunkRequests = new ArrayBlockingQueue<>(
 			1024);
 	//private HashMap<Position, Position> outstandingChunks = new HashMap<>();
-	private NodeCache cache;
+
 	private Thread lookupThread = new Thread(new ChunkLookupRunnable());
 	
 	@Override
 	public MapChunk requestChunk(Position pos) throws MapGeneratorException, InterruptedException {
-		MapChunk chk = this.cache.getChunkFailFast(pos);
+		MapChunk chk = this.nc.getChunkFailFast(pos);
 		if (chk == null) {
 			this.chunkRequests.put(pos);
 		}
