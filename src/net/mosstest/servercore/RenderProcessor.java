@@ -46,11 +46,11 @@ public class RenderProcessor extends SimpleApplication {
 	private SpotLight spot = new SpotLight();
 	
 	public NodeManager nManager;
-	public RenderPreparator rPreparator;
+	public IRenderPreparator rPreparator;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(24000, false);
 	
 	
-	public static RenderProcessor init (NodeManager manager, RenderPreparator prep) {
+	public static RenderProcessor init (NodeManager manager, IRenderPreparator prep) {
 		RenderProcessor app = new RenderProcessor ();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
@@ -63,7 +63,7 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	
 	
-	private void initNodeThings(NodeManager manager, RenderPreparator prep) {
+	private void initNodeThings(NodeManager manager, IRenderPreparator prep) {
 		nManager = manager;
 		rPreparator = prep;
 	}
