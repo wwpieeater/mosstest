@@ -110,7 +110,7 @@ public class MossWorld {
 			}*/
 		} //else {
 		/*	*/this.rp = new LocalRenderPreparator(this.rend, this.nc);
-		/*	*/this.rend = RenderProcessor.init(this.nm, this.nc);
+		/*	*/this.rend = RenderProcessor.init(this.nm, this.rp);
 		//}
 
 	}
