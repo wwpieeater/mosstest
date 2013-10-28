@@ -5,28 +5,19 @@ import net.mosstest.scripting.Position;
 
 public class MossRenderChunkEvent extends MossRenderEvent {
 	private MapChunk myChunk;
-	private Position myPos;
 	public MossRenderChunkEvent (MapChunk ch) {
 		myChunk = ch;
-		myPos = ch.pos;
 	}
 	
-	public int getX () {
-		return myPos.x;
+	public MapChunk getChk () {
+		return myChunk;
 	}
-	public int getY() {
-		return myPos.y;
-	}
-	public int getZ() {
-		return myPos.z;
-	}
-	
 	public Position getPos () {
-		return myPos;
+		return myChunk.pos;
 	}
 	
-	public int getNodeId (byte x, byte y, byte z) {
+	/*public int getNodeId (byte x, byte y, byte z) {
 		return myChunk.getNodeId(x, y, z);
-	}
+	}*/
 }
  
