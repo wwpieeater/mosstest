@@ -20,6 +20,12 @@ public class NodeManager {
 	private HashBiMap<Short, String> pending = HashBiMap.create();
 	private DB nodeDb;
 
+	private final MapNode unknownFallbackNode = new MapNode("unknown.png",
+			"sys:unknown", "An unknown piece of the world", 1);
+	{
+		this.unknownFallbackNode.setNodeId((short) -1);
+	}
+
 	public MapNode getNode(short nodeId) {
 		return this.definedNodes.get(nodeId);
 	}
@@ -50,11 +56,14 @@ public class NodeManager {
 	}
 
 	public MapNode getNode(String string, boolean isModified) {
-		return this.defNodeByName.get(string);
+		MapNode r = this.defNodeByName.get(string);
+		return r==null?this.unknownFallbackNode:r;
 	}
 
 	public MapNode getNode(String string) {
-		return this.defNodeByName.get(string);
+
+		MapNode r = this.defNodeByName.get(string);
+		return r==null?this.unknownFallbackNode:r;
 	}
 
 	/**

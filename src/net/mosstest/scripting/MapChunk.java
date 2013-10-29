@@ -94,7 +94,7 @@ public class MapChunk {
 	public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
 		this.pos = pos2;
 		this.lightNodes = Arrays.copyOf(nodes, nodes.length);
-		this.modified = Arrays.copyOf(modified, modified.length);
+		this.modified = modified==null?new boolean[16][16][16]:Arrays.copyOf(modified, modified.length);
 	}
 
 	public int getNodeId(byte x, byte y, byte z) {

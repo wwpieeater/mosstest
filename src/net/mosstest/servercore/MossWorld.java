@@ -83,6 +83,7 @@ public class MossWorld {
 								+ ". The error wrapped was: " + e.getMessage());
 			}*/
 		this.nc = new NodeCache(this.db);
+		this.nm = new NodeManager(this.db.nodes);
 		//this.db = new MapDatabase(this.baseDir);
 		try {
 			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 1337);
@@ -92,7 +93,6 @@ public class MossWorld {
 		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
 		this.fp = new FuturesProcessor();
-		this.nm = new NodeManager(this.db.nodes);
 		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp, this.nm);
 		this.sEnv = new ScriptEnv(this.mossEnv);
 		ArrayList<MossScript> scripts = this.game.getScripts();

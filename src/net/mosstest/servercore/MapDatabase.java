@@ -64,7 +64,7 @@ public class MapDatabase {
 		byte[] chunk = this.map.get(pos.toBytes());
 		if (chunk == null) {
 			MapChunk gen = MapGenerators.getDefaultMapgen().generateChunk(pos);
-			this.map.put(pos.toBytes(), gen.writeLight(true));
+			//this.map.put(pos.toBytes(), gen.writeLight(true));
 			return gen;
 		}
 		try {

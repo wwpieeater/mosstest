@@ -15,7 +15,8 @@ public class NodeCache {
 		synchronized (this.chunks) {
 			synchronized (MapDatabase.class) {
 				MapChunk ourChunk = null;
-				ourChunk = this.chunks.get(pos).get();
+				SoftReference<MapChunk> ref = this.chunks.get(pos);
+				ourChunk = ref==null?null:ref.get();
 				if (ourChunk == null) {
 					ourChunk = this.db.getChunk(pos);
 					this.chunks.put(pos, new SoftReference<>(ourChunk));
@@ -27,7 +28,8 @@ public class NodeCache {
 	
 	
 	public MapChunk getChunkFailFast(Position pos) {
-		return this.chunks.get(pos).get();
+		SoftReference<MapChunk> ref = this.chunks.get(pos);
+		return (ref==null?null:ref.get());
 	}
 	//public void requestMapChunk
 	

@@ -120,8 +120,61 @@ public class MapGenerators {
 		@Override
 		public MapChunk generateChunk(Position pos)
 				throws MapGeneratorException {
-			// TODO Auto-generated method stub
-			return null;
+			int[][][] lightNodes = new int[16][16][16];
+			short grass = this.nm.getNode("mg:grass", false).getNodeId();
+			short dirt = this.nm.getNode("mg:dirt", false).getNodeId();
+			short stone = this.nm.getNode("mg:stone", false).getNodeId();
+			short air = this.nm.getNode("mg:air", false).getNodeId();
+			short sand = this.nm.getNode("mg:sand", false).getNodeId();
+			for (int x = 0; x < 16; x++) {
+				long globalx = pos.getX() * 16 + x;
+				for (int y = 0; y < 16; y++) {
+					long globaly = pos.getY() * 16 + y;
+					int elevation = (int) (HEIGHT_AVG + // average height
+					(HEIGHT_JITTER * // jitter height
+					(Math.pow(this.elevationNoise.noise( // get noise
+							x * SIMPLEX_SCALE_FACTOR, // scale
+							y * SIMPLEX_SCALE_FACTOR, // scale
+							this.elevationSeed, this.elevationSeed), // seed
+							SIMPLEX_ROOT_DEGREE) // emphasize peaks
+					- 0.5))); // center on average height
+					int dirtelevation = (int) (elevation - // max possible
+															// height
+					(3 * // jitter height
+					(Math.pow(this.elevationNoise.noise( // get noise
+							x * SIMPLEX_LOCAL_SCALE_FACTOR, // scale
+							y * SIMPLEX_LOCAL_SCALE_FACTOR, // scale
+							this.dirtSeed, this.elevationSeed), // seed
+							1.0 / SIMPLEX_ROOT_DEGREE) // emphasize peaks
+					)));
+					double humidity = this.elevationNoise.noise(this.elevationSeed, pos.getY()*16+y, this.humiditySeed, pos.getX()*16+x);
+					inner: for (int z = 0; z < 16; z++) {
+						long globalz = pos.getZ() * 16 + z;
+						if (lightNodes[x][y][z] != 0)
+							continue inner;
+						if (globalz > elevation) {
+							lightNodes[x][y][z] = air;
+							continue inner;
+						}
+						if (globalz == elevation) {
+							lightNodes[x][y][z] = (humidity>=0.5)?grass:sand;
+							continue inner;
+						}
+						if (globalz > dirtelevation) {
+							lightNodes[x][y][z] = (humidity>=0.5)?dirt:sand;
+						}
+
+						oreLoop: for (Ore ore : this.ores) {
+							if (ore.checkOre(globalx, globaly, globalz)) {
+								lightNodes[x][y][z] = ore.node.getNodeId();
+								break oreLoop;
+							} //if
+						} //oreloop
+					} //z
+				} //y
+			} //x
+			
+			return new MapChunk(pos, lightNodes, null);
 		}
 
 		@Override
