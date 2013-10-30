@@ -19,7 +19,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
 					MapChunk chk = LocalRenderPreparator.this.nc
 							.getChunk(requested);
 					chk.pos = requested;
-					LocalRenderPreparator.this.rp.renderEventQueue
+					LocalRenderPreparator.this.rend.renderEventQueue
 							.put(new MossRenderChunkEvent(chk));
 				} catch (InterruptedException e) {
 					// pass
@@ -32,7 +32,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
 
 	}
 
-	private RenderProcessor rp;
+	private RenderProcessor rend;
 	private NodeCache nc;
 	private volatile boolean run = true;
 	public ArrayBlockingQueue<Position> chunkRequests = new ArrayBlockingQueue<>(
@@ -59,9 +59,8 @@ public class LocalRenderPreparator implements IRenderPreparator {
 	}
 
 	public LocalRenderPreparator(RenderProcessor rp, NodeCache nc) {
-		this.rp = rp;
+		this.rend = rp;
 		this.nc = nc;
-		this.lookupThread.start();
 	}
 
 	@Override
@@ -71,8 +70,19 @@ public class LocalRenderPreparator implements IRenderPreparator {
 
 	@Override
 	public void recvOutstandingChunk(Position pos, MapChunk chk) {
-		// TODO Auto-generated method stub
+		// pass
+	}
 
+	@Override
+	public void start() {
+		System.out.println("<<< START LOCAL RENDER PREPARATOR >>>");
+		this.lookupThread.start();
+
+	}
+
+	@Override
+	public void setRenderProcessor(RenderProcessor rend) {
+		this.rend = rend;
 	}
 
 	// TODO: Handle player movement, other server->client events affecting

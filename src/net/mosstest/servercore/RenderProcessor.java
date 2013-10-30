@@ -57,6 +57,8 @@ public class RenderProcessor extends SimpleApplication {
 	public static RenderProcessor init(NodeManager manager,
 			IRenderPreparator prep) {
 		RenderProcessor app = new RenderProcessor();
+		prep.setRenderProcessor(app);
+		prep.start();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
 		settings.setSamples(2);
@@ -108,11 +110,14 @@ public class RenderProcessor extends SimpleApplication {
 
 		inputManager.setCursorVisible(false);
 		MossRenderEvent myEvent = renderEventQueue.poll();
-		if (myEvent instanceof MossRenderStopEvent) {
-			System.out.println("Thread shutting down");
-		} else if (myEvent instanceof MossRenderChunkEvent) {
-			renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
-					((MossRenderChunkEvent) myEvent).getPos());
+		if (myEvent != null) {
+			System.out.println("process event"+System.identityHashCode(myEvent));
+			if (myEvent instanceof MossRenderStopEvent) {
+				System.out.println("Thread shutting down");
+			} else if (myEvent instanceof MossRenderChunkEvent) {
+				renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
+						((MossRenderChunkEvent) myEvent).getPos());
+			}
 		}/*
 		 * else if (myEvent instanceof MossNodeAddEvent) { int x =
 		 * ((MossNodeAddEvent) myEvent).getX(); int y = ((MossNodeAddEvent)
@@ -271,7 +276,7 @@ public class RenderProcessor extends SimpleApplication {
 	 */
 	public Material getMaterial(short nVal) {
 		Material mat = null;
-		switch (nVal) {
+		switch (nVal) { //FIXME thatnerd2 speak to me in person regarding this
 		case 1:
 			mat = new Material(assetManager,
 					"Common/MatDefs/Light/Lighting.j3md");
