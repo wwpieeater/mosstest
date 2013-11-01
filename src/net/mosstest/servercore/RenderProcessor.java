@@ -42,7 +42,7 @@ public class RenderProcessor extends SimpleApplication {
 	private float[] locChanges = { 0, 0, 0 };
 	private double lastTime;
 	private boolean invertY = false;
-
+	
 	private Vector3f initialUpVec;
 	private Node worldNode;
 	private SpotLight spot = new SpotLight();
@@ -186,7 +186,14 @@ public class RenderProcessor extends SimpleApplication {
 		RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
 		allChunks.put(pos, thisChunk);
 	}
-
+	public void getChunk (Position pos) {
+		MapChunk maybe = null;
+		try {maybe = rPreparator.requestChunk(pos);} 
+		catch (MapGeneratorException e) {e.printStackTrace();} 
+		catch (InterruptedException e) {e.printStackTrace();}
+		if (maybe != null) {renderChunk(maybe, pos);
+		}
+	}
 	public void testLoadSurroundingChunks() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
@@ -196,55 +203,13 @@ public class RenderProcessor extends SimpleApplication {
 		// Position p6 = new Position(0,0,-1,0);
 		// Position p7 = new Position(-1,0,-1,0);
 
-		try {
-			renderChunk(rPreparator.requestChunk(p1), p1);
-		} catch (MapGeneratorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			System.out.println("oh well.");
-		}
-
-		try {
-			renderChunk(rPreparator.requestChunk(p2), p2);
-		} catch (MapGeneratorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			System.out.println("oh well.");
-		}
-		try {
-			renderChunk(rPreparator.requestChunk(p3), p3);
-		} catch (MapGeneratorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			System.out.println("oh well.");
-		}
-		try {
-			renderChunk(rPreparator.requestChunk(p4), p4);
-		} catch (MapGeneratorException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (NullPointerException e) {
-			System.out.println("oh well.");
-		}
-		// renderChunk(rPreparator.requestChunk(p5), p5);
-		// renderChunk(rPreparator.requestChunk(p6), p6);
-		// renderChunk(rPreparator.requestChunk(p7), p8);
-
+		getChunk(p1);
+		getChunk(p2);
+		getChunk(p3);
+		getChunk(p4);
+		// getChunk(p5);
+		// getChunk(p6);
+		// getChunk(p7);
 	}
 
 	/*
