@@ -24,6 +24,7 @@ public class NodeManager {
 			"sys:unknown", "An unknown piece of the world", 1);
 	{
 		this.unknownFallbackNode.setNodeId((short) -1);
+		definedNodes.add(this.unknownFallbackNode);
 	}
 
 	public MapNode getNode(short nodeId) {
@@ -35,6 +36,7 @@ public class NodeManager {
 			node.setNodeId(this.pending.inverse().get(node.nodeName));
 			this.definedNodes.set(this.pending.inverse().get(node.nodeName),
 					node);
+			this.defNodeByName.put(node.nodeName, node);
 		} else {
 			if (this.definedNodes.size() > 16384)
 				throw new MossWorldLoadException("Too many nodedefs"); //$NON-NLS-1$
@@ -42,10 +44,11 @@ public class NodeManager {
 			node.setNodeId((short) this.definedNodes.size());
 
 			this.definedNodes.add(node);
+			this.defNodeByName.put(node.nodeName, node);
 			this.nodeDb.put(new byte[] { (byte) (node.getNodeId() >>> 8),
 					(byte) (node.getNodeId() & 0xFF) }, bytes(node.nodeName));
 		}
-		this.defNodeByName.put(node.nodeName, node);
+		
 
 		return node.getNodeId();
 	}

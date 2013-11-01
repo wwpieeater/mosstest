@@ -1,3 +1,4 @@
+
 package net.mosstest.servercore;
 
 import java.util.HashMap;
