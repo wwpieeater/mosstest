@@ -5,6 +5,7 @@ import java.io.File;
 import net.mosstest.scripting.*;
 import net.mosstest.servercore.*;
 import static org.junit.Assert.*;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -13,14 +14,14 @@ import org.junit.Test;
 
 public class MapGeneratorTest {
 
-	private static NodeManager nm;
+	private static INodeManager nm;
 	private static MapDatabase db;
 
 	@BeforeClass
 	public static void oneTimeSetUp() {
 		try {
 			db = new MapDatabase(new File("data/worlds/junit-test-world"));
-			nm = new NodeManager(db.nodes);
+			nm = new LocalNodeManager(db.nodes);
 			MapGenerators.setDefaultMapGenerator(
 					new MapGenerators.SimplexMapGenerator(), nm, 7485787384L);
 		} catch (MossWorldLoadException | MapDatabaseException e) {

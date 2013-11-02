@@ -30,7 +30,7 @@ public class MossWorld {
 	private ServerNetworkingManager snv;
 	volatile boolean run = true;
 	private FuturesProcessor fp;
-	private NodeManager nm;
+	private INodeManager nm;
 	private IRenderPreparator rp;
 	private RenderProcessor rend;
 
@@ -83,7 +83,7 @@ public class MossWorld {
 								+ ". The error wrapped was: " + e.getMessage());
 			}*/
 		this.nc = new NodeCache(this.db);
-		this.nm = new NodeManager(this.db.nodes);
+		this.nm = new LocalNodeManager(this.db.nodes);
 		//this.db = new MapDatabase(this.baseDir);
 		try {
 			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 1337);

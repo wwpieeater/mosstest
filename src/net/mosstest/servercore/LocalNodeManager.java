@@ -14,23 +14,21 @@ import org.iq80.leveldb.DB;
 
 import com.google.common.collect.HashBiMap;
 
-public class NodeManager {
-	private ArrayList<MapNode> definedNodes = new ArrayList<>();
-	private HashMap<String, MapNode> defNodeByName = new HashMap<>();
-	private HashBiMap<Short, String> pending = HashBiMap.create();
+public class LocalNodeManager extends AbstractNodeManager {
 	private DB nodeDb;
 
-	private final MapNode unknownFallbackNode = new MapNode("unknown.png",
-			"sys:unknown", "An unknown piece of the world", 1);
-	{
-		this.unknownFallbackNode.setNodeId((short) -1);
-		definedNodes.add(this.unknownFallbackNode);
-	}
-
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.INodeManager#getNode(short)
+	 */
+	@Override
 	public MapNode getNode(short nodeId) {
 		return this.definedNodes.get(nodeId);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.INodeManager#putNode(net.mosstest.scripting.MapNode)
+	 */
+	@Override
 	public short putNode(MapNode node) throws MossWorldLoadException {
 		if (this.pending.containsValue(node.nodeName)) {
 			node.setNodeId(this.pending.inverse().get(node.nodeName));
@@ -53,28 +51,48 @@ public class NodeManager {
 		return node.getNodeId();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.INodeManager#putNodeAlias(java.lang.String, java.lang.String)
+	 */
+	@Override
 	public void putNodeAlias(String alias, String dst) {
 		MapNode dstNode = this.defNodeByName.get(dst);
 		this.defNodeByName.put(alias, dstNode);
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.INodeManager#getNode(java.lang.String, boolean)
+	 */
+	@Override
 	public MapNode getNode(String string, boolean isModified) {
 		MapNode r = this.defNodeByName.get(string);
-		return r==null?this.unknownFallbackNode:r;
+		return (r==null)?AbstractNodeManager.MAPNODE_UNKNOWN:r;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.INodeManager#getNode(java.lang.String)
+	 */
+	@Override
 	public MapNode getNode(String string) {
 
 		MapNode r = this.defNodeByName.get(string);
-		return r==null?this.unknownFallbackNode:r;
+		return (r==null)?AbstractNodeManager.MAPNODE_UNKNOWN:r;
 	}
 
 	/**
 	 * 
 	 */
-	public NodeManager(DB nodedb) {
+	public LocalNodeManager(DB nodedb) {
 		this.nodeDb = nodedb;
-		for (Entry<byte[], byte[]> entry : nodedb) {
+		this.init();
+	}
+
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.INodeManager#init()
+	 */
+	@Override
+	public void init() {
+		for (Entry<byte[], byte[]> entry : this.nodeDb) {
 			short parsedId = (short) (entry.getKey()[0] * 256 + entry.getKey()[1]);
 			String parsedString = asString(entry.getValue());
 			this.pending.put(parsedId, parsedString);

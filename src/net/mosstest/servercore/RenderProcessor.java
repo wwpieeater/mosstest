@@ -49,12 +49,12 @@ public class RenderProcessor extends SimpleApplication {
 	private DirectionalLight sun = new DirectionalLight();
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 
-	public NodeManager nManager;
+	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
-	public static RenderProcessor init(NodeManager manager,
+	public static RenderProcessor init(INodeManager manager,
 			IRenderPreparator prep) {
 		RenderProcessor app = new RenderProcessor();
 		prep.setRenderProcessor(app);
@@ -69,7 +69,7 @@ public class RenderProcessor extends SimpleApplication {
 		return app;
 	}
 
-	private void initNodeThings(NodeManager manager, IRenderPreparator prep) {
+	private void initNodeThings(INodeManager manager, IRenderPreparator prep) {
 		nManager = manager;
 		rPreparator = prep;
 	}
@@ -125,7 +125,7 @@ public class RenderProcessor extends SimpleApplication {
 		 * Position pos = ((MossNodeAddEvent) myEvent).getPosition();
 		 * 
 		 * short defRef = ((MossNodeAddEvent) myEvent).getDef(); MapNode def =
-		 * /*NodeManager.getNode(defRef)null; Material mat =
+		 * /*LocalNodeManager.getNode(defRef)null; Material mat =
 		 * getMaterial(defRef); allChunks.get(pos).addNode(def, mat, blockSize,
 		 * x, y, z); Vector3f loc = allChunks.get(pos).getNodeLoc(x, y, z,
 		 * blockSize); RenderNode geom = new RenderNode (mat, loc, blockSize,
@@ -167,7 +167,7 @@ public class RenderProcessor extends SimpleApplication {
 						Vector3f loc = new Vector3f(xLocation, yLocation,
 								zLocation);
 						RenderNode geom = new RenderNode(mat, loc, blockSize, /*
-																			 * NodeManager
+																			 * LocalNodeManager
 																			 * .
 																			 * getNode
 																			 * (
