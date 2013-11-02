@@ -137,11 +137,8 @@ public class RenderProcessor extends SimpleApplication {
 		if (chk == null) {
 			return;
 		}
-		int x = pos.x;
-		int y = pos.y;
-		int z = pos.z;
 
-		double offset = 16 * blockSize - blockSize;
+		double offset = 16 * blockSize;
 		RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 
 		for (byte i = 0; i < 16; i++) {
@@ -149,34 +146,20 @@ public class RenderProcessor extends SimpleApplication {
 				for (byte k = 0; k < 16; k++) {
 					int nVal = chk.getNodeId(i, j, k);
 					Material mat = getMaterial((short) nVal);
-					switch (nVal) {
-					case 0:
-						break;
-					case 1:
-						// if (k == 0 || k == 15 || j == 0 || j == 15 || i == 0
-						// || i == 15) {
-						float xLocation = (float) ((x + (32 * blockSize * pos.x))
-								- offset + (i * 2 * blockSize));
-						float yLocation = (float) ((y - playerHeight) - (j * 2 * blockSize));
-						float zLocation = (float) ((z - offset + 32 * blockSize
-								* pos.z) + (k * 2 * blockSize));
-						Vector3f loc = new Vector3f(xLocation, yLocation,
+					if (nVal == 0) {return;}
+					else {
+						
+						float x = (float) ((pos.x + (32 * blockSize * pos.x)) - offset + (i * 2 * blockSize));
+						float y = (float) ((pos.y - playerHeight) - (j * 2 * blockSize));
+						float z = (float) ((pos.z + (32 * blockSize * pos.z)) - offset  + (k * 2 * blockSize));
+						
+						/*Vector3f loc = new Vector3f(xLocation, yLocation,
 								zLocation);
-						RenderNode geom = new RenderNode(mat, loc, blockSize, /*
-																			 * NodeManager
-																			 * .
-																			 * getNode
-																			 * (
-																			 * (
-																			 * short
-																			 * )
-																			 * nVal
-																			 * )
-																			 */
+						RenderNode geom = new RenderNode(mat, loc, blockSize, NodeManager.getNode((short)nVal)
 						null);
 						nodesInChunk[i][j][k] = geom;
 						worldNode.attachChild(geom);
-						break;
+						break;*/
 					// }
 					}
 
