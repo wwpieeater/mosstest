@@ -1,11 +1,11 @@
 package net.mosstest.scripting;
 
+import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
-import net.mosstest.servercore.NodeManager;
 
 public interface IMapGenerator {
 
-	void init(long seed, NodeManager nm, Object... params) throws MapGeneratorException;
+	void init(long seed, INodeManager nm, Object... params) throws MapGeneratorException;
 
 	public MapChunk generateChunk(Position pos) throws MapGeneratorException;
 

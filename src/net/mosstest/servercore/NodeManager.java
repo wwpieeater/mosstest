@@ -20,8 +20,7 @@ public class NodeManager {
 	private HashBiMap<Short, String> pending = HashBiMap.create();
 	private DB nodeDb;
 
-	private final MapNode unknownFallbackNode = new MapNode("unknown.png",
-			"sys:unknown", "An unknown piece of the world", 1);
+	private final MapNode unknownFallbackNode = new MapNode("unknown.png", "sys:unknown", "An unknown piece of the world", 1);
 	{
 		this.unknownFallbackNode.setNodeId((short) -1);
 		definedNodes.add(this.unknownFallbackNode);
@@ -63,6 +62,7 @@ public class NodeManager {
 		return r==null?this.unknownFallbackNode:r;
 	}
 
+	
 	public MapNode getNode(String string) {
 
 		MapNode r = this.defNodeByName.get(string);

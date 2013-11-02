@@ -7,10 +7,10 @@ import org.iq80.leveldb.DB;
 
 import net.mosstest.scripting.MossItem.Stack;
 import net.mosstest.servercore.FuturesProcessor;
+import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MossWorldLoadException;
 import net.mosstest.servercore.NodeCache;
-import net.mosstest.servercore.NodeManager;
 import net.mosstest.servercore.ScriptSandboxBorderToken;
 
 /**
@@ -52,7 +52,7 @@ public class MossScriptEnv {
 	private ScriptableDatabase db;
 	private NodeCache nc;
 	private FuturesProcessor fp;
-	private NodeManager nm;
+	private INodeManager nm;
 
 	/**
 	 * Registers an event hander to fire on a player death. This will be run in
@@ -615,7 +615,7 @@ public class MossScriptEnv {
 	}
 
 	public MossScriptEnv(ScriptableDatabase db, NodeCache nc,
-			FuturesProcessor fp, NodeManager nm) {
+			FuturesProcessor fp, INodeManager nm) {
 		this.db = db;
 		this.nc = nc;
 		this.fp = fp;

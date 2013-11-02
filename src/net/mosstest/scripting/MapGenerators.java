@@ -3,14 +3,14 @@ package net.mosstest.scripting;
 import java.util.ArrayList;
 import java.util.Random;
 
+import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
-import net.mosstest.servercore.NodeManager;
 import toxi.math.noise.SimplexNoise;
 
 public class MapGenerators {
 	private static volatile IMapGenerator mg;
 
-	public static void setDefaultMapGenerator(IMapGenerator g, NodeManager nm, long seed,
+	public static void setDefaultMapGenerator(IMapGenerator g, INodeManager nm, long seed,
 			Object... params) throws MapGeneratorException {
 		synchronized (MapGenerators.class) {
 			mg = g;
@@ -24,9 +24,9 @@ public class MapGenerators {
 
 	public static class FlatMapGenerator implements IMapGenerator {
 		long seed;
-		NodeManager nm;
+		INodeManager nm;
 		@Override
-		public void init(long seed, NodeManager nm, Object... params)
+		public void init(long seed, INodeManager nm, Object... params)
 				throws MapGeneratorException {
 			this.seed = seed;
 			this.nm=nm;
@@ -102,9 +102,9 @@ public class MapGenerators {
 		double humiditySeed;
 		SimplexNoise elevationNoise = new SimplexNoise();
 		ArrayList<Ore> ores = new ArrayList<>();
-		NodeManager nm;
+		INodeManager nm;
 		@Override
-		public void init(long seed, NodeManager nm,Object... params)
+		public void init(long seed, INodeManager nm,Object... params)
 				throws MapGeneratorException {
 			this.nm=nm;
 			this.baseSeed = seed;

@@ -1,4 +1,5 @@
 
+<<<<<<< HEAD
 package net.mosstest.servercore;
 
 import java.util.HashMap;
@@ -134,6 +135,7 @@ public class RenderProcessor extends SimpleApplication {
 	}
 
 	public void renderChunk(MapChunk chk, Position pos) {
+
 		if (chk == null) {
 			return;
 		}
@@ -167,8 +169,8 @@ public class RenderProcessor extends SimpleApplication {
 			}
 		}
 
-		RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
-		allChunks.put(pos, thisChunk);
+		/*RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
+		allChunks.put(pos, thisChunk);*/
 	}
 	public void getChunk (Position pos) {
 		MapChunk maybe = null;
@@ -372,5 +374,4 @@ public class RenderProcessor extends SimpleApplication {
 			}
 		}
 	};
-
 }
