@@ -280,9 +280,9 @@ public class RenderProcessor extends SimpleApplication {
 		}
 
 		MapChunk ch = new MapChunk(pos, testNodes, testModified);
-		MapChunk ch2 = new MapChunk(pos2, tN2, tM2);
+		//MapChunk ch2 = new MapChunk(pos2, tN2, tM2);
 		renderChunk(ch, pos);
-		renderChunk(ch2, pos2);
+		//renderChunk(ch2, pos2);
 		GeometryBatchFactory.optimize(worldNode);
 	}
 	 
