@@ -20,4 +20,3 @@ public class MossRenderChunkEvent extends MossRenderEvent {
 		return myChunk.getNodeId(x, y, z);
 	}*/
 }
- 

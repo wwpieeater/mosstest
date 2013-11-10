@@ -1,7 +1,7 @@
-
-<<<<<<< HEAD
 package net.mosstest.servercore;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
@@ -24,7 +24,10 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.scene.Geometry;
+import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
+import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.system.AppSettings;
 import com.jme3.math.ColorRGBA;
 
@@ -51,13 +54,12 @@ public class RenderProcessor extends SimpleApplication {
 	private DirectionalLight sun = new DirectionalLight();
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 
-	public NodeManager nManager;
+	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
-	public static RenderProcessor init(NodeManager manager,
-			IRenderPreparator prep) {
+	public static RenderProcessor init(INodeManager manager, IRenderPreparator prep) {
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
@@ -69,7 +71,7 @@ public class RenderProcessor extends SimpleApplication {
 		return app;
 	}
 
-	private void initNodeThings(NodeManager manager, IRenderPreparator prep) {
+	private void initNodeThings(INodeManager manager, IRenderPreparator prep) {
 		nManager = manager;
 		rPreparator = prep;
 	}
@@ -90,8 +92,8 @@ public class RenderProcessor extends SimpleApplication {
 		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
 		rootNode.addLight(sun);
 		rootNode.addLight(spot);
-		// testChunkEvents();
-		testLoadSurroundingChunks();
+		testChunkEvents();
+		//testLoadSurroundingChunks();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -133,54 +135,104 @@ public class RenderProcessor extends SimpleApplication {
 		 * com.jme3.asset.plugins.FileLocator.class); }
 		 */
 	}
-
-	public void renderChunk(MapChunk chk, Position pos) {
-
-		if (chk == null) {
-			return;
-		}
-
-		double offset = 16 * blockSize;
-		RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
-
-		for (byte i = 0; i < 16; i++) {
-			for (byte j = 0; j < 16; j++) {
-				for (byte k = 0; k < 16; k++) {
-					int nVal = chk.getNodeId(i, j, k);
-					Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {return;}
-					else {
-						
-						float x = (float) ((pos.x + (32 * blockSize * pos.x)) - offset + (i * 2 * blockSize));
-						float y = (float) ((pos.y - playerHeight) - (j * 2 * blockSize));
-						float z = (float) ((pos.z + (32 * blockSize * pos.z)) - offset  + (k * 2 * blockSize));
-						
-						/*Vector3f loc = new Vector3f(xLocation, yLocation,
-								zLocation);
-						RenderNode geom = new RenderNode(mat, loc, blockSize, NodeManager.getNode((short)nVal)
-						null);
-						nodesInChunk[i][j][k] = geom;
-						worldNode.attachChild(geom);
-						break;*/
-					// }
-					}
-
-				}
-			}
-		}
-
-		/*RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
-		allChunks.put(pos, thisChunk);*/
-	}
+	
 	public void getChunk (Position pos) {
 		MapChunk maybe = null;
 		try {maybe = rPreparator.requestChunk(pos);} 
 		catch (MapGeneratorException e) {e.printStackTrace();} 
 		catch (InterruptedException e) {e.printStackTrace();}
-		if (maybe != null) {renderChunk(maybe, pos);
-		}
+		if (maybe != null) {renderChunk(maybe, pos);}
 	}
-	public void testLoadSurroundingChunks() {
+	
+	public void renderChunk(MapChunk chk, Position pos) {
+		//Unnecessary?
+		if (chk == null) {
+			return;
+		}
+		double offset = 16 * blockSize;
+		int ixOffset = 0;
+		Mesh bigMesh = new Mesh ();
+		FloatBuffer tcoords = FloatBuffer.allocate(500000);
+		FloatBuffer vertices = FloatBuffer.allocate(500000);
+		IntBuffer indices = IntBuffer.allocate(500000);
+		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
+
+		for (byte i = 0; i < 5; i++) {
+			for (byte j = 0; j < 5; j++) {
+				for (byte k = 0; k < 5; k++) {
+					int nVal = chk.getNodeId(i, j, k);
+					//MapNode node = nManager.getNode((short) nVal);
+					//Material mat = getMaterial((short) nVal);
+					if (nVal == 0) {System.out.println("WARRRNINGINIGNINGINGINN");return;}
+					
+					else {
+						
+						float x = (float) ((pos.x + (32 * blockSize * pos.x)) - offset + (i * 3 * blockSize));
+						float y = (float) ((pos.y - playerHeight) - (j * 3 * blockSize));
+						float z = (float) ((pos.z + (32 * blockSize * pos.z)) - offset  + (k * 3 * blockSize));
+						
+						addVertex(x, y, z, vertices); //Front face
+						addVertex(x, y - 2*blockSize, z, vertices);
+						addVertex(x + 2*blockSize, y, z, vertices);
+						addVertex(x + 2*blockSize, y - 2*blockSize, z, vertices); //Top Face
+						addVertex(x, y, z + 2*blockSize, vertices);
+						addVertex(x + 2*blockSize, y, z + 2*blockSize, vertices);
+						addVertex(x + 2*blockSize, y - 2*blockSize, z + 2*blockSize, vertices); //right face
+						addVertex(x, y - 2*blockSize, z + 2*blockSize, vertices); //left face
+
+						addTriIX(ixOffset + 3, ixOffset + 1, ixOffset + 0, indices);//front
+						addTriIX(ixOffset + 3, ixOffset + 0, ixOffset + 2, indices);
+						addTriIX(ixOffset + 4, ixOffset + 2, ixOffset + 0, indices);//top
+						addTriIX(ixOffset + 4, ixOffset + 5, ixOffset + 2, indices);
+						addTriIX(ixOffset + 3, ixOffset + 2, ixOffset + 6, indices);//right
+						addTriIX(ixOffset + 2, ixOffset + 5, ixOffset + 6, indices);
+						addTriIX(ixOffset + 0, ixOffset + 1, ixOffset + 7, indices);//left
+						addTriIX(ixOffset + 0, ixOffset + 7, ixOffset + 4, indices);
+						addTriIX(ixOffset + 4, ixOffset + 6, ixOffset + 5, indices);//back
+						addTriIX(ixOffset + 4, ixOffset + 7, ixOffset + 6, indices);
+						addTriIX(ixOffset + 1, ixOffset + 6, ixOffset + 7, indices);//bottom
+						addTriIX(ixOffset + 1, ixOffset + 3, ixOffset + 6, indices);
+						
+						for(int cv=0; cv<8; cv++) {
+							tcoords.put(1); tcoords.put(0);
+							tcoords.put(1); tcoords.put(1);
+						}
+						
+						
+						
+						//RenderNode geom = new RenderNode(mat, loc, blockSize, NodeManager.getNode((short)nVal)null);
+						//nodesInChunk[i][j][k] = geom;
+						ixOffset += 8;
+						System.out.println(ixOffset);
+					}
+
+				}
+			}
+		}
+		Material mat = getMaterial((short) 1);
+		bigMesh.setBuffer(Type.Position, 3, vertices);
+		bigMesh.setBuffer(Type.TexCoord, 2, tcoords);
+		bigMesh.setBuffer(Type.Index, 3, indices);
+		bigMesh.updateBound();
+		Geometry geom = new Geometry("chunkMesh", bigMesh);
+		geom.setMaterial(mat);
+		worldNode.attachChild(geom);
+		/*RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
+		allChunks.put(pos, thisChunk);*/
+	}
+	private void addVertex (float x, float y, float z, FloatBuffer buffer) {
+		buffer.put(x);
+		buffer.put(y);
+		buffer.put(z);
+	}
+	
+	private void addTriIX (int a, int b, int c, IntBuffer buffer) {
+		buffer.put(a);
+		buffer.put(b);
+		buffer.put(c);
+	}
+	
+	private void testLoadSurroundingChunks() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
 		Position p3 = new Position(0, 0, 1, 0);
@@ -198,28 +250,42 @@ public class RenderProcessor extends SimpleApplication {
 		// getChunk(p7);
 	}
 
-	/*
-	 * this is like the local testing, I make these chunks almost literally by
-	 * hand and then test with them so I don't have to rely on anything from
-	 * outside the preparator.
-	 */
-	/*
-	 * public void testChunkEvents () { Position pos = new Position(0, 0, 0, 0);
-	 * Position pos2 = new Position(-1,0,-1,0); boolean[][][] testModified = new
-	 * boolean[16][16][16]; boolean[][][] tM2 = new boolean[16][16][16];
-	 * for(boolean[][] l1 : testModified) {for(boolean[] l2 : l1)
-	 * {Arrays.fill(l2, false);}} for(boolean[][] l1 : tM2) {for(boolean[] l2 :
-	 * l1) {Arrays.fill(l2, false);}}
-	 * 
-	 * int[][][] tN2 = new int[16][16][16]; int[][][] testNodes = new
-	 * int[16][16][16]; for(int[][] l1 : testNodes) {for(int[] l2 : l1)
-	 * {Arrays.fill(l2, 1);}} for(int[][] l1 : tN2) {for(int[] l2 : l1)
-	 * {Arrays.fill(l2, 1);}}
-	 * 
-	 * MapChunk ch = new MapChunk(pos, testNodes, testModified); MapChunk ch2 =
-	 * new MapChunk(pos2, tN2, tM2); renderChunk(ch, pos); renderChunk(ch2,
-	 * pos2); GeometryBatchFactory.optimize(worldNode); }
-	 */
+	private void testChunkEvents() {
+		Position pos = new Position(0, 0, 0, 0);
+		Position pos2 = new Position(1, 0, 1, 0);
+		boolean[][][] testModified = new boolean[16][16][16];
+		boolean[][][] tM2 = new boolean[16][16][16];
+		for (boolean[][] l1 : testModified) {
+			for (boolean[] l2 : l1) {
+				Arrays.fill(l2, false);
+			}
+		}
+		for (boolean[][] l1 : tM2) {
+			for (boolean[] l2 : l1) {
+				Arrays.fill(l2, false);
+			}
+		}
+
+		int[][][] tN2 = new int[16][16][16];
+		int[][][] testNodes = new int[16][16][16];
+		for (int[][] l1 : testNodes) {
+			for (int[] l2 : l1) {
+				Arrays.fill(l2, 1);
+			}
+		}
+		for (int[][] l1 : tN2) {
+			for (int[] l2 : l1) {
+				Arrays.fill(l2, 1);
+			}
+		}
+
+		MapChunk ch = new MapChunk(pos, testNodes, testModified);
+		MapChunk ch2 = new MapChunk(pos2, tN2, tM2);
+		renderChunk(ch, pos);
+		renderChunk(ch2, pos2);
+		GeometryBatchFactory.optimize(worldNode);
+	}
+	 
 	public Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
@@ -232,17 +298,6 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		return mat;
 	}
-
-	/**
-	 * Looks for changes in position, moves in direction of camera.
-	 * 
-	 * @param cx
-	 *            change in x
-	 * @param cy
-	 *            change in y
-	 * @param cz
-	 *            change in z
-	 */
 	private void moveWorld(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
