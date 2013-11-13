@@ -193,10 +193,10 @@ public class RenderProcessor extends SimpleApplication {
 						addTriIX(ixOffset + 1, ixOffset + 6, ixOffset + 7, indices);//bottom
 						addTriIX(ixOffset + 1, ixOffset + 3, ixOffset + 6, indices);
 						
-						for(int cv=0; cv<8; cv++) {
+						/*for(int cv=0; cv<8; cv++) {
 							tcoords.put(1); tcoords.put(0);
 							tcoords.put(1); tcoords.put(1);
-						}
+						}*/
 						
 						
 						
@@ -211,7 +211,7 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		Material mat = getMaterial((short) 1);
 		bigMesh.setBuffer(Type.Position, 3, vertices);
-		bigMesh.setBuffer(Type.TexCoord, 2, tcoords);
+		//bigMesh.setBuffer(Type.TexCoord, 2, tcoords);
 		bigMesh.setBuffer(Type.Index, 3, indices);
 		bigMesh.updateBound();
 		Geometry geom = new Geometry("chunkMesh", bigMesh);
@@ -290,11 +290,13 @@ public class RenderProcessor extends SimpleApplication {
 		Material mat = null;
 		switch (nVal) {
 		case 1:
-			mat = new Material(assetManager,
-					"Common/MatDefs/Light/Lighting.j3md");
-			mat.setBoolean("UseMaterialColors", true);
-			mat.setColor("Ambient", ColorRGBA.Green);
-			mat.setColor("Diffuse", ColorRGBA.Green);
+			/*mat = new Material(assetManager,
+					"Common/MatDefs/Light/Lighting.j3md");*/
+			mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			mat.setColor("Color", ColorRGBA.Green);
+			//mat.setBoolean("UseMaterialColors", true);
+			//mat.setColor("Ambient", ColorRGBA.Green);
+			//mat.setColor("Diffuse", ColorRGBA.Green);
 		}
 		return mat;
 	}
