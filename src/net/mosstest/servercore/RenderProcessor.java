@@ -145,10 +145,6 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	
 	public void renderChunk(MapChunk chk, Position pos) {
-		//Unnecessary?
-		if (chk == null) {
-			return;
-		}
 		double offset = 16 * blockSize;
 		int ixOffset = 0;
 		Mesh bigMesh = new Mesh ();
@@ -163,7 +159,7 @@ public class RenderProcessor extends SimpleApplication {
 					int nVal = chk.getNodeId(i, j, k);
 					//MapNode node = nManager.getNode((short) nVal);
 					//Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {System.out.println("WARRRNINGINIGNINGINGINN");return;}
+					if (nVal == 0) {return;}
 					
 					else {
 						
