@@ -193,11 +193,6 @@ public class RenderProcessor extends SimpleApplication {
 						addTriIX(ixOffset + 1, ixOffset + 6, ixOffset + 7, indices);//bottom
 						addTriIX(ixOffset + 1, ixOffset + 3, ixOffset + 6, indices);
 						
-						/*for(int cv=0; cv<8; cv++) {
-							tcoords.put(1); tcoords.put(0);
-							tcoords.put(1); tcoords.put(1);
-						}*/
-						
 						
 						
 						//RenderNode geom = new RenderNode(mat, loc, blockSize, NodeManager.getNode((short)nVal)null);
@@ -211,7 +206,6 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		Material mat = getMaterial((short) 1);
 		bigMesh.setBuffer(Type.Position, 3, vertices);
-		//bigMesh.setBuffer(Type.TexCoord, 2, tcoords);
 		bigMesh.setBuffer(Type.Index, 3, indices);
 		bigMesh.updateBound();
 		Geometry geom = new Geometry("chunkMesh", bigMesh);
