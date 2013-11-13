@@ -15,6 +15,9 @@ import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+import java.awt.Dialog.ModalityType;
+import javax.swing.DefaultComboBoxModel;
+import com.jme3.material.RenderState.TestFunction;
 
 public class GUIWorldCreationDialog extends JDialog {
 
@@ -40,6 +43,10 @@ public class GUIWorldCreationDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public GUIWorldCreationDialog() {
+		setTitle("Create new singleplayer world...");
+		setModal(true);
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setResizable(false);
 		setBounds(100, 100, 450, 159);
 		getContentPane().setLayout(new BorderLayout());
 		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -79,7 +86,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			this.contentPanel.add(lblGameProfile, "2, 6, right, default");
 		}
 		{
-			this.comboBox = new JComboBox<String>(); //todo pass array in with set of games.
+			this.comboBox = new JComboBox<String>();
 			this.contentPanel.add(this.comboBox, "4, 6, fill, default");
 		}
 		{
