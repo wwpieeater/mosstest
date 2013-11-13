@@ -1,39 +1,32 @@
 package net.mosstest.launcher;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.AbstractTableModel;
-import javax.swing.JTextArea;
-import java.awt.Color;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.RowSpec;
-import java.awt.Component;
-import java.awt.Point;
-import java.awt.Rectangle;
-import javax.swing.SpringLayout;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import java.awt.CardLayout;
-import javax.swing.BoxLayout;
 
 public class GUIClientsideLauncher {
+	private SingleplayerListTableModel mdl;
 
-	public class SingleplayerListEntry {
+	public static class SingleplayerListEntry {
 
 		public String name;
 		public String description;
@@ -65,7 +58,15 @@ public class GUIClientsideLauncher {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					GUIClientsideLauncher window = new GUIClientsideLauncher(new ArrayList<SingleplayerListEntry>());
+					ArrayList<SingleplayerListEntry> entries = new ArrayList<SingleplayerListEntry>();
+					entries.add(new SingleplayerListEntry("name1", "desc1",
+							"game1"));
+					entries.add(new SingleplayerListEntry(
+							"name2",
+							"desc2",
+							"game2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+					GUIClientsideLauncher window = new GUIClientsideLauncher(
+							entries);
 					window.frmMosstestClientLauncher.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -77,35 +78,94 @@ public class GUIClientsideLauncher {
 	/**
 	 * Create the application.
 	 */
-	public GUIClientsideLauncher(ArrayList<SingleplayerListEntry> singleplayerEntries) {
+	public GUIClientsideLauncher(
+			ArrayList<SingleplayerListEntry> singleplayerEntries) {
 		initialize(singleplayerEntries);
 	}
 
 	/**
 	 * Initialize the contents of the frame.
-	 * @param singleplayerEntries 
+	 * 
+	 * @param singleplayerEntries
 	 */
 	private void initialize(ArrayList<SingleplayerListEntry> singleplayerEntries) {
 		this.frmMosstestClientLauncher = new JFrame();
-		frmMosstestClientLauncher.setTitle("Mosstest Client launcher <0.0.1-initial>");
+		this.frmMosstestClientLauncher
+				.setTitle("Mosstest Client launcher <0.0.1-initial>");
 		this.frmMosstestClientLauncher.setBounds(100, 100, 800, 480);
-		this.frmMosstestClientLauncher.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.frmMosstestClientLauncher
+				.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		this.frmMosstestClientLauncher.getContentPane().add(tabbedPane, BorderLayout.CENTER);
+		this.frmMosstestClientLauncher.getContentPane().add(tabbedPane,
+				BorderLayout.CENTER);
 
 		JPanel singleplayerTab = new JPanel();
 		tabbedPane.addTab("Singleplayer", null, singleplayerTab, null);
 		singleplayerTab.setLayout(new BorderLayout(0, 0));
-
+		this.table = new JTable();
+		this.table.setFillsViewportHeight(true);
+		this.mdl = new SingleplayerListTableModel(singleplayerEntries);
+		this.table.setModel(this.mdl);
+		this.table.getColumnModel().getColumn(0).setPreferredWidth(90);
+		this.table.getColumnModel().getColumn(1).setPreferredWidth(256);
+		this.table.getColumnModel().getColumn(2).setPreferredWidth(104);
+		this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		JPanel singleplayerControlBtns = new JPanel();
 		singleplayerTab.add(singleplayerControlBtns, BorderLayout.SOUTH);
 		singleplayerControlBtns.setLayout(new GridLayout(0, 4, 0, 0));
 
 		JButton btnPlaySingleplayer = new JButton("Play");
+		btnPlaySingleplayer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+
+				int row = GUIClientsideLauncher.this.table.getSelectedRow();
+				if (row < 0) {
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"No world was selected to be started. Please select an existing world in the table, or create a new world.",
+									"No world selected",
+									JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				GUIClientsideLauncher.this.frmMosstestClientLauncher
+						.setVisible(false);
+				// below is testing code. in reality this would call a method to
+				// start a world and block. This should be in a try-catch block
+				// for the bug reporter to snatch up.
+				for (int i = 0; i < 100; i++) {
+					System.out.println("selected: "
+							+ GUIClientsideLauncher.this.mdl.getValueAt(row, 0)
+							+ "::swing thread: " + i);
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
+				}
+				GUIClientsideLauncher.this.frmMosstestClientLauncher
+						.setVisible(true);
+			}
+		});
 		singleplayerControlBtns.add(btnPlaySingleplayer);
 
 		JButton btnNewSingleplayer = new JButton("New...");
+		btnNewSingleplayer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				GUIWorldCreationDialog dlg = new GUIWorldCreationDialog();
+				dlg.setVisible(true);
+				if (dlg.dlgResult) {
+					System.out.println("got value: " + dlg.nameField.getText());
+					System.out.println("got desc: " + dlg.inputDesc.getText());
+					System.out.println("got game: "
+							+ dlg.comboBox.getSelectedIndex());
+				} else
+					System.out.println("cxld");
+			}
+		});
 
 		singleplayerControlBtns.add(btnNewSingleplayer);
 
@@ -113,50 +173,66 @@ public class GUIClientsideLauncher {
 		singleplayerControlBtns.add(btnSettingsSingleplayer);
 
 		JButton btnDelete = new JButton("Delete...");
+		btnDelete.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int row = GUIClientsideLauncher.this.table.getSelectedRow();
+				if (row < 0) {
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"No world was selected to be deleted. Please select an existing world in the table.",
+									"No world selected",
+									JOptionPane.WARNING_MESSAGE);
+					return;
+				}
+				
+				
+			}
+		});
 		singleplayerControlBtns.add(btnDelete);
 
-		this.table = new JTable();
-		this.table.setFillsViewportHeight(true);
-		this.table.setModel(new SingleplayerListTableModel(singleplayerEntries));
-		this.table.getColumnModel().getColumn(0).setPreferredWidth(90);
-		this.table.getColumnModel().getColumn(1).setPreferredWidth(256);
-		this.table.getColumnModel().getColumn(2).setPreferredWidth(104);
-		this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		//singleplayerTab.add(this.table, BorderLayout.CENTER);
+		// singleplayerTab.add(this.table, BorderLayout.CENTER);
 
 		JScrollPane singleplayerScrollPane = new JScrollPane(this.table);
-		singleplayerScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		singleplayerScrollPane
+				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		singleplayerTab.add(singleplayerScrollPane, BorderLayout.CENTER);
 		JPanel aboutTab = new JPanel();
 		tabbedPane.addTab("About", null, aboutTab, null);
 		tabbedPane.setEnabledAt(1, true);
 		SpringLayout sl_aboutTab = new SpringLayout();
 		aboutTab.setLayout(sl_aboutTab);
-		
+
 		JPanel communityToolsButtonPanel = new JPanel();
-		sl_aboutTab.putConstraint(SpringLayout.NORTH, communityToolsButtonPanel, 405, SpringLayout.NORTH, aboutTab);
-		sl_aboutTab.putConstraint(SpringLayout.WEST, communityToolsButtonPanel, 0, SpringLayout.WEST, aboutTab);
-		sl_aboutTab.putConstraint(SpringLayout.EAST, communityToolsButtonPanel, 787, SpringLayout.WEST, aboutTab);
+		sl_aboutTab.putConstraint(SpringLayout.NORTH,
+				communityToolsButtonPanel, 405, SpringLayout.NORTH, aboutTab);
+		sl_aboutTab.putConstraint(SpringLayout.WEST, communityToolsButtonPanel,
+				0, SpringLayout.WEST, aboutTab);
+		sl_aboutTab.putConstraint(SpringLayout.EAST, communityToolsButtonPanel,
+				787, SpringLayout.WEST, aboutTab);
 		aboutTab.add(communityToolsButtonPanel);
 		communityToolsButtonPanel.setLayout(new GridLayout(0, 5, 0, 0));
-		
+
 		JButton btnReportBug = new JButton("Report a bug...");
+		btnReportBug.setEnabled(false);
 		communityToolsButtonPanel.add(btnReportBug);
-		
+
 		JButton btnRequestNewFeature = new JButton("Request new feature...");
+		btnRequestNewFeature.setEnabled(false);
 		communityToolsButtonPanel.add(btnRequestNewFeature);
-		
+
 		JButton btnVisitWebsite = new JButton("Visit website");
+		btnVisitWebsite.setEnabled(false);
 		communityToolsButtonPanel.add(btnVisitWebsite);
-		
+
 		JButton btnGithubProject = new JButton("GitHub project");
+		btnGithubProject.setEnabled(false);
 		communityToolsButtonPanel.add(btnGithubProject);
-		
+
 		JButton btnVisitForums = new JButton("Visit forums");
+		btnVisitForums.setEnabled(false);
 		communityToolsButtonPanel.add(btnVisitForums);
-		
-		
-		
+
 		JTextArea textArea = new JTextArea();
 		aboutTab.add(textArea);
 		textArea.setText("  __  __  ____   _____ _____ _______ ______  _____ _______ \r\n"
@@ -189,14 +265,19 @@ public class GUIClientsideLauncher {
 		textArea.setBackground(new Color(192, 192, 192));
 		textArea.setEditable(false);
 		JScrollPane scrollPane = new JScrollPane(textArea);
-		sl_aboutTab.putConstraint(SpringLayout.NORTH, scrollPane, 0, SpringLayout.NORTH, aboutTab);
-		sl_aboutTab.putConstraint(SpringLayout.WEST, scrollPane, 0, SpringLayout.WEST, aboutTab);
-		sl_aboutTab.putConstraint(SpringLayout.SOUTH, scrollPane, 0, SpringLayout.NORTH, communityToolsButtonPanel);
-		sl_aboutTab.putConstraint(SpringLayout.EAST, scrollPane, 787, SpringLayout.WEST, aboutTab);
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+		sl_aboutTab.putConstraint(SpringLayout.NORTH, scrollPane, 0,
+				SpringLayout.NORTH, aboutTab);
+		sl_aboutTab.putConstraint(SpringLayout.WEST, scrollPane, 0,
+				SpringLayout.WEST, aboutTab);
+		sl_aboutTab.putConstraint(SpringLayout.SOUTH, scrollPane, 0,
+				SpringLayout.NORTH, communityToolsButtonPanel);
+		sl_aboutTab.putConstraint(SpringLayout.EAST, scrollPane, 787,
+				SpringLayout.WEST, aboutTab);
+		scrollPane
+				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane
+				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		aboutTab.add(scrollPane);
-		
 
 	}
 

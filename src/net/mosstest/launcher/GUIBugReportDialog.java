@@ -1,30 +1,26 @@
 package net.mosstest.launcher;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import net.miginfocom.swing.MigLayout;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JFileChooser;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JCheckBox;
 import java.awt.Color;
-import java.awt.Window.Type;
-import javax.swing.JProgressBar;
-import javax.swing.Box;
-import javax.swing.SwingConstants;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-import javax.swing.BoxLayout;
 import java.awt.Cursor;
 import java.awt.Dimension;
+
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JProgressBar;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import com.jgoodies.forms.factories.FormFactory;
+import com.jgoodies.forms.layout.ColumnSpec;
+import com.jgoodies.forms.layout.FormLayout;
+import com.jgoodies.forms.layout.RowSpec;
 
 public class GUIBugReportDialog extends JDialog {
 
@@ -57,42 +53,57 @@ public class GUIBugReportDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(this.contentPanel, BorderLayout.CENTER);
-		this.contentPanel.setLayout(new MigLayout("", "[][grow]", "[][][][grow][grow]"));
+		contentPanel.setLayout(new FormLayout(new ColumnSpec[] {
+				FormFactory.UNRELATED_GAP_COLSPEC,
+				ColumnSpec.decode("163px"),
+				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
+				ColumnSpec.decode("441px"),},
+			new RowSpec[] {
+				FormFactory.UNRELATED_GAP_ROWSPEC,
+				RowSpec.decode("20px"),
+				FormFactory.NARROW_LINE_GAP_ROWSPEC,
+				RowSpec.decode("20px"),
+				FormFactory.NARROW_LINE_GAP_ROWSPEC,
+				RowSpec.decode("20px"),
+				FormFactory.NARROW_LINE_GAP_ROWSPEC,
+				RowSpec.decode("192px"),
+				FormFactory.NARROW_LINE_GAP_ROWSPEC,
+				RowSpec.decode("138px"),}));
 		{
 			JLabel lblName = new JLabel("Name:");
-			this.contentPanel.add(lblName, "cell 0 0,alignx trailing");
+			this.contentPanel.add(lblName, "2, 2, right, center");
 		}
 		{
 			this.reporterName = new JTextField();
-			this.contentPanel.add(this.reporterName, "cell 1 0,growx");
+			this.contentPanel.add(this.reporterName, "4, 2, fill, top");
 			this.reporterName.setColumns(10);
 		}
 		{
 			JLabel lblEmailoptional = new JLabel("e-mail (optional):");
-			this.contentPanel.add(lblEmailoptional, "cell 0 1,alignx trailing");
+			this.contentPanel.add(lblEmailoptional, "2, 4, right, center");
 		}
 		{
 			this.email = new JTextField();
-			this.contentPanel.add(this.email, "cell 1 1,growx");
+			this.contentPanel.add(this.email, "4, 4, fill, top");
 			this.email.setColumns(10);
 		}
 		{
 			JLabel lblProblemDescription = new JLabel("Problem summary:");
-			this.contentPanel.add(lblProblemDescription, "cell 0 2,alignx trailing");
+			this.contentPanel.add(lblProblemDescription, "2, 6, right, center");
 		}
 		{
 			this.problemSummary = new JTextField();
-			this.contentPanel.add(this.problemSummary, "cell 1 2,growx");
+			this.contentPanel.add(this.problemSummary, "4, 6, fill, top");
 			this.problemSummary.setColumns(10);
 		}
 		{
 			JLabel lblDetailedProblemDescription = new JLabel(
 					"Detailed problem description:");
-			this.contentPanel.add(lblDetailedProblemDescription, "cell 0 3,alignx trailing");
+			this.contentPanel.add(lblDetailedProblemDescription, "2, 8, right, center");
 		}
 		{
 			JScrollPane scrollPane = new JScrollPane();
-			this.contentPanel.add(scrollPane, "cell 1 3,grow");
+			this.contentPanel.add(scrollPane, "4, 8, fill, fill");
 			{
 				JTextArea txtLongDesc = new JTextArea();
 				txtLongDesc.setWrapStyleWord(true);
@@ -105,11 +116,11 @@ public class GUIBugReportDialog extends JDialog {
 		{
 			JCheckBox chckbxIncludeTechnicalInformation = new JCheckBox(
 					"Include technical information");
-			this.contentPanel.add(chckbxIncludeTechnicalInformation, "cell 0 4,alignx trailing,aligny top");
+			this.contentPanel.add(chckbxIncludeTechnicalInformation, "2, 10, left, top");
 		}
 		{
 			JScrollPane scrollPane = new JScrollPane();
-			this.contentPanel.add(scrollPane, "cell 1 4,grow");
+			this.contentPanel.add(scrollPane, "4, 10, fill, fill");
 			{
 				JTextArea textArea = new JTextArea();
 				textArea.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
