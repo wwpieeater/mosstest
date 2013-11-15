@@ -93,7 +93,7 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(sun);
 		rootNode.addLight(spot);
 		testChunkEvents();
-		//testLoadSurroundingChunks();
+		//testPeparator();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -150,6 +150,7 @@ public class RenderProcessor extends SimpleApplication {
 		Mesh bigMesh = new Mesh ();
 		FloatBuffer tcoords = FloatBuffer.allocate(500000);
 		FloatBuffer vertices = FloatBuffer.allocate(500000);
+		FloatBuffer normals = FloatBuffer.allocate(500000);
 		IntBuffer indices = IntBuffer.allocate(500000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 
@@ -167,28 +168,27 @@ public class RenderProcessor extends SimpleApplication {
 						float y = (float) ((pos.y - playerHeight) - (j * 3 * blockSize));
 						float z = (float) ((pos.z + (32 * blockSize * pos.z)) - offset  + (k * 3 * blockSize));
 						
-						addVertex(x, y, z, vertices); //Front face
+						/*addVertex(x, y, z, vertices); //Front face
 						addVertex(x, y - 2*blockSize, z, vertices);
 						addVertex(x + 2*blockSize, y, z, vertices);
 						addVertex(x + 2*blockSize, y - 2*blockSize, z, vertices); //Top Face
 						addVertex(x, y, z + 2*blockSize, vertices);
 						addVertex(x + 2*blockSize, y, z + 2*blockSize, vertices);
 						addVertex(x + 2*blockSize, y - 2*blockSize, z + 2*blockSize, vertices); //right face
-						addVertex(x, y - 2*blockSize, z + 2*blockSize, vertices); //left face
+						addVertex(x, y - 2*blockSize, z + 2*blockSize, vertices); //left face*/
 
-						addTriIX(ixOffset + 3, ixOffset + 1, ixOffset + 0, indices);//front
-						addTriIX(ixOffset + 3, ixOffset + 0, ixOffset + 2, indices);
-						addTriIX(ixOffset + 4, ixOffset + 2, ixOffset + 0, indices);//top
-						addTriIX(ixOffset + 4, ixOffset + 5, ixOffset + 2, indices);
-						addTriIX(ixOffset + 3, ixOffset + 2, ixOffset + 6, indices);//right
-						addTriIX(ixOffset + 2, ixOffset + 5, ixOffset + 6, indices);
-						addTriIX(ixOffset + 0, ixOffset + 1, ixOffset + 7, indices);//left
-						addTriIX(ixOffset + 0, ixOffset + 7, ixOffset + 4, indices);
-						addTriIX(ixOffset + 4, ixOffset + 6, ixOffset + 5, indices);//back
-						addTriIX(ixOffset + 4, ixOffset + 7, ixOffset + 6, indices);
-						addTriIX(ixOffset + 1, ixOffset + 6, ixOffset + 7, indices);//bottom
-						addTriIX(ixOffset + 1, ixOffset + 3, ixOffset + 6, indices);
-						
+						addTriangleIndex(ixOffset + 3, ixOffset + 1, ixOffset + 0, indices);//front
+						addTriangleIndex(ixOffset + 3, ixOffset + 0, ixOffset + 2, indices);
+						addTriangleIndex(ixOffset + 4, ixOffset + 2, ixOffset + 0, indices);//top
+						addTriangleIndex(ixOffset + 4, ixOffset + 5, ixOffset + 2, indices);
+						addTriangleIndex(ixOffset + 3, ixOffset + 2, ixOffset + 6, indices);//right
+						addTriangleIndex(ixOffset + 2, ixOffset + 5, ixOffset + 6, indices);
+						addTriangleIndex(ixOffset + 0, ixOffset + 1, ixOffset + 7, indices);//left
+						addTriangleIndex(ixOffset + 0, ixOffset + 7, ixOffset + 4, indices);
+						addTriangleIndex(ixOffset + 4, ixOffset + 6, ixOffset + 5, indices);//back
+						addTriangleIndex(ixOffset + 4, ixOffset + 7, ixOffset + 6, indices);
+						addTriangleIndex(ixOffset + 1, ixOffset + 6, ixOffset + 7, indices);//bottom
+						addTriangleIndex(ixOffset + 1, ixOffset + 3, ixOffset + 6, indices);
 						
 						
 						//RenderNode geom = new RenderNode(mat, loc, blockSize, NodeManager.getNode((short)nVal)null);
@@ -216,13 +216,13 @@ public class RenderProcessor extends SimpleApplication {
 		buffer.put(z);
 	}
 	
-	private void addTriIX (int a, int b, int c, IntBuffer buffer) {
+	private void addTriangleIndex (int a, int b, int c, IntBuffer buffer) {
 		buffer.put(a);
 		buffer.put(b);
 		buffer.put(c);
 	}
 	
-	private void testLoadSurroundingChunks() {
+	private void testPreparator() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
 		Position p3 = new Position(0, 0, 1, 0);
