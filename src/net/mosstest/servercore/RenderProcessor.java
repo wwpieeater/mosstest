@@ -168,27 +168,27 @@ public class RenderProcessor extends SimpleApplication {
 						float y = (float) ((pos.y - playerHeight) - (j * 3 * blockSize));
 						float z = (float) ((pos.z + (32 * blockSize * pos.z)) - offset  + (k * 3 * blockSize));
 						
-						/*addVertex(x, y, z, vertices); //Front face
-						addVertex(x, y - 2*blockSize, z, vertices);
-						addVertex(x + 2*blockSize, y, z, vertices);
-						addVertex(x + 2*blockSize, y - 2*blockSize, z, vertices); //Top Face
-						addVertex(x, y, z + 2*blockSize, vertices);
-						addVertex(x + 2*blockSize, y, z + 2*blockSize, vertices);
-						addVertex(x + 2*blockSize, y - 2*blockSize, z + 2*blockSize, vertices); //right face
-						addVertex(x, y - 2*blockSize, z + 2*blockSize, vertices); //left face*/
+						vertices.put(x).put(y).put(z); //Front face
+						vertices.put(x).put(y - 2*blockSize).put(z);
+						vertices.put(x + 2*blockSize).put(y).put(z);
+						vertices.put(x + 2*blockSize).put(y - 2*blockSize).put(z); //Top Face
+						vertices.put(x).put(y).put(z + 2*blockSize);
+						vertices.put(x + 2*blockSize).put(y).put(z + 2*blockSize);
+						vertices.put(x + 2*blockSize).put(y - 2*blockSize).put(z + 2*blockSize); //right face
+						vertices.put(x).put(y - 2*blockSize).put(z + 2*blockSize); //left face
 
-						addTriangleIndex(ixOffset + 3, ixOffset + 1, ixOffset + 0, indices);//front
-						addTriangleIndex(ixOffset + 3, ixOffset + 0, ixOffset + 2, indices);
-						addTriangleIndex(ixOffset + 4, ixOffset + 2, ixOffset + 0, indices);//top
-						addTriangleIndex(ixOffset + 4, ixOffset + 5, ixOffset + 2, indices);
-						addTriangleIndex(ixOffset + 3, ixOffset + 2, ixOffset + 6, indices);//right
-						addTriangleIndex(ixOffset + 2, ixOffset + 5, ixOffset + 6, indices);
-						addTriangleIndex(ixOffset + 0, ixOffset + 1, ixOffset + 7, indices);//left
-						addTriangleIndex(ixOffset + 0, ixOffset + 7, ixOffset + 4, indices);
-						addTriangleIndex(ixOffset + 4, ixOffset + 6, ixOffset + 5, indices);//back
-						addTriangleIndex(ixOffset + 4, ixOffset + 7, ixOffset + 6, indices);
-						addTriangleIndex(ixOffset + 1, ixOffset + 6, ixOffset + 7, indices);//bottom
-						addTriangleIndex(ixOffset + 1, ixOffset + 3, ixOffset + 6, indices);
+						indices.put(ixOffset + 3).put(ixOffset + 1).put(ixOffset + 0);//front
+						indices.put(ixOffset + 3).put(ixOffset + 0).put(ixOffset + 2);
+						indices.put(ixOffset + 4).put(ixOffset + 2).put(ixOffset + 0);//top
+						indices.put(ixOffset + 4).put(ixOffset + 5).put(ixOffset + 2);
+						indices.put(ixOffset + 3).put(ixOffset + 2).put(ixOffset + 6);//right
+						indices.put(ixOffset + 2).put(ixOffset + 5).put(ixOffset + 6);
+						indices.put(ixOffset + 0).put(ixOffset + 1).put(ixOffset + 7);//left
+						indices.put(ixOffset + 0).put(ixOffset + 7).put(ixOffset + 4);
+						indices.put(ixOffset + 4).put(ixOffset + 6).put(ixOffset + 5);//back
+						indices.put(ixOffset + 4).put(ixOffset + 7).put(ixOffset + 6);
+						indices.put(ixOffset + 1).put(ixOffset + 6).put(ixOffset + 7);//bottom
+						indices.put(ixOffset + 1).put(ixOffset + 3).put(ixOffset + 6);
 						
 						
 						//RenderNode geom = new RenderNode(mat, loc, blockSize, NodeManager.getNode((short)nVal)null);
