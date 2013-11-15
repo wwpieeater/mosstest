@@ -16,9 +16,11 @@ import com.jgoodies.forms.factories.FormFactory;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class GUIWorldDeletionDialog extends JDialog {
-
+	boolean dlgResult=false;
 	private final JPanel contentPanel = new JPanel();
 
 	/**
@@ -62,12 +64,24 @@ public class GUIWorldDeletionDialog extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton btnYes = new JButton("Yes");
+				btnYes.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						GUIWorldDeletionDialog.this.dlgResult = true;
+						GUIWorldDeletionDialog.this.dispose();
+					}
+				});
 				btnYes.setActionCommand("Yes");
 				buttonPane.add(btnYes);
 				getRootPane().setDefaultButton(btnYes);
 			}
 			{
 				JButton cancelButton = new JButton("No");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						GUIWorldDeletionDialog.this.dlgResult = false;
+						GUIWorldDeletionDialog.this.dispose();
+					}
+				});
 				buttonPane.add(cancelButton);
 			}
 		}

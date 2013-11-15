@@ -18,13 +18,15 @@ import com.jgoodies.forms.layout.RowSpec;
 import java.awt.Dialog.ModalityType;
 import javax.swing.DefaultComboBoxModel;
 import com.jme3.material.RenderState.TestFunction;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class GUIWorldCreationDialog extends JDialog {
-
+	boolean dlgResult= false;
 	private final JPanel contentPanel = new JPanel();
-	private JTextField nameField;
-	private JComboBox<String> comboBox;
-	private JTextField inputDesc;
+	JComboBox<String> comboBox;
+	JTextField inputDesc;
+	JTextField nameField;
 
 	/**
 	 * Launch the application.
@@ -95,12 +97,24 @@ public class GUIWorldCreationDialog extends JDialog {
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
+				okButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						GUIWorldCreationDialog.this.dlgResult = true;
+						GUIWorldCreationDialog.this.dispose();
+					}
+				});
 				okButton.setActionCommand("OK");
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
 				JButton cancelButton = new JButton("Cancel");
+				cancelButton.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						GUIWorldCreationDialog.this.dlgResult = false;
+						GUIWorldCreationDialog.this.dispose();
+					}
+				});
 				cancelButton.setActionCommand("Cancel");
 				buttonPane.add(cancelButton);
 			}
