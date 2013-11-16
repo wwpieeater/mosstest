@@ -10,16 +10,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
-
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
 import java.awt.Dialog.ModalityType;
 import javax.swing.DefaultComboBoxModel;
 import com.jme3.material.RenderState.TestFunction;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.GridLayout;
+import java.awt.Dimension;
 
 public class GUIWorldCreationDialog extends JDialog {
 	boolean dlgResult= false;
@@ -49,50 +46,64 @@ public class GUIWorldCreationDialog extends JDialog {
 		setModal(true);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
-		setBounds(100, 100, 450, 159);
+		setBounds(100, 100, 450, 142);
 		getContentPane().setLayout(new BorderLayout());
 		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(this.contentPanel, BorderLayout.CENTER);
-		this.contentPanel.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,
-				FormFactory.RELATED_GAP_COLSPEC,
-				ColumnSpec.decode("default:grow"),},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
+		contentPanel.setLayout(new GridLayout(3, 1, 0, 0));
 		{
-			JLabel lblWorldName = new JLabel("World name:");
-			this.contentPanel.add(lblWorldName, "2, 2, right, default");
+			JPanel namePanel = new JPanel();
+			namePanel.setMinimumSize(new Dimension(10, 20));
+			namePanel.setMaximumSize(new Dimension(32767, 20));
+			contentPanel.add(namePanel);
+			namePanel.setLayout(new BorderLayout(0, 0));
+			
+			{
+				JLabel lblWorldName = new JLabel("World name:");
+				namePanel.add(lblWorldName, BorderLayout.WEST);
+			}
+			{
+				this.nameField = new JTextField();
+				nameField.setMaximumSize(new Dimension(2147483647, 20));
+				namePanel.add(nameField, BorderLayout.CENTER);
+				this.nameField.setColumns(10);
+			}
 		}
 		{
-			this.nameField = new JTextField();
-			this.contentPanel.add(this.nameField, "4, 2, fill, default");
-			this.nameField.setColumns(10);
+			JPanel descPnl = new JPanel();
+			descPnl.setMinimumSize(new Dimension(10, 20));
+			descPnl.setMaximumSize(new Dimension(32767, 20));
+			contentPanel.add(descPnl);
+			descPnl.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lblDescription = new JLabel("Description:");
+				descPnl.add(lblDescription, BorderLayout.WEST);
+			}
+			{
+				this.inputDesc = new JTextField();
+				descPnl.add(inputDesc, BorderLayout.CENTER);
+				this.inputDesc.setColumns(10);
+			}
 		}
 		{
-			JLabel lblDescription = new JLabel("Description:");
-			this.contentPanel.add(lblDescription, "2, 4, right, default");
-		}
-		{
-			this.inputDesc = new JTextField();
-			this.contentPanel.add(this.inputDesc, "4, 4, fill, default");
-			this.inputDesc.setColumns(10);
-		}
-		{
-			JLabel lblGameProfile = new JLabel("Game profile:");
-			this.contentPanel.add(lblGameProfile, "2, 6, right, default");
-		}
-		{
-			this.comboBox = new JComboBox<String>();
-			this.contentPanel.add(this.comboBox, "4, 6, fill, default");
+			JPanel profPnl = new JPanel();
+			profPnl.setMinimumSize(new Dimension(10, 20));
+			profPnl.setMaximumSize(new Dimension(32767, 20));
+			contentPanel.add(profPnl);
+			profPnl.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lblGameProfile = new JLabel("Game profile:");
+				profPnl.add(lblGameProfile, BorderLayout.WEST);
+			}
+			{
+				this.comboBox = new JComboBox<String>();
+				comboBox.setMaximumSize(new Dimension(32767, 23));
+				profPnl.add(comboBox, BorderLayout.CENTER);
+			}
 		}
 		{
 			JPanel buttonPane = new JPanel();
+			buttonPane.setMaximumSize(new Dimension(32767, 23));
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
