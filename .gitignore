@@ -22,3 +22,4 @@ COMMIT_EDITMSG
 /target
 /build/output
 /data/worlds
+src/git.properties

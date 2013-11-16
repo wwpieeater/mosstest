@@ -23,6 +23,8 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.AbstractTableModel;
 
+import net.mosstest.servercore.MossWorld;
+
 public class GUIClientsideLauncher {
 	private SingleplayerListTableModel mdl;
 
@@ -134,17 +136,15 @@ public class GUIClientsideLauncher {
 				// below is testing code. in reality this would call a method to
 				// start a world and block. This should be in a try-catch block
 				// for the bug reporter to snatch up.
-				for (int i = 0; i < 100; i++) {
-					System.out.println("selected: "
-							+ GUIClientsideLauncher.this.mdl.getValueAt(row, 0)
-							+ "::swing thread: " + i);
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+				try {
+					throw new Exception();
+					//MossWorld w=new MossWorld((String)GUIClientsideLauncher.this.table.getModel().getValueAt(row, 0), -16511);
+				}
+				catch(Exception e) {
+					StringBuilder s=new StringBuilder("Exception uncaught in code\r\n");
+					
+					GUIBugReportDialog bg=new GUIBugReportDialog(MossDebugUtils.getDebugInformation(e));
+					bg.setVisible(true);
 				}
 				GUIClientsideLauncher.this.frmMosstestClientLauncher
 						.setVisible(true);
