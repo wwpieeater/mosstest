@@ -38,8 +38,8 @@ public class MapGenerators {
 			int[][][] nodes = new int[16][16][16];
 			try {
 				int fillNode = (pos.getZ() >= 0) ? this.nm.getNode(
-						"mg:air", false).getNodeId() : this.nm.getNode(
-						"mg:ground", false).getNodeId();
+						"mg:air", false).getNodeId() : this.nm.getNode( //$NON-NLS-1$
+						"mg:ground", false).getNodeId(); //$NON-NLS-1$
 
 				for (int x = 0; x < 16; x++) {
 					for (int y = 0; y < 16; y++) {
@@ -59,9 +59,9 @@ public class MapGenerators {
 		@Override
 		public void fillInChunk(int[][][] lightNodes, Position pos)
 				throws MapGeneratorException {
-			int fillNode = (pos.getZ() >= 0) ? this.nm.getNode("mg:air",
+			int fillNode = (pos.getZ() >= 0) ? this.nm.getNode("mg:air", //$NON-NLS-1$
 					false).getNodeId() : this.nm
-					.getNode("mg:ground", false).getNodeId();
+					.getNode("mg:ground", false).getNodeId(); //$NON-NLS-1$
 
 			for (int x = 0; x < 16; x++) {
 				for (int y = 0; y < 16; y++) {
@@ -121,11 +121,11 @@ public class MapGenerators {
 		public MapChunk generateChunk(Position pos)
 				throws MapGeneratorException {
 			int[][][] lightNodes = new int[16][16][16];
-			short grass = this.nm.getNode("mg:grass", false).getNodeId();
-			short dirt = this.nm.getNode("mg:dirt", false).getNodeId();
-			short stone = this.nm.getNode("mg:stone", false).getNodeId();
-			short air = this.nm.getNode("mg:air", false).getNodeId();
-			short sand = this.nm.getNode("mg:sand", false).getNodeId();
+			short grass = this.nm.getNode("mg:grass", false).getNodeId(); //$NON-NLS-1$
+			short dirt = this.nm.getNode("mg:dirt", false).getNodeId(); //$NON-NLS-1$
+			short stone = this.nm.getNode("mg:stone", false).getNodeId(); //$NON-NLS-1$
+			short air = this.nm.getNode("mg:air", false).getNodeId(); //$NON-NLS-1$
+			short sand = this.nm.getNode("mg:sand", false).getNodeId(); //$NON-NLS-1$
 			for (int x = 0; x < 16; x++) {
 				long globalx = pos.getX() * 16 + x;
 				for (int y = 0; y < 16; y++) {
@@ -181,11 +181,11 @@ public class MapGenerators {
 		public void fillInChunk(int[][][] lightNodes, Position pos)
 				throws MapGeneratorException {
 			//TODO make trees
-			short grass = this.nm.getNode("mg:grass", false).getNodeId();
-			short dirt = this.nm.getNode("mg:dirt", false).getNodeId();
-			short stone = this.nm.getNode("mg:stone", false).getNodeId();
-			short air = this.nm.getNode("mg:air", false).getNodeId();
-			short sand = this.nm.getNode("mg:sand", false).getNodeId();
+			short grass = this.nm.getNode("mg:grass", false).getNodeId(); //$NON-NLS-1$
+			short dirt = this.nm.getNode("mg:dirt", false).getNodeId(); //$NON-NLS-1$
+			short stone = this.nm.getNode("mg:stone", false).getNodeId(); //$NON-NLS-1$
+			short air = this.nm.getNode("mg:air", false).getNodeId(); //$NON-NLS-1$
+			short sand = this.nm.getNode("mg:sand", false).getNodeId(); //$NON-NLS-1$
 			for (int x = 0; x < 16; x++) {
 				long globalx = pos.getX() * 16 + x;
 				for (int y = 0; y < 16; y++) {

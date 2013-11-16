@@ -10,9 +10,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
 import java.awt.Dialog.ModalityType;
+
 import javax.swing.DefaultComboBoxModel;
+
 import com.jme3.material.RenderState.TestFunction;
+
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.GridLayout;
@@ -42,7 +46,7 @@ public class GUIWorldCreationDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public GUIWorldCreationDialog() {
-		setTitle("Create new singleplayer world...");
+		setTitle(Messages.getString("GUIWorldCreationDialog.DLG_TITLE")); //$NON-NLS-1$
 		setModal(true);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
@@ -59,7 +63,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			namePanel.setLayout(new BorderLayout(0, 0));
 			
 			{
-				JLabel lblWorldName = new JLabel("World name:");
+				JLabel lblWorldName = new JLabel(Messages.getString("GUIWorldCreationDialog.WORLD_NAME")); //$NON-NLS-1$
 				namePanel.add(lblWorldName, BorderLayout.WEST);
 			}
 			{
@@ -76,7 +80,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			contentPanel.add(descPnl);
 			descPnl.setLayout(new BorderLayout(0, 0));
 			{
-				JLabel lblDescription = new JLabel("Description:");
+				JLabel lblDescription = new JLabel(Messages.getString("GUIWorldCreationDialog.WORLD_DESC")); //$NON-NLS-1$
 				descPnl.add(lblDescription, BorderLayout.WEST);
 			}
 			{
@@ -92,7 +96,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			contentPanel.add(profPnl);
 			profPnl.setLayout(new BorderLayout(0, 0));
 			{
-				JLabel lblGameProfile = new JLabel("Game profile:");
+				JLabel lblGameProfile = new JLabel(Messages.getString("GUIWorldCreationDialog.GAME_PROFILE")); //$NON-NLS-1$
 				profPnl.add(lblGameProfile, BorderLayout.WEST);
 			}
 			{
@@ -107,26 +111,26 @@ public class GUIWorldCreationDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton okButton = new JButton("OK");
+				JButton okButton = new JButton(Messages.getString("GUIWorldCreationDialog.OK")); //$NON-NLS-1$
 				okButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						GUIWorldCreationDialog.this.dlgResult = true;
 						GUIWorldCreationDialog.this.dispose();
 					}
 				});
-				okButton.setActionCommand("OK");
+				okButton.setActionCommand(Messages.getString("GUIWorldCreationDialog.OK")); //$NON-NLS-1$
 				buttonPane.add(okButton);
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
+				JButton cancelButton = new JButton(Messages.getString("GUIWorldCreationDialog.CXL")); //$NON-NLS-1$
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						GUIWorldCreationDialog.this.dlgResult = false;
 						GUIWorldCreationDialog.this.dispose();
 					}
 				});
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.setActionCommand(Messages.getString("GUIWorldCreationDialog.CXL")); //$NON-NLS-1$
 				buttonPane.add(cancelButton);
 			}
 		}

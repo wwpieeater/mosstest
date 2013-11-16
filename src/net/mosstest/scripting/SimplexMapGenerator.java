@@ -41,11 +41,11 @@ public class SimplexMapGenerator implements IMapGenerator {
 	public MapChunk generateChunk(Position pos)
 			throws MapGeneratorException {
 		int[][][] lightNodes = new int[16][16][16];
-		short grass = this.nm.getNode("mg:grass", false).getNodeId();
-		short dirt = this.nm.getNode("mg:dirt", false).getNodeId();
-		short stone = this.nm.getNode("mg:stone", false).getNodeId();
-		short air = this.nm.getNode("mg:air", false).getNodeId();
-		short sand = this.nm.getNode("mg:sand", false).getNodeId();
+		short grass = this.nm.getNode("mg:grass", false).getNodeId(); //$NON-NLS-1$
+		short dirt = this.nm.getNode("mg:dirt", false).getNodeId(); //$NON-NLS-1$
+		short stone = this.nm.getNode("mg:stone", false).getNodeId(); //$NON-NLS-1$
+		short air = this.nm.getNode("mg:air", false).getNodeId(); //$NON-NLS-1$
+		short sand = this.nm.getNode("mg:sand", false).getNodeId(); //$NON-NLS-1$
 		for (int x = 0; x < 16; x++) {
 			long globalx = pos.getX() * 16 + x;
 			for (int y = 0; y < 16; y++) {
@@ -101,11 +101,11 @@ public class SimplexMapGenerator implements IMapGenerator {
 	public void fillInChunk(int[][][] lightNodes, Position pos)
 			throws MapGeneratorException {
 		//TODO make trees
-		short grass = this.nm.getNode("mg:grass", false).getNodeId();
-		short dirt = this.nm.getNode("mg:dirt", false).getNodeId();
-		short stone = this.nm.getNode("mg:stone", false).getNodeId();
-		short air = this.nm.getNode("mg:air", false).getNodeId();
-		short sand = this.nm.getNode("mg:sand", false).getNodeId();
+		short grass = this.nm.getNode("mg:grass", false).getNodeId(); //$NON-NLS-1$
+		short dirt = this.nm.getNode("mg:dirt", false).getNodeId(); //$NON-NLS-1$
+		short stone = this.nm.getNode("mg:stone", false).getNodeId(); //$NON-NLS-1$
+		short air = this.nm.getNode("mg:air", false).getNodeId(); //$NON-NLS-1$
+		short sand = this.nm.getNode("mg:sand", false).getNodeId(); //$NON-NLS-1$
 		for (int x = 0; x < 16; x++) {
 			long globalx = pos.getX() * 16 + x;
 			for (int y = 0; y < 16; y++) {

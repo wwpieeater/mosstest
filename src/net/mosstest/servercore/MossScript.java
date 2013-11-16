@@ -11,11 +11,11 @@ public class MossScript {
 		this.file = file;
 		try {
 			if (!this.file.getFile().isFile())
-				throw new MossWorldLoadException("Script named " + file.dirName
-						+ "/" + file.resourceName + " not found!");
+				throw new MossWorldLoadException(Messages.getString("MossScript.MSG_SCRIPT_NAMED_[NAME]") + file.dirName //$NON-NLS-1$
+						+ "/" + file.resourceName + Messages.getString("MossScript.[NAME]_NOT_FOUND")); //$NON-NLS-1$ //$NON-NLS-2$
 		} catch (IOException e) {
-			throw new MossWorldLoadException("IOException with script named "
-					+ file.dirName + "/" + file.resourceName);
+			throw new MossWorldLoadException(Messages.getString("MossScript.MSG_IO_EXCEPTION") //$NON-NLS-1$
+					+ file.dirName + "/" + file.resourceName); //$NON-NLS-1$
 		}
 	}
 
@@ -25,7 +25,7 @@ public class MossScript {
 		} catch (IOException e) {
 			// whoa there, something REALLY bad happened
 			throw new MossWorldLoadException(
-					"Extremely unexpected situation on our hands");
+					Messages.getString("MossScript.MSG_OOPS")); //$NON-NLS-1$
 
 		}
 	}

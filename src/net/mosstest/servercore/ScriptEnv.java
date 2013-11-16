@@ -71,7 +71,7 @@ public class ScriptEnv {
 		} catch (RhinoException e) {
 			System.out.println(e.getMessage());
 			throw new MossWorldLoadException(
-					"Script error has occured. Wrapped exception: \r\n" + e.getMessage() + "\r\n" + e.getScriptStackTrace()); //$NON-NLS-1$
+					Messages.getString("ScriptEnv.ERR_SCRIPT_ERR") + e.getMessage() + "\r\n" + e.getScriptStackTrace()); //$NON-NLS-1$ //$NON-NLS-2$
 		}
 		return ScriptResult.RESULT_EXECUTED;
 	}
@@ -101,7 +101,7 @@ public class ScriptEnv {
 		ContextFactory.initGlobal(new SandboxContextFactory());
 		this.cx = ContextFactory.getGlobal().enterContext();
 		this.globalScope = this.cx.initStandardObjects();
-		this.globalScope.put("moss", this.globalScope, ev);
+		this.globalScope.put("moss", this.globalScope, ev); //$NON-NLS-1$
 	}
 
 	public static class SandboxNativeJavaObject extends NativeJavaObject {

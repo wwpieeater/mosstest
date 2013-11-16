@@ -16,13 +16,18 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+
 import java.awt.Component;
+
 import javax.swing.SpringLayout;
+
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.GridLayout;
+
 import javax.swing.SwingConstants;
+
 import java.awt.Point;
 import java.awt.Dialog.ModalityType;
 
@@ -56,7 +61,7 @@ public class GUIBugReportDialog extends JDialog {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setMinimumSize(new Dimension(640, 480));
 		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-		setTitle("Report a bug");
+		setTitle(Messages.getString("GUIBugReportDialog.DLG_BUG_TITLE")); //$NON-NLS-1$
 		setBounds(100, 100, 640, 480);
 		getContentPane().setLayout(new BorderLayout());
 		contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -70,7 +75,7 @@ public class GUIBugReportDialog extends JDialog {
 			namePanel.setLayout(new BorderLayout(0, 0));
 			
 			{
-				lblName = new JLabel("Name:");
+				lblName = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_NAME")); //$NON-NLS-1$
 				namePanel.add(lblName, BorderLayout.WEST);
 				lblName.setHorizontalTextPosition(SwingConstants.LEFT);
 				lblName.setHorizontalAlignment(SwingConstants.LEFT);
@@ -91,7 +96,7 @@ public class GUIBugReportDialog extends JDialog {
 			contentPanel.add(emailPanel);
 			emailPanel.setLayout(new BorderLayout(0, 0));
 			{
-				JLabel lblEmailoptional = new JLabel("e-mail (optional):");
+				JLabel lblEmailoptional = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_EMAIL")); //$NON-NLS-1$
 				emailPanel.add(lblEmailoptional, BorderLayout.WEST);
 			}
 			{
@@ -107,7 +112,7 @@ public class GUIBugReportDialog extends JDialog {
 			contentPanel.add(summaryPnl);
 			summaryPnl.setLayout(new BorderLayout(0, 0));
 			{
-				JLabel lblProblemDescription = new JLabel("Problem summary:");
+				JLabel lblProblemDescription = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_SUMMARY")); //$NON-NLS-1$
 				summaryPnl.add(lblProblemDescription, BorderLayout.WEST);
 			}
 			{
@@ -122,7 +127,7 @@ public class GUIBugReportDialog extends JDialog {
 			descPanel.setLayout(new BorderLayout(0, 0));
 			{
 				JLabel lblDetailedProblemDescription = new JLabel(
-						"Detailed problem description:");
+						Messages.getString("GUIBugReportDialog.DLG_BUG_DESC")); //$NON-NLS-1$
 				lblDetailedProblemDescription.setVerticalAlignment(SwingConstants.TOP);
 				descPanel.add(lblDetailedProblemDescription, BorderLayout.WEST);
 			}
@@ -135,7 +140,7 @@ public class GUIBugReportDialog extends JDialog {
 					txtLongDesc.setWrapStyleWord(true);
 					txtLongDesc.setLineWrap(true);
 					txtLongDesc
-							.setText("Please describe your problem here, preferably including what you had done, what you expected to happen, what happened, and any other details about the world or game.\r\n\r\nPlease note that we cannot help with third-party games or mods.");
+							.setText(Messages.getString("GUIBugReportDialog.DLG_BUG_DESC_DEFAULT")); //$NON-NLS-1$
 				}
 			}
 		}
@@ -149,7 +154,7 @@ public class GUIBugReportDialog extends JDialog {
 			techInfoPanel.setLayout(new BorderLayout(0, 0));
 			{
 				chckbxIncludeTechnicalInformation = new JCheckBox(
-						"Include technical information");
+						Messages.getString("GUIBugReportDialog.DLG_CHECKBOX_INCLUDE_TECH_INFO")); //$NON-NLS-1$
 				techInfoPanel.add(chckbxIncludeTechnicalInformation, BorderLayout.WEST);
 				chckbxIncludeTechnicalInformation.setLocation(new Point(2, 0));
 				chckbxIncludeTechnicalInformation.setVerticalAlignment(SwingConstants.TOP);
@@ -168,7 +173,7 @@ public class GUIBugReportDialog extends JDialog {
 					textArea.setEditable(false);
 					textArea.setWrapStyleWord(true);
 					textArea.setLineWrap(true);
-					textArea.setText("The following information will be included in the bug report if this box is checked: \r\n\r\n"+traceback);
+					textArea.setText(Messages.getString("GUIBugReportDialog.NOTICE_INFO_INCLUDED")+traceback); //$NON-NLS-1$
 				}
 			}
 		}
@@ -185,15 +190,15 @@ public class GUIBugReportDialog extends JDialog {
 				buttonPane.add(progressBar);
 			}
 			{
-				JButton okButton = new JButton("Submit");
+				JButton okButton = new JButton(Messages.getString("GUIBugReportDialog.DLG_SUBMIT")); //$NON-NLS-1$
 				buttonPane.add(okButton);
-				okButton.setActionCommand("OK");
+				okButton.setActionCommand(Messages.getString("GUIBugReportDialog.DLG_OK")); //$NON-NLS-1$
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
+				JButton cancelButton = new JButton(Messages.getString("GUIBugReportDialog.DLG_CXL")); //$NON-NLS-1$
 				buttonPane.add(cancelButton);
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.setActionCommand(Messages.getString("GUIBugReportDialog.DLG_CXL")); //$NON-NLS-1$
 			}
 		}
 	}

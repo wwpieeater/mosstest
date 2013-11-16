@@ -46,7 +46,7 @@ public class ServerNetworkingManager {
 					if (ServerNetworkingManager.this.currentConnections.get() > ServerNetworkingManager.this.currentServicingThreads
 							.get()) {
 						new Thread(ServerNetworkingManager.this.svrNetGroup,
-								new SocketRecvRunnable(), "connection thread"
+								new SocketRecvRunnable(), Messages.getString("ServerNetworkingManager.CONN_THREAD_NAME") //$NON-NLS-1$
 										+ Math.random()).start();
 					}
 
@@ -62,19 +62,19 @@ public class ServerNetworkingManager {
 			throws IOException {
 		this.bindingIdentifiers = new HashMap<>();
 		this.acceptThread.start();
-		this.maxConnections = EngineSettings.getInt("net.maxConnections", 255) * 2 + 1;
+		this.maxConnections = EngineSettings.getInt("net.maxConnections", 255) * 2 + 1; //$NON-NLS-1$
 		this.runConnections = new AtomicBoolean(true);
 		this.currentConnections = new AtomicInteger(0);
 		this.currentServicingThreads = new AtomicInteger(0);
 		this.sSock = new ServerSocket(port);
 		this.connectionQueue = new ArrayBlockingQueue<>(4);
-		this.acceptThread = new Thread(new AcceptRunnable(), "svrNetAccept");
+		this.acceptThread = new Thread(new AcceptRunnable(), Messages.getString("ServerNetworkingManager.ACCEPT_THREAD")); //$NON-NLS-1$
 		this.acceptThread.start();
 	}
 
 	private HashMap<Long, ServerSession> bindingIdentifiers;
 	private final int maxConnections;
-	private ThreadGroup svrNetGroup = new ThreadGroup("SvrNetGroup");
+	private ThreadGroup svrNetGroup = new ThreadGroup(Messages.getString("ServerNetworkingManager.THREADGROUP")); //$NON-NLS-1$
 	protected AtomicBoolean runConnections;
 	protected AtomicInteger currentConnections;
 	protected AtomicInteger currentServicingThreads;

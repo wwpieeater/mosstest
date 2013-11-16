@@ -7,7 +7,7 @@ public class MossEvent {
 			Entity recvEntity, MossFormspec fspec, MossInventoryAction action, double damage,
 			String initiatingMessage, ScriptSandboxBorderToken tok) {
 		if (!(tok instanceof ScriptSandboxBorderToken) || tok == null)
-			throw new SecurityException("Attempt to access controlled resources in the script DMZ.");
+			throw new SecurityException(Messages.getString("MossEvent.MSG_CROSS_DMZ_SECURITY_WARNING")); //$NON-NLS-1$
 		this.type = type;
 		this.actor = actor;
 		this.pos=pos;

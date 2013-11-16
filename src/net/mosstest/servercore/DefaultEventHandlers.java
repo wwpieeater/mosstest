@@ -12,7 +12,7 @@ public static void processEvent(final MossEvent evt, MossScriptEnv env) throws M
 		switch (evt.type) {
 		case EVT_CHATCOMMAND:
 			env.sendChatMessage((Player) evt.actor, null,
-					"No such chat command");
+					Messages.getString("DefaultEventHandlers.NO_SUCH_CMD")); //$NON-NLS-1$
 			break;
 		case EVT_CHATMESSAGE:
 			env.sendChatAll((Player) evt.actor,

@@ -25,7 +25,7 @@ public class MossRemoteFile extends MossFile {
 		// super call to establish fields.
 		super(dirName, resourceName);
 		//ensure filename is valid.
-		if(!(dirName.matches("[a-zA-Z0-9]*")&&resourceName.matches("[a-zA-Z0-9]*"))) throw new FileNotFoundException(); 
+		if(!(dirName.matches("[a-zA-Z0-9]*")&&resourceName.matches("[a-zA-Z0-9]*"))) throw new FileNotFoundException();  //$NON-NLS-1$ //$NON-NLS-2$
 		this.file = new File(cacheDir, dirName);
 		this.file = new File(this.file, resourceName);
 		this.length = length;
@@ -45,7 +45,7 @@ public class MossRemoteFile extends MossFile {
 			throw new IllegalArgumentException(
 					"attempted to access a chunk with an invalid length"); //$NON-NLS-1$
 		byte[] buf = new byte[CHUNK_LENGTH];
-		RandomAccessFile rf = new RandomAccessFile(this.file, "r");
+		RandomAccessFile rf = new RandomAccessFile(this.file, "r"); //$NON-NLS-1$
 		rf.seek(CHUNK_LENGTH * chk);
 		rf.readFully(buf);
 		rf.close();
@@ -59,7 +59,7 @@ public class MossRemoteFile extends MossFile {
 		if (data.length != ((chk == this.numChunks - 1) ? this.length
 				% CHUNK_LENGTH : CHUNK_LENGTH))
 			throw new ArrayIndexOutOfBoundsException("Array is not 65536 bytes"); //$NON-NLS-1$
-		RandomAccessFile rf = new RandomAccessFile(this.file, "rwd");
+		RandomAccessFile rf = new RandomAccessFile(this.file, "rwd"); //$NON-NLS-1$
 		rf.seek(chk*CHUNK_LENGTH);
 		rf.write(data);
 		this.chunksDone.set(chk, true);

@@ -14,8 +14,8 @@ public abstract class AbstractNodeManager implements INodeManager {
 	protected HashMap<String, MapNode> defNodeByName = new HashMap<>();
 	protected HashBiMap<Short, String> pending = HashBiMap.create();
 
-	public static final MapNode MAPNODE_UNKNOWN = new MapNode("unknown.png",
-			"sys:unknown", "An unknown piece of the world", 1);
+	public static final MapNode MAPNODE_UNKNOWN = new MapNode("unknown.png", //$NON-NLS-1$
+			"sys:unknown", Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), 1); //$NON-NLS-1$ //$NON-NLS-2$
 	static {
 		MAPNODE_UNKNOWN.setNodeId((short) -1);
 	}

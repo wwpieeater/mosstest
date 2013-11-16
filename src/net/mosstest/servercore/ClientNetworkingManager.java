@@ -383,7 +383,7 @@ public class ClientNetworkingManager {
 				}
 			}
 		}
-	}, "netClientSendQueue");
+	}, Messages.getString("ClientNetworkingManager.THREAD_QUEUEING")); //$NON-NLS-1$
 
 	private Thread netTimeoutThread = new Thread(new Runnable() {
 
@@ -397,8 +397,8 @@ public class ClientNetworkingManager {
 						|| cTime - ClientNetworkingManager.this.lastUdpIn.get() > 10000) {
 					ClientManager
 							.showErrorScreen(
-									"Network Timeout",
-									"The connection to the server has been lost or has become too slow to continue. \r\nThis is likely caused by an unstable connection, poor WiFi, loose cables, or a firewall issue.",
+									Messages.getString("ClientNetworkingManager.ERR_NETWORK_TIMEOUT"), //$NON-NLS-1$
+									Messages.getString("ClientNetworkingManager.DESC_NETWORK_TIMEOUT"), //$NON-NLS-1$
 									true);
 
 				}
@@ -457,6 +457,6 @@ public class ClientNetworkingManager {
 			}
 
 		}
-	}, "netTimeout");
+	}, Messages.getString("ClientNetworkingManager.THREAD_NET_TIMEOUT")); //$NON-NLS-1$
 
 }

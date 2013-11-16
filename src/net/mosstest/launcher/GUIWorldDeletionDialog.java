@@ -22,7 +22,7 @@ public class GUIWorldDeletionDialog extends JDialog {
 	 */
 	public static void main(String[] args) {
 		try {
-			GUIWorldDeletionDialog dialog = new GUIWorldDeletionDialog("test from main");
+			GUIWorldDeletionDialog dialog = new GUIWorldDeletionDialog("test from main"); //$NON-NLS-1$
 			dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 			dialog.setVisible(true);
 		} catch (Exception e) {
@@ -34,7 +34,7 @@ public class GUIWorldDeletionDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public GUIWorldDeletionDialog(String worldName) {
-		setTitle("Delete singleplayer world...");
+		setTitle(Messages.getString("GUIWorldDeletionDialog.DLG_TITLE")); //$NON-NLS-1$
 		setModal(true);
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setResizable(false);
@@ -49,7 +49,7 @@ public class GUIWorldDeletionDialog extends JDialog {
 			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 			
 			{
-				JLabel lblAreYouSure = new JLabel("Are you sure you wish to delete the world called "+worldName+"? This operation cannot be undone.");
+				JLabel lblAreYouSure = new JLabel(Messages.getString("GUIWorldDeletionDialog.AREYOUSURE_TEXT")+worldName+Messages.getString("GUIWorldDeletionDialog.QUESTIONMARK_CANNOT_UNDO")); //$NON-NLS-1$ //$NON-NLS-2$
 				panel.add(lblAreYouSure);
 				lblAreYouSure.setHorizontalTextPosition(SwingConstants.LEFT);
 				lblAreYouSure.setHorizontalAlignment(SwingConstants.LEFT);
@@ -60,19 +60,19 @@ public class GUIWorldDeletionDialog extends JDialog {
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
 			getContentPane().add(buttonPane, BorderLayout.SOUTH);
 			{
-				JButton btnYes = new JButton("Yes");
+				JButton btnYes = new JButton(Messages.getString("GUIWorldDeletionDialog.YES")); //$NON-NLS-1$
 				btnYes.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						GUIWorldDeletionDialog.this.dlgResult = true;
 						GUIWorldDeletionDialog.this.dispose();
 					}
 				});
-				btnYes.setActionCommand("Yes");
+				btnYes.setActionCommand(Messages.getString("GUIWorldDeletionDialog.YES")); //$NON-NLS-1$
 				buttonPane.add(btnYes);
 				getRootPane().setDefaultButton(btnYes);
 			}
 			{
-				JButton cancelButton = new JButton("No");
+				JButton cancelButton = new JButton(Messages.getString("GUIWorldDeletionDialog.NO")); //$NON-NLS-1$
 				cancelButton.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
 						GUIWorldDeletionDialog.this.dlgResult = false;

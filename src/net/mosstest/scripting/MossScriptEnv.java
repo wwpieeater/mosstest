@@ -418,7 +418,7 @@ public class MossScriptEnv {
 		MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
 		if (chk == null)
 			return;
-		chk.setNode(pos.xl, pos.yl, pos.zl, this.nm.getNode("mg:air")
+		chk.setNode(pos.xl, pos.yl, pos.zl, this.nm.getNode("mg:air") //$NON-NLS-1$
 				.getNodeId());
 		this.nc.setChunk(pos.chunk, chk);
 	}
@@ -502,7 +502,7 @@ public class MossScriptEnv {
 		this.nm.putNode(nd);
 		nd.level=0;
 		for (int i = 1; i < 8; i++) {
-			LiquidNode innerNd=new LiquidNode(params, textures, sysname+"$LEVEL$"+i, userFacingName, light);
+			LiquidNode innerNd=new LiquidNode(params, textures, sysname+"$LEVEL$"+i, userFacingName, light); //$NON-NLS-1$
 			innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i/8f)-0.5f);
 			nd.liquidLevels[i]=innerNd;
 			innerNd.liquidLevels=nd.liquidLevels;
@@ -581,7 +581,7 @@ public class MossScriptEnv {
 		this.nm.putNode(nd);
 		nd.level=0;
 		for (int i = 1; i < 8; i++) {
-			LiquidNode innerNd=new LiquidNode(new LiquidFlowingNodeParams(), textures, sysname+"$LEVEL$"+i, userFacingName, light);
+			LiquidNode innerNd=new LiquidNode(new LiquidFlowingNodeParams(), textures, sysname+"$LEVEL$"+i, userFacingName, light); //$NON-NLS-1$
 			innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i/8f)-0.5f);
 			nd.liquidLevels[i]=innerNd;
 			innerNd.liquidLevels=nd.liquidLevels;
