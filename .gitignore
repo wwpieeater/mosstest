@@ -7,6 +7,11 @@
 *.db
 .svn
 .svn
+.bzr
+/.bzr
+*/.bzr
+.bzrignore
+*/.bzrignore
 .project
 /nbproject/private/
 /dist/
