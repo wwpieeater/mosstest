@@ -1,23 +1,17 @@
 package net.mosstest.launcher;
 
 import java.awt.BorderLayout;
-import java.awt.Dialog.ModalityType;
 import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 public class GUIWorldDeletionDialog extends JDialog {
 	boolean dlgResult=false;
@@ -48,15 +42,18 @@ public class GUIWorldDeletionDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(this.contentPanel, BorderLayout.CENTER);
-		this.contentPanel.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.RELATED_GAP_COLSPEC,
-				FormFactory.DEFAULT_COLSPEC,},
-			new RowSpec[] {
-				FormFactory.RELATED_GAP_ROWSPEC,
-				FormFactory.DEFAULT_ROWSPEC,}));
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
 		{
-			JLabel lblAreYouSure = new JLabel("Are you sure you wish to delete the world called "+worldName+"? This operation cannot be undone.");
-			this.contentPanel.add(lblAreYouSure, "2, 2, right, default");
+			JPanel panel = new JPanel();
+			contentPanel.add(panel);
+			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+			
+			{
+				JLabel lblAreYouSure = new JLabel("Are you sure you wish to delete the world called "+worldName+"? This operation cannot be undone.");
+				panel.add(lblAreYouSure);
+				lblAreYouSure.setHorizontalTextPosition(SwingConstants.LEFT);
+				lblAreYouSure.setHorizontalAlignment(SwingConstants.LEFT);
+			}
 		}
 		{
 			JPanel buttonPane = new JPanel();
