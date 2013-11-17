@@ -6,15 +6,19 @@ import java.util.ResourceBundle;
 public class Messages {
 	private static final String BUNDLE_NAME = "net.mosstest.launcher.messages"; //$NON-NLS-1$
 
-	private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle
+	private static ResourceBundle resBundle = ResourceBundle
 			.getBundle(BUNDLE_NAME);
+
+	public static void changeLanguage(String identifier) {
+		resBundle = ResourceBundle.getBundle(BUNDLE_NAME + "." + identifier);
+	}
 
 	private Messages() {
 	}
 
 	public static String getString(String key) {
 		try {
-			return RESOURCE_BUNDLE.getString(key);
+			return resBundle.getString(key);
 		} catch (MissingResourceException e) {
 			return '!' + key + '!';
 		}

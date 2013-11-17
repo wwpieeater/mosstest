@@ -6,6 +6,12 @@
 	<version>0.1.0-SNAPSHOT</version>
 	<name>Mosstest</name>
 	<description>Open-source InfiniMiner remake</description>
+	<repositories>
+		<repository>
+			<id>moss-forums</id>
+			<url>http://forum-mosstest.rhcloud.com/repository/</url>
+		</repository>
+	</repositories>
 	<build>
 		<testSourceDirectory>tests</testSourceDirectory>
 		<sourceDirectory>src</sourceDirectory>
