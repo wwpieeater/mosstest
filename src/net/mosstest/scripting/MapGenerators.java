@@ -3,6 +3,8 @@ package net.mosstest.scripting;
 import java.util.ArrayList;
 import java.util.Random;
 
+import org.apache.commons.lang.NotImplementedException;
+
 import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
 import toxi.math.noise.SimplexNoise;
@@ -81,7 +83,7 @@ public class MapGenerators {
 		@Override
 		public void registerOre(MapNode oreNode, double minDepth,
 				double rarity, double clumping, int seed, Object... params) {
-			// TODO Auto-generated method stub
+			throw new NotImplementedException(FlatMapGenerator.class);
 
 		}
 

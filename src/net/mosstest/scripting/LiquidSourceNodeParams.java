@@ -21,7 +21,6 @@ public class LiquidSourceNodeParams extends DefaultNodeParams implements
 
 	@Override
 	public boolean shouldFill(int contacting, int flowing) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 	

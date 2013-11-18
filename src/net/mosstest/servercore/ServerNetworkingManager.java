@@ -212,7 +212,6 @@ public class ServerNetworkingManager {
 								sess.quenchedSince = System.currentTimeMillis();
 							}
 							if (commandId == 254) {
-								// FIXME 0.1
 								sess.isValid.set(false);
 								sess = ServerNetworkingManager.this.bindingIdentifiers.get(Long
 										.valueOf(dataIn.readLong()));
