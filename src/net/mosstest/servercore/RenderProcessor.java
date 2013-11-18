@@ -171,11 +171,6 @@ public class RenderProcessor extends SimpleApplication {
 						vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
 						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
-						
-						System.out.println("V1: "+x+","+y+","+z);
-						System.out.println("V2: "+x+","+(y-BLOCK_SIZE)+","+z);
-						System.out.println("V3: "+(x+BLOCK_SIZE)+","+y+","+z);
-						
 						for(int m=0; m<8; m++) {
 							normals.put(0).put(0).put(10);
 						}
