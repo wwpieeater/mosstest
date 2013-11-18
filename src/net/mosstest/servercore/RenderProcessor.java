@@ -218,7 +218,7 @@ public class RenderProcessor extends SimpleApplication {
 		
 	}
 	
-	private void testPreparator() {
+	private void preparatorChunkTest() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
 		Position p3 = new Position(0, 0, 1, 0);
