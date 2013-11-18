@@ -91,7 +91,7 @@ public class RenderProcessor extends SimpleApplication {
 		spot.setColor(ColorRGBA.White.mult(3f));
 		spot.setPosition(cam.getLocation());
 		spot.setDirection(cam.getDirection());
-		//rootNode.addLight(spot);
+		rootNode.addLight(spot);
 		
 		lamp.setColor(ColorRGBA.Yellow);
 		lamp.setRadius(4f);
@@ -102,8 +102,8 @@ public class RenderProcessor extends SimpleApplication {
 		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
 		rootNode.addLight(sun);
 		
-		localChunkTest();
-		//testPeparator();
+		//localChunkTest();
+		preparatorChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -126,6 +126,7 @@ public class RenderProcessor extends SimpleApplication {
 			System.out.println("Thread shutting down");
 		}
 		else if (myEvent instanceof MossRenderChunkEvent) {
+			System.out.println("GOT AN EVENT TO RENDER A CHUNK");
 			renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
 					((MossRenderChunkEvent) myEvent).getPos());
 		}
@@ -228,6 +229,7 @@ public class RenderProcessor extends SimpleApplication {
 		// Position p7 = new Position(-1,0,-1,0);
 
 		getChunk(p1);
+		System.out.println("SENT REQUEST");
 		getChunk(p2);
 		getChunk(p3);
 		getChunk(p4);
@@ -237,7 +239,7 @@ public class RenderProcessor extends SimpleApplication {
 	}
 
 	private void localChunkTest() {
-		for(int i=0; i<2; i++) {
+		for(int i=0; i<1; i++) {
 			for(int j=0; j<1; j++) {
 				for(int k=0; k<1; k++) {
 					Position pos = new Position(i, j, k, 0);
@@ -311,6 +313,8 @@ public class RenderProcessor extends SimpleApplication {
 		q.normalizeLocal();
 
 		cam.setAxes(q);
+		
+		spot.setDirection(cam.getDirection());
 	}
 
 	private void initKeyBindings() {
