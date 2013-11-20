@@ -53,9 +53,9 @@ public class RenderProcessor extends SimpleApplication {
 	
 	private Vector3f initialUpVec;
 	private Node worldNode;
-	private SpotLight spot = new SpotLight();
-	private PointLight lamp = new PointLight();
-	private DirectionalLight sun = new DirectionalLight();
+	private SpotLight spot;
+	private PointLight lamp;
+	private DirectionalLight sun;
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 
 	public INodeManager nManager;
@@ -83,24 +83,12 @@ public class RenderProcessor extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
-		worldNode = new Node("world");
-		rootNode.attachChild(worldNode);
-		spot.setSpotRange(300f);
-		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
-		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
-		spot.setColor(ColorRGBA.White.mult(3f));
-		spot.setPosition(cam.getLocation());
-		spot.setDirection(cam.getDirection());
-		rootNode.addLight(spot);
 		
-		lamp.setColor(ColorRGBA.Yellow);
-		lamp.setRadius(4f);
-		lamp.setPosition(cam.getLocation());
-		//rootNode.addLight(lamp);
+		setupWorldNode ();
+		setupFlashlight();
+		setupSunlight();
+		//setupLamplight();
 		
-		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
-		rootNode.addLight(sun);
 		
 		//localChunkTest();
 		preparatorChunkTest();
@@ -259,7 +247,40 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		GeometryBatchFactory.optimize(worldNode);
 	}
-	 
+	
+	private void setupFlashlight () {
+		spot = new SpotLight();
+		spot.setSpotRange(300f);
+		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
+		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
+		spot.setColor(ColorRGBA.White.mult(3f));
+		spot.setPosition(cam.getLocation());
+		spot.setDirection(cam.getDirection());
+		rootNode.addLight(spot);
+	}
+	
+	private void setupSunlight () {
+		sun = new DirectionalLight();
+		sun.setColor(ColorRGBA.White);
+		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
+		rootNode.addLight(sun);
+	}
+	
+	private void setupLamplight () {
+		lamp = new PointLight();
+		lamp.setColor(ColorRGBA.Yellow);
+		lamp.setRadius(4f);
+		lamp.setPosition(cam.getLocation());
+		rootNode.addLight(lamp);
+	}
+	
+	private void setupWorldNode () {
+		worldNode = new Node("world");
+		rootNode.attachChild(worldNode);
+	}
+
+	
+	
 	public Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
@@ -276,6 +297,7 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		return mat;
 	}
+	
 	private void moveWorld(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
