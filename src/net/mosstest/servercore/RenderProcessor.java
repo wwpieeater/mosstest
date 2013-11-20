@@ -63,21 +63,26 @@ public class RenderProcessor extends SimpleApplication {
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
-	public static RenderProcessor init(INodeManager manager, IRenderPreparator prep) {
+	public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
 		settings.setSamples(2);
 		app.setSettings(settings);
 		app.setShowSettings(false);
-		app.initNodeThings(manager, prep);
+		app.initManager(manager);
+		app.initPreparator(preparator);
 		app.start();
 		return app;
 	}
 
-	private void initNodeThings(INodeManager manager, IRenderPreparator prep) {
+	private void initManager (INodeManager manager) {
 		nManager = manager;
+	}
+	
+	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
+		rPreparator.start();
 	}
 
 	@Override
