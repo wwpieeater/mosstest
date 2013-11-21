@@ -3,7 +3,17 @@ package net.mosstest.scripting;
 import net.mosstest.servercore.MossFile;
 
 public class MossItem {
-	public MossItem(MossFile invTex, MossFile wieldTex, double invWeight,
+	private short itemId = 0;
+
+	public void setItemId(short itemId) {
+		this.itemId = itemId;
+	}
+
+	public short getItemId() {
+		return this.itemId;
+	}
+
+	public MossItem(String invTex, String wieldTex, double invWeight,
 			boolean mayStack, String displayName, String technicalName) {
 		this.invTex = invTex;
 		this.wieldTex = wieldTex;
@@ -13,8 +23,8 @@ public class MossItem {
 		this.technicalName = technicalName;
 	}
 
-	final MossFile invTex;
-	final MossFile wieldTex;
+	final String invTex;
+	final String wieldTex;
 	final double invWeight;
 	boolean mayStack;
 	final String displayName;
@@ -25,6 +35,7 @@ public class MossItem {
 			this.item = item;
 			this.amount = amount;
 		}
+
 		final MossItem item;
 		/**
 		 * If amount is not an integer then it is a stack with wear. Once zero
@@ -37,8 +48,10 @@ public class MossItem {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result
-				+ ((technicalName == null) ? 0 : technicalName.hashCode());
+		result = prime
+				* result
+				+ ((this.technicalName == null) ? 0 : this.technicalName
+						.hashCode());
 		return result;
 	}
 
@@ -51,12 +64,20 @@ public class MossItem {
 		if (getClass() != obj.getClass())
 			return false;
 		MossItem other = (MossItem) obj;
-		if (technicalName == null) {
+		if (this.technicalName == null) {
 			if (other.technicalName != null)
 				return false;
-		} else if (!technicalName.equals(other.technicalName))
+		} else if (!this.technicalName.equals(other.technicalName))
 			return false;
 		return true;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public String getTechnicalName() {
+		return technicalName;
 	}
 
 }
