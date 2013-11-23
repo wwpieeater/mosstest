@@ -4,7 +4,7 @@ import net.mosstest.servercore.MossFile;
 
 public class MossTool extends MossItem {
 
-	public MossTool(MossFile invTex, MossFile wieldTex, double invWeight,
+	public MossTool(String invTex, String wieldTex, double invWeight,
 			boolean mayStack, String displayName, String technicalName) {
 		super(invTex, wieldTex, invWeight, mayStack, displayName, technicalName);
 	}
