@@ -1,0 +1,157 @@
+msgid "AbstractNodeManager.DESC_UNKNOWN_NODE"
+msgstr "An unknown piece of the world"
+
+msgid "ClientNetworkingManager.DESC_NETWORK_TIMEOUT"
+msgstr ""
+"The connection to the server has been lost or has become too slow to "
+"continue. \n"
+"This is likely caused by an unstable connection, poor WiFi, loose cables, or "
+"a firewall issue."
+
+msgid "ClientNetworkingManager.ERR_NETWORK_TIMEOUT"
+msgstr "Network Timeout"
+
+msgid "ClientNetworkingManager.THREAD_NET_TIMEOUT"
+msgstr "netTimeout"
+
+msgid "ClientNetworkingManager.THREAD_QUEUEING"
+msgstr "netClientSendQueue"
+
+msgid "DefaultEventHandlers.NO_SUCH_CMD"
+msgstr "No such chat command."
+
+msgid "EventProcessor.MSG_ADD_DYNAMIC"
+msgstr "Dynamically added thread"
+
+msgid "EventProcessor.MSG_STOP_ONE_THREAD"
+msgstr "Stopping one thread"
+
+msgid "EventProcessor.MSG_THREAD_START"
+msgstr "Worker thread started"
+
+msgid "EventProcessor.THREAD_NAME_MGR"
+msgstr "EventProcessorManager"
+
+msgid "EventProcessor.THREADGROUP"
+msgstr "EventProcessor"
+
+msgid "FuturesProcessor.FUTURES_THREAD"
+msgstr "futures"
+
+msgid "LocalRenderPreparator.MG_EXCEPT"
+msgstr "The map generator has thrown an exception."
+
+msgid "LocalRenderPreparator.MSG_REQUESTED"
+msgstr "REQUESTED "
+
+msgid "LocalRenderPreparator.START_MSG"
+msgstr "<<< START LOCAL RENDER PREPARATOR >>>"
+
+msgid "MapChunk.BAD_SER_VER"
+msgstr "Incorrect serialization version"
+
+msgid "MapDatabase.ERR_DB_FAIL"
+msgstr "Database loading failed."
+
+msgid "MossDebugUtils.27"
+msgstr "git.build.time"
+
+msgid "MossDebugUtils.MSG_BUILT_ON"
+msgstr "Built on: "
+
+msgid "MossDebugUtils.MSG_CORES"
+msgstr "Available cores: "
+
+msgid "MossDebugUtils.MSG_EXCEPTION_CAUGHT"
+msgstr "<<<Exception caught>>> \n"
+
+msgid "MossDebugUtils.MSG_FREE_SPACE"
+msgstr "Free space (bytes): "
+
+msgid "MossDebugUtils.MSG_FREEMEM"
+msgstr "Free memory (bytes): "
+
+msgid "MossDebugUtils.MSG_FS_ROOT"
+msgstr "File system root: "
+
+msgid "MossDebugUtils.MSG_IO_EXCEPTION"
+msgstr "IOException loading, perhaps non-existent?"
+
+msgid "MossDebugUtils.MSG_JAVA_PROPS"
+msgstr "<<<Java properties>>>\n"
+
+msgid "MossDebugUtils.MSG_MAXMEM"
+msgstr "Maximum memory (bytes): "
+
+msgid "MossDebugUtils.MSG_MEM_NO_LIMIT"
+msgstr "no limit"
+
+msgid "MossDebugUtils.MSG_SYS_PROPS"
+msgstr "<<<System properties>>>\n"
+
+msgid "MossDebugUtils.MSG_TOTAL_MEM"
+msgstr "Total memory (bytes): "
+
+msgid "MossDebugUtils.MSG_TOTAL_SPACE"
+msgstr "Total space (bytes): "
+
+msgid "MossDebugUtils.MSG_USABLE_SPACE"
+msgstr "Usable space (bytes): "
+
+msgid "MossGame.CFG_LOAD_ERR"
+msgstr "Error in loading the configuration file."
+
+msgid "MossGame.DIR_OR_CFG_NOT_FOUND"
+msgstr "Game directory or configuration file not found."
+
+msgid "MossGame.FILE_NOT_FOUND"
+msgstr "file not found: "
+
+msgid "MossScript.[NAME]_NOT_FOUND"
+msgstr " not found!"
+
+msgid "MossScript.MSG_IO_EXCEPTION"
+msgstr "IOException with script named "
+
+msgid "MossScript.MSG_OOPS"
+msgstr "Extremely unexpected situation on our hands"
+
+msgid "MossScript.MSG_SCRIPT_NAMED_[NAME]"
+msgstr "Script named "
+
+msgid "MossTest.PORT_DESC"
+msgstr "Port number to use"
+
+msgid "MossTest.RUN_STANDALONE"
+msgstr "Run as standalone server"
+
+msgid "MossWorld.ERR_DB"
+msgstr ""
+"An error has occured when opening the database. It is likely inaccessible, "
+"on a full disk, or corrupt."
+
+msgid "MossWorld.MG_SELECT_FAILURE"
+msgstr "The map generator could not be seeded."
+
+msgid "MossWorld.NO_GAME_ID"
+msgstr ""
+"The game ID is not specified. The game ID must be specified in game.xml as "
+"<gameid>foo</gameid> where data/games/foo is a directory with a valid game."
+
+msgid "MossWorld.NO_NETWORKING_NOW"
+msgstr "Networking cannot occur at this time"
+
+msgid "NodeManager.DESC_UNKNWN_NODE"
+msgstr "An unknown piece of the world"
+
+msgid "ScriptEnv.ERR_SCRIPT_ERR"
+msgstr "Script error has occured. Wrapped exception: \n"
+
+msgid "ServerNetworkingManager.ACCEPT_THREAD"
+msgstr "svrNetAccept"
+
+msgid "ServerNetworkingManager.CONN_THREAD_NAME"
+msgstr "connection thread"
+
+msgid "ServerNetworkingManager.THREADGROUP"
+msgstr "SvrNetGroup"

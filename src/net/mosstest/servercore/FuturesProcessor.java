@@ -12,7 +12,7 @@ public class FuturesProcessor {
 	TreeMap<Long, Job> jobs = new TreeMap<>();
 	volatile long nextWakeup = System.currentTimeMillis();
 
-	public Thread futuresThread = new Thread(new FuturesRunnable(), "futures");
+	public Thread futuresThread = new Thread(new FuturesRunnable(), Messages.getString("FuturesProcessor.FUTURES_THREAD")); //$NON-NLS-1$
 
 	public synchronized void runOnce(long delayMillis, Runnable runnable) {
 		Job tJob = new Job(System.currentTimeMillis() + delayMillis, 0, 0, 1.0,

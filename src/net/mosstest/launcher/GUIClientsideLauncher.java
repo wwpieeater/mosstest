@@ -23,6 +23,9 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.table.AbstractTableModel;
 
+import net.mosstest.servercore.MossDebugUtils;
+import net.mosstest.servercore.MossWorld;
+
 public class GUIClientsideLauncher {
 	private SingleplayerListTableModel mdl;
 
@@ -53,18 +56,18 @@ public class GUIClientsideLauncher {
 		} catch (ClassNotFoundException | InstantiationException
 				| IllegalAccessException | UnsupportedLookAndFeelException e1) {
 			System.out
-					.println("[ERROR] [NONFATAL] [GUI] System Look-And-Feel could not be set; falling back to default L&F.");
+					.println(Messages.getString("GUIClientsideLauncher.WARN_SET_LAF")); //$NON-NLS-1$
 		}
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
 					ArrayList<SingleplayerListEntry> entries = new ArrayList<SingleplayerListEntry>();
-					entries.add(new SingleplayerListEntry("name1", "desc1",
-							"game1"));
+					entries.add(new SingleplayerListEntry("name1", "desc1", //$NON-NLS-1$ //$NON-NLS-2$
+							"game1")); //$NON-NLS-1$
 					entries.add(new SingleplayerListEntry(
-							"name2",
-							"desc2",
-							"game2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"));
+							"name2", //$NON-NLS-1$
+							"desc2", //$NON-NLS-1$
+							"game2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")); //$NON-NLS-1$
 					GUIClientsideLauncher window = new GUIClientsideLauncher(
 							entries);
 					window.frmMosstestClientLauncher.setVisible(true);
@@ -91,7 +94,7 @@ public class GUIClientsideLauncher {
 	private void initialize(ArrayList<SingleplayerListEntry> singleplayerEntries) {
 		this.frmMosstestClientLauncher = new JFrame();
 		this.frmMosstestClientLauncher
-				.setTitle("Mosstest Client launcher <0.0.1-initial>");
+				.setTitle(Messages.getString("GUIClientsideLauncher.DLG_TITLE")); //$NON-NLS-1$
 		this.frmMosstestClientLauncher.setBounds(100, 100, 800, 480);
 		this.frmMosstestClientLauncher
 				.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -101,7 +104,7 @@ public class GUIClientsideLauncher {
 				BorderLayout.CENTER);
 
 		JPanel singleplayerTab = new JPanel();
-		tabbedPane.addTab("Singleplayer", null, singleplayerTab, null);
+		tabbedPane.addTab(Messages.getString("GUIClientsideLauncher.DLG_SINGLEPLAYER"), null, singleplayerTab, null); //$NON-NLS-1$
 		singleplayerTab.setLayout(new BorderLayout(0, 0));
 		this.table = new JTable();
 		this.table.setFillsViewportHeight(true);
@@ -115,7 +118,7 @@ public class GUIClientsideLauncher {
 		singleplayerTab.add(singleplayerControlBtns, BorderLayout.SOUTH);
 		singleplayerControlBtns.setLayout(new GridLayout(0, 4, 0, 0));
 
-		JButton btnPlaySingleplayer = new JButton("Play");
+		JButton btnPlaySingleplayer = new JButton(Messages.getString("GUIClientsideLauncher.DLG_PLAY")); //$NON-NLS-1$
 		btnPlaySingleplayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 
@@ -124,8 +127,8 @@ public class GUIClientsideLauncher {
 					JOptionPane
 							.showMessageDialog(
 									null,
-									"No world was selected to be started. Please select an existing world in the table, or create a new world.",
-									"No world selected",
+									Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED"), //$NON-NLS-1$
+									Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED_TITLE"), //$NON-NLS-1$
 									JOptionPane.WARNING_MESSAGE);
 					return;
 				}
@@ -134,17 +137,15 @@ public class GUIClientsideLauncher {
 				// below is testing code. in reality this would call a method to
 				// start a world and block. This should be in a try-catch block
 				// for the bug reporter to snatch up.
-				for (int i = 0; i < 100; i++) {
-					System.out.println("selected: "
-							+ GUIClientsideLauncher.this.mdl.getValueAt(row, 0)
-							+ "::swing thread: " + i);
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
-					}
-
+				try {
+					throw new Exception();
+					//MossWorld w=new MossWorld((String)GUIClientsideLauncher.this.table.getModel().getValueAt(row, 0), -16511);
+				}
+				catch(Exception e) {
+					StringBuilder s=new StringBuilder("Exception uncaught in code\r\n");
+					
+					GUIBugReportDialog bg=new GUIBugReportDialog(MossDebugUtils.getDebugInformation(e));
+					bg.setVisible(true);
 				}
 				GUIClientsideLauncher.this.frmMosstestClientLauncher
 						.setVisible(true);
@@ -152,27 +153,27 @@ public class GUIClientsideLauncher {
 		});
 		singleplayerControlBtns.add(btnPlaySingleplayer);
 
-		JButton btnNewSingleplayer = new JButton("New...");
+		JButton btnNewSingleplayer = new JButton(Messages.getString("GUIClientsideLauncher.DLG_NEW")); //$NON-NLS-1$
 		btnNewSingleplayer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				GUIWorldCreationDialog dlg = new GUIWorldCreationDialog();
 				dlg.setVisible(true);
 				if (dlg.dlgResult) {
-					System.out.println("got value: " + dlg.nameField.getText());
-					System.out.println("got desc: " + dlg.inputDesc.getText());
-					System.out.println("got game: "
+					System.out.println("got value: " + dlg.nameField.getText()); //$NON-NLS-1$
+					System.out.println("got desc: " + dlg.inputDesc.getText()); //$NON-NLS-1$
+					System.out.println("got game: " //$NON-NLS-1$
 							+ dlg.comboBox.getSelectedIndex());
 				} else
-					System.out.println("cxld");
+					System.out.println("cxld"); //$NON-NLS-1$
 			}
 		});
 
 		singleplayerControlBtns.add(btnNewSingleplayer);
 
-		JButton btnSettingsSingleplayer = new JButton("Settings...");
+		JButton btnSettingsSingleplayer = new JButton(Messages.getString("GUIClientsideLauncher.DLG_SETTINGS")); //$NON-NLS-1$
 		singleplayerControlBtns.add(btnSettingsSingleplayer);
 
-		JButton btnDelete = new JButton("Delete...");
+		JButton btnDelete = new JButton(Messages.getString("GUIClientsideLauncher.DLG_DELETE")); //$NON-NLS-1$
 		btnDelete.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				int row = GUIClientsideLauncher.this.table.getSelectedRow();
@@ -180,8 +181,8 @@ public class GUIClientsideLauncher {
 					JOptionPane
 							.showMessageDialog(
 									null,
-									"No world was selected to be deleted. Please select an existing world in the table.",
-									"No world selected",
+									Messages.getString("GUIClientsideLauncher.DLG_NO_WORLD_TO_DELETE"), //$NON-NLS-1$
+									Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED_TITLE"), //$NON-NLS-1$
 									JOptionPane.WARNING_MESSAGE);
 					return;
 				}
@@ -198,7 +199,7 @@ public class GUIClientsideLauncher {
 				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		singleplayerTab.add(singleplayerScrollPane, BorderLayout.CENTER);
 		JPanel aboutTab = new JPanel();
-		tabbedPane.addTab("About", null, aboutTab, null);
+		tabbedPane.addTab(Messages.getString("GUIClientsideLauncher.DLG_ABOUT"), null, aboutTab, null); //$NON-NLS-1$
 		tabbedPane.setEnabledAt(1, true);
 		SpringLayout sl_aboutTab = new SpringLayout();
 		aboutTab.setLayout(sl_aboutTab);
@@ -213,23 +214,23 @@ public class GUIClientsideLauncher {
 		aboutTab.add(communityToolsButtonPanel);
 		communityToolsButtonPanel.setLayout(new GridLayout(0, 5, 0, 0));
 
-		JButton btnReportBug = new JButton("Report a bug...");
+		JButton btnReportBug = new JButton(Messages.getString("GUIClientsideLauncher.23")); //$NON-NLS-1$
 		btnReportBug.setEnabled(false);
 		communityToolsButtonPanel.add(btnReportBug);
 
-		JButton btnRequestNewFeature = new JButton("Request new feature...");
+		JButton btnRequestNewFeature = new JButton(Messages.getString("GUIClientsideLauncher.24")); //$NON-NLS-1$
 		btnRequestNewFeature.setEnabled(false);
 		communityToolsButtonPanel.add(btnRequestNewFeature);
 
-		JButton btnVisitWebsite = new JButton("Visit website");
+		JButton btnVisitWebsite = new JButton(Messages.getString("GUIClientsideLauncher.25")); //$NON-NLS-1$
 		btnVisitWebsite.setEnabled(false);
 		communityToolsButtonPanel.add(btnVisitWebsite);
 
-		JButton btnGithubProject = new JButton("GitHub project");
+		JButton btnGithubProject = new JButton(Messages.getString("GUIClientsideLauncher.26")); //$NON-NLS-1$
 		btnGithubProject.setEnabled(false);
 		communityToolsButtonPanel.add(btnGithubProject);
 
-		JButton btnVisitForums = new JButton("Visit forums");
+		JButton btnVisitForums = new JButton(Messages.getString("GUIClientsideLauncher.27")); //$NON-NLS-1$
 		btnVisitForums.setEnabled(false);
 		communityToolsButtonPanel.add(btnVisitForums);
 
@@ -244,10 +245,10 @@ public class GUIClientsideLauncher {
 				+ "                                                           \r\n"
 				+ "  0.0.1-initial                                              \r\n"
 				+ ""
-				+ "Made by hexafraction, thatnerd2, et al.\r\n"
-				+ "Default game code and textures created by dolinksy296, hexafraction, et. al.\r\n"
-				+ "\r\n"
-				+ "Uses the following libraries:\r\n"
+				+ Messages.getString("GUIClientsideLauncher.NOTICE_PRIMARY_AUTHORS") //$NON-NLS-1$
+				+ Messages.getString("GUIClientsideLauncher.NOTICE_DEFAULT_GAME_CODE") //$NON-NLS-1$
+				+ Messages.getString("GUIClientsideLauncher.SYS_NEWLINE") //$NON-NLS-1$
+				+ Messages.getString("GUIClientsideLauncher.USES_LIBS") //$NON-NLS-1$
 				+ "* Apache Commons Lang\r\n"
 				+ "* Apache Commons Collections\r\n"
 				+ "* JInput\r\n"
@@ -259,8 +260,8 @@ public class GUIClientsideLauncher {
 				+ "* Mozilla Rhino\r\n"
 				+ "* leveldbjni\r\n"
 				+ "* junit4 for testing\r\n"
-				+ "\r\n"
-				+ "Made with the help of Eclipse, Git, Maven, and countless services such as TravisCI and GitHub.\r\n");
+				+ Messages.getString("GUIClientsideLauncher.SYS_NEWLINE") //$NON-NLS-1$
+				+ Messages.getString("GUIClientsideLauncher.NOTICE_TOOLS_USED")); //$NON-NLS-1$
 		textArea.setWrapStyleWord(true);
 		textArea.setBackground(new Color(192, 192, 192));
 		textArea.setEditable(false);
@@ -282,8 +283,8 @@ public class GUIClientsideLauncher {
 	}
 
 	class SingleplayerListTableModel extends AbstractTableModel {
-		private String[] columnNames = { "World name", "Description",
-				"Game preset" };
+		private String[] columnNames = { Messages.getString("GUIClientsideLauncher.COL_WORLD_NAME"), Messages.getString("GUIClientsideLauncher.COL_WORLD_DESC"), //$NON-NLS-1$ //$NON-NLS-2$
+				Messages.getString("GUIClientsideLauncher.COL_GAME_PRESET") }; //$NON-NLS-1$
 		private ArrayList<SingleplayerListEntry> entries = new ArrayList<>();
 
 		public int getColumnCount() {

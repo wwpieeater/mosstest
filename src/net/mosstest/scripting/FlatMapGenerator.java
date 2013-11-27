@@ -19,8 +19,8 @@ public class FlatMapGenerator implements IMapGenerator {
 		int[][][] nodes = new int[16][16][16];
 		try {
 			int fillNode = (pos.getZ() >= 0) ? this.nm.getNode(
-					"mg:air", false).getNodeId() : this.nm.getNode(
-					"mg:ground", false).getNodeId();
+					"mg:air", false).getNodeId() : this.nm.getNode( //$NON-NLS-1$
+					"mg:ground", false).getNodeId(); //$NON-NLS-1$
 
 			for (int x = 0; x < 16; x++) {
 				for (int y = 0; y < 16; y++) {
@@ -40,9 +40,9 @@ public class FlatMapGenerator implements IMapGenerator {
 	@Override
 	public void fillInChunk(int[][][] lightNodes, Position pos)
 			throws MapGeneratorException {
-		int fillNode = (pos.getZ() >= 0) ? this.nm.getNode("mg:air",
+		int fillNode = (pos.getZ() >= 0) ? this.nm.getNode("mg:air", //$NON-NLS-1$
 				false).getNodeId() : this.nm
-				.getNode("mg:ground", false).getNodeId();
+				.getNode("mg:ground", false).getNodeId(); //$NON-NLS-1$
 
 		for (int x = 0; x < 16; x++) {
 			for (int y = 0; y < 16; y++) {

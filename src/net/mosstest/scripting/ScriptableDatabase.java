@@ -21,12 +21,12 @@ public class ScriptableDatabase {
 
 	public DBase getDb(String name) throws IOException {
 		if (!name.matches("[a-zA-Z]{1,32}")) { //$NON-NLS-1$
-			throw new IllegalArgumentException("Invalid database name.");
+			throw new IllegalArgumentException(Messages.getString("ScriptableDatabase.DB_NAME_INVALID")); //$NON-NLS-1$
 		}
 		Options options = new Options();
 		options.createIfMissing(true);
-		return new DBase(factory.open(new File(this.baseDir, "sc_" + name
-				+ ".db"), options), name);
+		return new DBase(factory.open(new File(this.baseDir, "sc_" + name //$NON-NLS-1$
+				+ ".db"), options), name); //$NON-NLS-1$
 
 	}
 

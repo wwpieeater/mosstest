@@ -31,7 +31,7 @@ public class EventProcessor {
 			"maxEventThreads", 8); //$NON-NLS-1$
 	protected final int initialEventThreads = EngineSettings.getInt(
 			"initialEventThreads", 8); //$NON-NLS-1$
-	ThreadGroup eventProcessorGroup = new ThreadGroup("EventProcessor"); //$NON-NLS-1$
+	ThreadGroup eventProcessorGroup = new ThreadGroup(Messages.getString("EventProcessor.THREADGROUP")); //$NON-NLS-1$
 	protected AtomicBoolean runManager = new AtomicBoolean(true);
 	protected final int sampleInterval = EngineSettings.getInt(
 			"eventQueueTuneSampleInterval", 100); //$NON-NLS-1$
@@ -71,7 +71,7 @@ public class EventProcessor {
 									@Override
 									public void run() {
 										System.out
-												.println("Worker thread starteds"); //$NON-NLS-1$
+												.println(Messages.getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
 										processEvents();
 									}
 
@@ -97,7 +97,7 @@ public class EventProcessor {
 											@Override
 											public void run() {
 												System.out
-														.println("Dynamically added thread"); //$NON-NLS-1$
+														.println(Messages.getString("EventProcessor.MSG_ADD_DYNAMIC")); //$NON-NLS-1$
 												processEvents();
 											}
 
@@ -107,7 +107,7 @@ public class EventProcessor {
 
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) lDownshift / (float) lSamples)) {
-								System.out.println(("Stopping one thread"));
+								System.out.println((Messages.getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
 								EventProcessor.this.eventQueue
 										.add(new MossEvent(
 												MossEvent.EvtType.EVT_THREADSTOP,
@@ -128,7 +128,7 @@ public class EventProcessor {
 						}
 					}
 				}
-			}, "EventProcessorManager"); //$NON-NLS-1$
+			}, Messages.getString("EventProcessor.THREAD_NAME_MGR")); //$NON-NLS-1$
 	private MossScriptEnv ev;
 
 	void processEvents() {

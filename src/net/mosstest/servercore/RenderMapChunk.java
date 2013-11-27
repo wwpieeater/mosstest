@@ -5,7 +5,7 @@ import net.mosstest.scripting.MapNode;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.Vector3f;
-
+@Deprecated
 public class RenderMapChunk {
 	private RenderNode[][][] myNodes = new RenderNode[16][16][16];
 	private int x, y, z;
@@ -28,7 +28,7 @@ public class RenderMapChunk {
 	
 	public void addNode (MapNode def, Material mat, float size, int i, int j, int k) {
 		Vector3f loc = new Vector3f(x+i*size, y-j*size-40, z+k*size);
-		myNodes[i][j][k] = new RenderNode(mat, loc, size, def);
+		//myNodes[i][j][k] = new RenderNode(mat, loc, size, def);
 	}
 	
 	public Vector3f getNodeLoc (int i, int j, int k, float size) {

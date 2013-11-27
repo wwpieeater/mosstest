@@ -7,6 +7,11 @@
 *.db
 .svn
 .svn
+.bzr
+/.bzr
+*/.bzr
+.bzrignore
+*/.bzrignore
 .project
 /nbproject/private/
 /dist/
@@ -22,3 +27,4 @@ COMMIT_EDITMSG
 /target
 /build/output
 /data/worlds
+src/git.properties

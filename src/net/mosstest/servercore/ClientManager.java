@@ -13,7 +13,7 @@ public class ClientManager {
 	static final int STATE_INVALID=-1;
 	static ClientNetworkingManager net;
 	static void init(String host, int port, String username, char[] password) throws IOException{
-		net=new ClientNetworkingManager(host, port, EngineSettings.getBool("client_udp", true));
+		net=new ClientNetworkingManager(host, port, EngineSettings.getBool("client_udp", true)); //$NON-NLS-1$
 		net.beginConnectHandshake();
 		
 	}

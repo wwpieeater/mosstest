@@ -12,7 +12,7 @@ public class MossLocalFile extends MossFile {
 		// super call to establish fields.
 		super(dirName, resourceName);
 		//ensure filename is valid.
-		if(!(dirName.matches("[a-zA-Z0-9.]*")&&resourceName.matches("[a-zA-Z0-9.]*"))) throw new FileNotFoundException(); 
+		if(!(dirName.matches("[a-zA-Z0-9.]*")&&resourceName.matches("[a-zA-Z0-9.]*"))) throw new FileNotFoundException();  //$NON-NLS-1$ //$NON-NLS-2$
 		this.file = new File(baseDir, dirName);
 		this.file = new File(this.file, resourceName);
 	}
@@ -21,7 +21,7 @@ public class MossLocalFile extends MossFile {
 
 	@Override
 	public RandomAccessFile getRandAccessCopy() throws FileNotFoundException {
-		return new RandomAccessFile(this.file, "r");
+		return new RandomAccessFile(this.file, "r"); //$NON-NLS-1$
 	}
 
 	public byte[] readChunk(int chk) throws IOException {

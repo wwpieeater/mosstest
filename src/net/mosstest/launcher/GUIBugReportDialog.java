@@ -17,10 +17,19 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 
-import com.jgoodies.forms.factories.FormFactory;
-import com.jgoodies.forms.layout.ColumnSpec;
-import com.jgoodies.forms.layout.FormLayout;
-import com.jgoodies.forms.layout.RowSpec;
+import java.awt.Component;
+
+import javax.swing.SpringLayout;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.GridLayout;
+
+import javax.swing.SwingConstants;
+
+import java.awt.Point;
+import java.awt.Dialog.ModalityType;
 
 public class GUIBugReportDialog extends JDialog {
 
@@ -28,6 +37,8 @@ public class GUIBugReportDialog extends JDialog {
 	private JTextField reporterName;
 	private JTextField email;
 	private JTextField problemSummary;
+	private JCheckBox chckbxIncludeTechnicalInformation;
+	private JLabel lblName;
 
 	/**
 	 * Launch the application.
@@ -46,91 +57,129 @@ public class GUIBugReportDialog extends JDialog {
 	 * Create the dialog.
 	 */
 	public GUIBugReportDialog(String traceback) {
+		setModal(true);
+		setModalityType(ModalityType.APPLICATION_MODAL);
 		setMinimumSize(new Dimension(640, 480));
-		setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
-		setTitle("Report a bug");
+		setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+		setTitle(Messages.getString("GUIBugReportDialog.DLG_BUG_TITLE")); //$NON-NLS-1$
 		setBounds(100, 100, 640, 480);
 		getContentPane().setLayout(new BorderLayout());
+		contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(this.contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new FormLayout(new ColumnSpec[] {
-				FormFactory.UNRELATED_GAP_COLSPEC,
-				ColumnSpec.decode("163px"),
-				FormFactory.LABEL_COMPONENT_GAP_COLSPEC,
-				ColumnSpec.decode("441px"),},
-			new RowSpec[] {
-				FormFactory.UNRELATED_GAP_ROWSPEC,
-				RowSpec.decode("20px"),
-				FormFactory.NARROW_LINE_GAP_ROWSPEC,
-				RowSpec.decode("20px"),
-				FormFactory.NARROW_LINE_GAP_ROWSPEC,
-				RowSpec.decode("20px"),
-				FormFactory.NARROW_LINE_GAP_ROWSPEC,
-				RowSpec.decode("192px"),
-				FormFactory.NARROW_LINE_GAP_ROWSPEC,
-				RowSpec.decode("138px"),}));
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 		{
-			JLabel lblName = new JLabel("Name:");
-			this.contentPanel.add(lblName, "2, 2, right, center");
-		}
-		{
-			this.reporterName = new JTextField();
-			this.contentPanel.add(this.reporterName, "4, 2, fill, top");
-			this.reporterName.setColumns(10);
-		}
-		{
-			JLabel lblEmailoptional = new JLabel("e-mail (optional):");
-			this.contentPanel.add(lblEmailoptional, "2, 4, right, center");
-		}
-		{
-			this.email = new JTextField();
-			this.contentPanel.add(this.email, "4, 4, fill, top");
-			this.email.setColumns(10);
-		}
-		{
-			JLabel lblProblemDescription = new JLabel("Problem summary:");
-			this.contentPanel.add(lblProblemDescription, "2, 6, right, center");
-		}
-		{
-			this.problemSummary = new JTextField();
-			this.contentPanel.add(this.problemSummary, "4, 6, fill, top");
-			this.problemSummary.setColumns(10);
-		}
-		{
-			JLabel lblDetailedProblemDescription = new JLabel(
-					"Detailed problem description:");
-			this.contentPanel.add(lblDetailedProblemDescription, "2, 8, right, center");
-		}
-		{
-			JScrollPane scrollPane = new JScrollPane();
-			this.contentPanel.add(scrollPane, "4, 8, fill, fill");
+			JPanel namePanel = new JPanel();
+			namePanel.setMaximumSize(new Dimension(32767, 20));
+			contentPanel.add(namePanel);
+			namePanel.setLayout(new BorderLayout(0, 0));
+			
 			{
-				JTextArea txtLongDesc = new JTextArea();
-				txtLongDesc.setWrapStyleWord(true);
-				txtLongDesc.setLineWrap(true);
-				txtLongDesc
-						.setText("Please describe your problem here, preferably including what you had done, what you expected to happen, what happened, and any other details about the world or game.\r\n\r\nPlease note that we cannot help with third-party games or mods.");
-				scrollPane.setViewportView(txtLongDesc);
+				lblName = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_NAME")); //$NON-NLS-1$
+				namePanel.add(lblName, BorderLayout.WEST);
+				lblName.setHorizontalTextPosition(SwingConstants.LEFT);
+				lblName.setHorizontalAlignment(SwingConstants.LEFT);
+				lblName.setAlignmentY(Component.TOP_ALIGNMENT);
+			}
+			lblName.setLabelFor(reporterName);
+			{
+				this.reporterName = new JTextField();
+				namePanel.add(reporterName, BorderLayout.CENTER);
+				reporterName.setMaximumSize(new Dimension(2147483647, 20));
+				reporterName.setAlignmentY(Component.TOP_ALIGNMENT);
+				this.reporterName.setColumns(10);
 			}
 		}
 		{
-			JCheckBox chckbxIncludeTechnicalInformation = new JCheckBox(
-					"Include technical information");
-			this.contentPanel.add(chckbxIncludeTechnicalInformation, "2, 10, left, top");
+			JPanel emailPanel = new JPanel();
+			emailPanel.setMaximumSize(new Dimension(32767, 20));
+			contentPanel.add(emailPanel);
+			emailPanel.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lblEmailoptional = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_EMAIL")); //$NON-NLS-1$
+				emailPanel.add(lblEmailoptional, BorderLayout.WEST);
+			}
+			{
+				this.email = new JTextField();
+				emailPanel.add(email, BorderLayout.CENTER);
+				email.setMaximumSize(new Dimension(2147483647, 20));
+				this.email.setColumns(10);
+			}
+		}
+		{
+			JPanel summaryPnl = new JPanel();
+			summaryPnl.setMaximumSize(new Dimension(32767, 20));
+			contentPanel.add(summaryPnl);
+			summaryPnl.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lblProblemDescription = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_SUMMARY")); //$NON-NLS-1$
+				summaryPnl.add(lblProblemDescription, BorderLayout.WEST);
+			}
+			{
+				this.problemSummary = new JTextField();
+				summaryPnl.add(problemSummary, BorderLayout.CENTER);
+				this.problemSummary.setColumns(10);
+			}
+		}
+		{
+			JPanel descPanel = new JPanel();
+			contentPanel.add(descPanel);
+			descPanel.setLayout(new BorderLayout(0, 0));
+			{
+				JLabel lblDetailedProblemDescription = new JLabel(
+						Messages.getString("GUIBugReportDialog.DLG_BUG_DESC")); //$NON-NLS-1$
+				lblDetailedProblemDescription.setVerticalAlignment(SwingConstants.TOP);
+				descPanel.add(lblDetailedProblemDescription, BorderLayout.WEST);
+			}
+			{
+				JScrollPane scrollPane = new JScrollPane();
+				descPanel.add(scrollPane, BorderLayout.CENTER);
+				{
+					JTextArea txtLongDesc = new JTextArea();
+					scrollPane.setViewportView(txtLongDesc);
+					txtLongDesc.setWrapStyleWord(true);
+					txtLongDesc.setLineWrap(true);
+					txtLongDesc
+							.setText(Messages.getString("GUIBugReportDialog.DLG_BUG_DESC_DEFAULT")); //$NON-NLS-1$
+				}
+			}
 		}
 		{
 			JScrollPane scrollPane = new JScrollPane();
-			this.contentPanel.add(scrollPane, "4, 10, fill, fill");
+			this.contentPanel.add(scrollPane);
+		}
+		{
+			JPanel techInfoPanel = new JPanel();
+			contentPanel.add(techInfoPanel);
+			techInfoPanel.setLayout(new BorderLayout(0, 0));
 			{
-				JTextArea textArea = new JTextArea();
-				textArea.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-				textArea.setBackground(new Color(204, 204, 204));
-				textArea.setEditable(false);
-				textArea.setWrapStyleWord(true);
-				textArea.setLineWrap(true);
-				textArea.setText("The following information will be included in the bug report if this box is checked: \r\n\r\n"+traceback);
-				scrollPane.setViewportView(textArea);
+				chckbxIncludeTechnicalInformation = new JCheckBox(
+						Messages.getString("GUIBugReportDialog.DLG_CHECKBOX_INCLUDE_TECH_INFO")); //$NON-NLS-1$
+				techInfoPanel.add(chckbxIncludeTechnicalInformation, BorderLayout.WEST);
+				chckbxIncludeTechnicalInformation.setLocation(new Point(2, 0));
+				chckbxIncludeTechnicalInformation.setVerticalAlignment(SwingConstants.TOP);
+				chckbxIncludeTechnicalInformation.setHorizontalTextPosition(SwingConstants.LEFT);
+				chckbxIncludeTechnicalInformation.setAlignmentX(Component.CENTER_ALIGNMENT);
+				chckbxIncludeTechnicalInformation.setHorizontalAlignment(SwingConstants.LEFT);
 			}
+			{
+				JScrollPane scrollPane = new JScrollPane();
+				techInfoPanel.add(scrollPane, BorderLayout.CENTER);
+				{
+					JTextArea textArea = new JTextArea();
+					scrollPane.setViewportView(textArea);
+					textArea.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+					textArea.setBackground(new Color(204, 204, 204));
+					textArea.setEditable(false);
+					textArea.setWrapStyleWord(true);
+					textArea.setLineWrap(true);
+					textArea.setText(Messages.getString("GUIBugReportDialog.NOTICE_INFO_INCLUDED")+traceback); //$NON-NLS-1$
+				}
+			}
+		}
+		{
+			JScrollPane scrollPane = new JScrollPane();
+			this.contentPanel.add(scrollPane);
 		}
 		{
 			JPanel buttonPane = new JPanel();
@@ -141,15 +190,15 @@ public class GUIBugReportDialog extends JDialog {
 				buttonPane.add(progressBar);
 			}
 			{
-				JButton okButton = new JButton("Submit");
+				JButton okButton = new JButton(Messages.getString("GUIBugReportDialog.DLG_SUBMIT")); //$NON-NLS-1$
 				buttonPane.add(okButton);
-				okButton.setActionCommand("OK");
+				okButton.setActionCommand(Messages.getString("GUIBugReportDialog.DLG_OK")); //$NON-NLS-1$
 				getRootPane().setDefaultButton(okButton);
 			}
 			{
-				JButton cancelButton = new JButton("Cancel");
+				JButton cancelButton = new JButton(Messages.getString("GUIBugReportDialog.DLG_CXL")); //$NON-NLS-1$
 				buttonPane.add(cancelButton);
-				cancelButton.setActionCommand("Cancel");
+				cancelButton.setActionCommand(Messages.getString("GUIBugReportDialog.DLG_CXL")); //$NON-NLS-1$
 			}
 		}
 	}

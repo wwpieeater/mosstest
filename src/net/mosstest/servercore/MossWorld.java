@@ -66,16 +66,15 @@ public class MossWorld {
 
 				if (!this.worldCfg.containsKey("gameid")) { //$NON-NLS-1$
 					throw new MossWorldLoadException(
-							"The game ID is not specified. The game ID must be specified in game.xml as <gameid>game</gameid> "
-									+ "where data/games/game is a directory with a valid game.");
+							Messages.getString("MossWorld.NO_GAME_ID")); //$NON-NLS-1$
 				}
-				this.game = new MossGame(this.worldCfg.getString("gameid"));
+				this.game = new MossGame(this.worldCfg.getString("gameid")); //$NON-NLS-1$
 				
 				try {
 					this.db = new MapDatabase(this.baseDir);
 				} catch (MapDatabaseException e) {
 					throw new MossWorldLoadException(
-							"An error has occured when opening the database. It is likely inaccessible, on a full disk, or corrupt.");
+							Messages.getString("MossWorld.ERR_DB")); //$NON-NLS-1$
 				}
 			/*} catch (IOException | ConfigurationException e) {
 				throw new MossWorldLoadException(
@@ -88,7 +87,7 @@ public class MossWorld {
 		try {
 			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 1337);
 		} catch (MapGeneratorException e) {
-			System.err.println("The map generator could not be seeded.");
+			System.err.println(Messages.getString("MossWorld.MG_SELECT_FAILURE")); //$NON-NLS-1$
 			System.exit(4);
 		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
@@ -101,7 +100,7 @@ public class MossWorld {
 		}
 		this.evp = new EventProcessor(this.mossEnv);
 		if (port >= 0) {
-			System.out.println("Networking cannot occur at this time");
+			System.out.println(Messages.getString("MossWorld.NO_NETWORKING_NOW")); //$NON-NLS-1$
 			/*try {
 				this.snv = new ServerNetworkingManager(port, this);
 			} catch (IOException e) {
@@ -120,7 +119,7 @@ public class MossWorld {
 	}
 
 	public static void main(String[] args) throws MossWorldLoadException, MapDatabaseException, ConfigurationException, IOException {
-		MossWorld m = new MossWorld("test", -1);
+		MossWorld m = new MossWorld("test", -1); //$NON-NLS-1$
 
 	}
 }

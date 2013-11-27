@@ -1,0 +1,153 @@
+msgid "GUIBugReportDialog.DLG_BUG_DESC"
+msgstr "Detailed problem description:"
+
+msgid "GUIBugReportDialog.DLG_BUG_DESC_DEFAULT"
+msgstr ""
+"Please describe your problem here, preferably including what you had done, "
+"what you expected to happen, what happened, and any other details about the "
+"world or game.\n"
+"\n"
+"Please note that we cannot help with third-party games or mods."
+
+msgid "GUIBugReportDialog.DLG_BUG_EMAIL"
+msgstr "e-mail (optional):"
+
+msgid "GUIBugReportDialog.DLG_BUG_NAME"
+msgstr "Name:"
+
+msgid "GUIBugReportDialog.DLG_BUG_SUMMARY"
+msgstr "Problem summary:"
+
+msgid "GUIBugReportDialog.DLG_BUG_TITLE"
+msgstr "Report a bug"
+
+msgid "GUIBugReportDialog.DLG_CHECKBOX_INCLUDE_TECH_INFO"
+msgstr "Include technical information"
+
+msgid "GUIBugReportDialog.DLG_CXL"
+msgstr "Cancel"
+
+msgid "GUIBugReportDialog.DLG_OK"
+msgstr "OK"
+
+msgid "GUIBugReportDialog.DLG_SUBMIT"
+msgstr "Submit"
+
+msgid "GUIBugReportDialog.NOTICE_INFO_INCLUDED"
+msgstr ""
+"The following information will be included in the bug report if this box is "
+"checked: \n"
+"\n"
+
+msgid "GUIClientsideLauncher.23"
+msgstr "Report a bug..."
+
+msgid "GUIClientsideLauncher.24"
+msgstr "Request new feature..."
+
+msgid "GUIClientsideLauncher.25"
+msgstr "Visit website"
+
+msgid "GUIClientsideLauncher.26"
+msgstr "GitHub project"
+
+msgid "GUIClientsideLauncher.27"
+msgstr "Visit forums"
+
+msgid "GUIClientsideLauncher.COL_GAME_PRESET"
+msgstr "Game preset"
+
+msgid "GUIClientsideLauncher.COL_WORLD_DESC"
+msgstr "Description"
+
+msgid "GUIClientsideLauncher.COL_WORLD_NAME"
+msgstr "World name"
+
+msgid "GUIClientsideLauncher.DLG_ABOUT"
+msgstr "About"
+
+msgid "GUIClientsideLauncher.DLG_DELETE"
+msgstr "Delete..."
+
+msgid "GUIClientsideLauncher.DLG_NEW"
+msgstr "New..."
+
+msgid "GUIClientsideLauncher.DLG_NO_WORLD_TO_DELETE"
+msgstr ""
+"No world was selected to be deleted. Please select an existing world in the "
+"table."
+
+msgid "GUIClientsideLauncher.DLG_PLAY"
+msgstr "Play"
+
+msgid "GUIClientsideLauncher.DLG_SETTINGS"
+msgstr "Settings..."
+
+msgid "GUIClientsideLauncher.DLG_SINGLEPLAYER"
+msgstr "Singleplayer"
+
+msgid "GUIClientsideLauncher.DLG_TITLE"
+msgstr "Mosstest Client launcher <0.0.1-initial>"
+
+msgid "GUIClientsideLauncher.ERR_NO_WORLD_SELECTED"
+msgstr ""
+"No world was selected to be started. Please select an existing world in the "
+"table, or create a new world."
+
+msgid "GUIClientsideLauncher.ERR_NO_WORLD_SELECTED_TITLE"
+msgstr "No world selected"
+
+msgid "GUIClientsideLauncher.NOTICE_DEFAULT_GAME_CODE"
+msgstr ""
+"Default game code and textures created by dolinksy296, hexafraction, et. "
+"al.\n"
+
+msgid "GUIClientsideLauncher.NOTICE_PRIMARY_AUTHORS"
+msgstr "Made by hexafraction, thatnerd2, et al.\n"
+
+msgid "GUIClientsideLauncher.NOTICE_TOOLS_USED"
+msgstr ""
+"Made with the help of Eclipse, Git, Maven, and countless services such as "
+"TravisCI and GitHub.\n"
+
+msgid "GUIClientsideLauncher.SYS_NEWLINE"
+msgstr "\n"
+
+msgid "GUIClientsideLauncher.USES_LIBS"
+msgstr "Uses the following libraries:\n"
+
+msgid "GUIClientsideLauncher.WARN_SET_LAF"
+msgstr "Warning: The system look-and-feel cannot be set"
+
+msgid "GUIWorldCreationDialog.CXL"
+msgstr "Cancel"
+
+msgid "GUIWorldCreationDialog.DLG_TITLE"
+msgstr "Create new singleplayer world..."
+
+msgid "GUIWorldCreationDialog.GAME_PROFILE"
+msgstr "Game profile:"
+
+msgid "GUIWorldCreationDialog.OK"
+msgstr "OK"
+
+msgid "GUIWorldCreationDialog.WORLD_DESC"
+msgstr "Description:"
+
+msgid "GUIWorldCreationDialog.WORLD_NAME"
+msgstr "World name:"
+
+msgid "GUIWorldDeletionDialog.AREYOUSURE_TEXT"
+msgstr "Are you sure you wish to delete the world called "
+
+msgid "GUIWorldDeletionDialog.DLG_TITLE"
+msgstr "Delete singleplayer world..."
+
+msgid "GUIWorldDeletionDialog.NO"
+msgstr "No"
+
+msgid "GUIWorldDeletionDialog.QUESTIONMARK_CANNOT_UNDO"
+msgstr "? This operation cannot be undone."
+
+msgid "GUIWorldDeletionDialog.YES"
+msgstr "Yes"

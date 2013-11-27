@@ -14,8 +14,8 @@ public class LocalRenderPreparator implements IRenderPreparator {
 				try {
 					Position requested = LocalRenderPreparator.this.chunkRequests
 							.take();
-					System.out.println("REQUESTED " + requested.x + ","
-							+ requested.y + "," + requested.z);
+					System.out.println(Messages.getString("LocalRenderPreparator.MSG_REQUESTED") + requested.x + "," //$NON-NLS-1$ //$NON-NLS-2$
+							+ requested.y + "," + requested.z); //$NON-NLS-1$
 					MapChunk chk = LocalRenderPreparator.this.nc
 							.getChunk(requested);
 					chk.pos = requested;
@@ -25,7 +25,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
 					// pass
 				} catch (MapGeneratorException e) {
 					System.out
-							.print("The map generator has thrown an exception.");
+							.print(Messages.getString("LocalRenderPreparator.MG_EXCEPT")); //$NON-NLS-1$
 				}
 			}
 		}
@@ -46,7 +46,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
 			InterruptedException {
 		try {
 			MapChunk chk = this.nc.getChunkFailFast(pos);
-			System.out.println(chk == null ? "null chunk failfast" : chk
+			System.out.println(chk == null ? "null chunk failfast" : chk //$NON-NLS-1$
 					.toString());
 			if (chk == null) {
 				this.chunkRequests.put(pos);
@@ -75,7 +75,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
 
 	@Override
 	public void start() {
-		System.out.println("<<< START LOCAL RENDER PREPARATOR >>>");
+		System.out.println(Messages.getString("LocalRenderPreparator.START_MSG")); //$NON-NLS-1$
 		this.lookupThread.start();
 
 	}
