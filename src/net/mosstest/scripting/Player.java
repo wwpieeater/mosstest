@@ -28,10 +28,12 @@ public class Player {
 	 */
 	public final Object antiCheatDataLock = new Object();
 
-	private Player(String name, int maxHealth) {
-		this.name = name;
-		this.inventories.put("default", new MossInventory(96, 8, 6)); //$NON-NLS-1$
-	}
+	
+	public Player(String name, int maxHealth) {
+		this.name=name;
+		this.inventories.put("default", new MossInventory(96, 8, 6));
+	} //$NON-NLS-1$
+
 
 	public MossInventory createInventory(String name, int rows, int cols,
 			int maxStack) {
@@ -55,6 +57,18 @@ public class Player {
 		for (String priv : privs) {
 			this.privs.remove(priv);
 		}
+	}
+	
+	public void setChunkPosition (int x, int y, int z) {
+		xchk = x;
+		ychk = y;
+		zchk = z;
+	}
+	
+	public void setPositionOffsets (double x, double y, double z) {
+		xoffset = x;
+		yoffset = y;
+		zoffset = z;
 	}
 
 }

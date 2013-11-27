@@ -1,11 +1,13 @@
 package net.mosstest.servercore;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
 
 import jme3tools.optimize.GeometryBatchFactory;
 
@@ -37,6 +39,7 @@ import java.util.Arrays;
 import net.mosstest.scripting.INodeParams;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.MapNode;
+import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
 
 public class RenderProcessor extends SimpleApplication {
@@ -53,57 +56,54 @@ public class RenderProcessor extends SimpleApplication {
 	
 	private Vector3f initialUpVec;
 	private Node worldNode;
-	private SpotLight spot = new SpotLight();
-	private PointLight lamp = new PointLight();
-	private DirectionalLight sun = new DirectionalLight();
+	private SpotLight spot;
+	private PointLight lamp;
+	private DirectionalLight sun;
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 
 	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
+	public Player player;;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
-	public static RenderProcessor init(INodeManager manager, IRenderPreparator prep) {
+	public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
+		java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
 		settings.setSamples(2);
 		app.setSettings(settings);
 		app.setShowSettings(false);
-		app.initNodeThings(manager, prep);
+		app.initManager(manager);
+		app.initPreparator(preparator);
 		app.start();
 		return app;
 	}
 
-	private void initNodeThings(INodeManager manager, IRenderPreparator prep) {
+	private void initManager (INodeManager manager) {
 		nManager = manager;
+	}
+	
+	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
+		System.out.println("INITIALIZING PREPARATOR");
+		rPreparator.setRenderProcessor(this);
+		rPreparator.start();
 	}
 
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
-		worldNode = new Node("world");
-		rootNode.attachChild(worldNode);
-		spot.setSpotRange(300f);
-		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
-		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
-		spot.setColor(ColorRGBA.White.mult(3f));
-		spot.setPosition(cam.getLocation());
-		spot.setDirection(cam.getDirection());
-		rootNode.addLight(spot);
 		
-		lamp.setColor(ColorRGBA.Yellow);
-		lamp.setRadius(4f);
-		lamp.setPosition(cam.getLocation());
-		//rootNode.addLight(lamp);
+		setupWorldNode ();
+		setupFlashlight();
+		setupSunlight();
+		//setupLamplight();
+		setupPlayer();
 		
-		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
-		rootNode.addLight(sun);
-		
-		//localChunkTest();
-		preparatorChunkTest();
+		localChunkTest();
+		//preparatorChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -144,9 +144,9 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = FloatBuffer.allocate(500000);
-		FloatBuffer normals = FloatBuffer.allocate(500000);
-		IntBuffer indices = IntBuffer.allocate(500000);
+		FloatBuffer vertices = getDirectFloatBuffer(1000000);
+		FloatBuffer normals = getDirectFloatBuffer(1000000);
+		IntBuffer indices = getDirectIntBuffer(1000000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 
 		for (byte i = 0; i < 16; i++) {
@@ -155,14 +155,16 @@ public class RenderProcessor extends SimpleApplication {
 					int nVal = chk.getNodeId(i, j, k);
 					//MapNode node = nManager.getNode((short) nVal);
 					//Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {return;}
+					if (nVal == 0) {System.out.println("GOT A 0");return;}
 					
 					else {
 						
 						float x = (float) ((pos.x + (CHUNK_OFFSET * pos.x)) - BLOCK_OFFSET_FROM_CENTER + (i * BLOCK_SIZE));
 						float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
 						float z = (float) ((pos.z + (CHUNK_OFFSET * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + (k * BLOCK_SIZE));
-
+						//System.out.println(x+","+y+","+z);
+						//System.out.println(pos.x+","+pos.y+","+pos.z+"\n");
+						
 						vertices.put(x).put(y).put(z); //Front face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z);
 						vertices.put(x + BLOCK_SIZE).put(y).put(z);
@@ -171,6 +173,7 @@ public class RenderProcessor extends SimpleApplication {
 						vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
 						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
+						
 						for(int m=0; m<8; m++) {
 							normals.put(0).put(0).put(10);
 						}
@@ -224,13 +227,12 @@ public class RenderProcessor extends SimpleApplication {
 		// Position p7 = new Position(-1,0,-1,0);
 
 		getChunk(p1);
-		System.out.println("SENT REQUEST");
-		getChunk(p2);
-		getChunk(p3);
-		getChunk(p4);
-		// getChunk(p5);
-		// getChunk(p6);
-		// getChunk(p7);
+		//getChunk(p2);
+		//getChunk(p3);
+		//getChunk(p4);
+		//getChunk(p5);
+		//getChunk(p6);
+		//getChunk(p7);
 	}
 
 	private void localChunkTest() {
@@ -259,23 +261,72 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		GeometryBatchFactory.optimize(worldNode);
 	}
-	 
-	public Material getMaterial(short nVal) {
+	
+	private FloatBuffer getDirectFloatBuffer (int size) {
+		ByteBuffer temp = ByteBuffer.allocateDirect(size);
+		return temp.asFloatBuffer();
+	}
+	
+	private IntBuffer getDirectIntBuffer (int size) {
+		ByteBuffer temp = ByteBuffer.allocateDirect(size);
+		return temp.asIntBuffer();
+	}
+
+	
+	private void setupFlashlight () {
+		spot = new SpotLight();
+		spot.setSpotRange(300f);
+		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
+		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
+		spot.setColor(ColorRGBA.White.mult(3f));
+		spot.setPosition(cam.getLocation());
+		spot.setDirection(cam.getDirection());
+		rootNode.addLight(spot);
+	}
+	
+	private void setupSunlight () {
+		sun = new DirectionalLight();
+		sun.setColor(ColorRGBA.White);
+		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
+		rootNode.addLight(sun);
+	}
+	
+	private void setupLamplight () {
+		lamp = new PointLight();
+		lamp.setColor(ColorRGBA.Yellow);
+		lamp.setRadius(4f);
+		lamp.setPosition(cam.getLocation());
+		rootNode.addLight(lamp);
+	}
+	
+	private void setupWorldNode () {
+		worldNode = new Node("world");
+		rootNode.attachChild(worldNode);
+	}
+	
+	private void setupPlayer () {
+		player = new Player ("Test Guy", 100);
+		player.setPositionOffsets (0,0,0);
+		player.setChunkPosition(0,0,0);
+	}
+	
+	private Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
-		case 1:
+		case 1:/*
 			mat = new Material(assetManager,
 					"Common/MatDefs/Light/Lighting.j3md");
 			mat.setBoolean("UseMaterialColors", true);
 			mat.setColor("Ambient", ColorRGBA.Green);
 			mat.setColor("Diffuse", ColorRGBA.Green);
-			
-			/*mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			mat.setColor("Color", ColorRGBA.Green);
 			*/
+			mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			mat.setColor("Color", ColorRGBA.Green);
+			
 		}
 		return mat;
 	}
+	
 	private void moveWorld(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
@@ -288,6 +339,10 @@ public class RenderProcessor extends SimpleApplication {
 								* transVector.y))
 				.addLocal(-cx * transVector.y, 0f, cx * transVector.x)
 				.addLocal(0f, -cy, 0f));
+		
+		System.out.println("World position: "+worldNode.getLocalTranslation());
+		System.out.println("Camera position: "+cam.getLocation());
+		System.out.println("Player position: "+player.xoffset+","+player.yoffset+","+player.zoffset);
 	}
 
 	private void rotateCamera(float value, Vector3f axis) {
