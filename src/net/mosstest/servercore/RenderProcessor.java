@@ -385,7 +385,7 @@ public class RenderProcessor extends SimpleApplication {
 	}
 
 	private void waitFor () {
-		//TODO
+		//TODO (what do i do here?)
 	}
 	
 	private void initKeyBindings() {
