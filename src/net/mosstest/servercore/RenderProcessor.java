@@ -349,9 +349,9 @@ public class RenderProcessor extends SimpleApplication {
 		int xchk = (int)Math.floor(xpos / (CHUNK_SIZE));
 		int ychk = (int)Math.floor(ypos / (CHUNK_SIZE));
 		int zchk = (int)Math.floor(zpos / (CHUNK_SIZE));
-		double xoffset = (xpos % CHUNK_SIZE);
-		double yoffset = (ypos % CHUNK_SIZE);
-		double zoffset = (zpos % CHUNK_SIZE);
+		double xoffset = (xpos % CHUNK_SIZE)/BLOCK_SIZE;
+		double yoffset = (ypos % CHUNK_SIZE)/BLOCK_SIZE;
+		double zoffset = (zpos % CHUNK_SIZE)/BLOCK_SIZE;
 		
 		synchronized(player.antiCheatDataLock){
 			player.setChunkPosition (xchk, ychk, zchk);
