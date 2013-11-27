@@ -130,13 +130,14 @@ public class GUIClientsideLauncher {
 
 				int row = GUIClientsideLauncher.this.table.getSelectedRow();
 				if (row < 0) {
+
+					logger.warn("An attempt was made to start gameplay without selecting a world.");
 					JOptionPane.showMessageDialog(
 							null,
 							Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED"), //$NON-NLS-1$
 							Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED_TITLE"), //$NON-NLS-1$
 							JOptionPane.WARNING_MESSAGE);
 
-					logger.warn("An attempt was made to start gameplay without selecting a world.");
 					return;
 				}
 				GUIClientsideLauncher.this.frmMosstestClientLauncher
@@ -150,7 +151,7 @@ public class GUIClientsideLauncher {
 					// MossWorld((String)GUIClientsideLauncher.this.table.getModel().getValueAt(row,
 					// 0), -16511);
 				} catch (Exception e) {
-					logger.error("Uncaught exception in game code, opening bug reporter.", e);
+					logger.error("Uncaught exception in game code, opening bug reporter.");
 					StringBuilder s = new StringBuilder(
 							"Exception uncaught in code\r\n");
 					String fname = MossDebugUtils.writeStracktrace(e);
@@ -197,13 +198,14 @@ public class GUIClientsideLauncher {
 			public void actionPerformed(ActionEvent e) {
 				int row = GUIClientsideLauncher.this.table.getSelectedRow();
 				if (row < 0) {
+
+					logger.warn("An attempt was made to delete a world, but none was selected.");
 					JOptionPane.showMessageDialog(
 							null,
 							Messages.getString("GUIClientsideLauncher.DLG_NO_WORLD_TO_DELETE"), //$NON-NLS-1$
 							Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED_TITLE"), //$NON-NLS-1$
 							JOptionPane.WARNING_MESSAGE);
 
-					logger.warn("An attempt was made to delete a world, but none was selected.");
 					return;
 				}
 
