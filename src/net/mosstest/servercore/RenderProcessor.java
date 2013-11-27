@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
@@ -82,6 +83,7 @@ public class RenderProcessor extends SimpleApplication {
 	
 	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
+		rPreparator.setRenderProcessor(this);
 		rPreparator.start();
 	}
 
@@ -93,7 +95,6 @@ public class RenderProcessor extends SimpleApplication {
 		setupFlashlight();
 		setupSunlight();
 		//setupLamplight();
-		
 		
 		//localChunkTest();
 		preparatorChunkTest();
@@ -137,9 +138,9 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = FloatBuffer.allocate(500000);
-		FloatBuffer normals = FloatBuffer.allocate(500000);
-		IntBuffer indices = IntBuffer.allocate(500000);
+		FloatBuffer vertices = getDirectFloatBuffer(1000000);
+		FloatBuffer normals = getDirectFloatBuffer(1000000);
+		IntBuffer indices = getDirectIntBuffer(1000000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 
 		for (byte i = 0; i < 16; i++) {
@@ -148,14 +149,16 @@ public class RenderProcessor extends SimpleApplication {
 					int nVal = chk.getNodeId(i, j, k);
 					//MapNode node = nManager.getNode((short) nVal);
 					//Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {return;}
+					if (nVal == 0) {System.out.println("GOT A 0");return;}
 					
 					else {
 						
 						float x = (float) ((pos.x + (CHUNK_OFFSET * pos.x)) - BLOCK_OFFSET_FROM_CENTER + (i * BLOCK_SIZE));
 						float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
 						float z = (float) ((pos.z + (CHUNK_OFFSET * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + (k * BLOCK_SIZE));
-
+						System.out.println(x+","+y+","+z);
+						System.out.println(pos.x+","+pos.y+","+pos.z+"\n");
+						
 						vertices.put(x).put(y).put(z); //Front face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z);
 						vertices.put(x + BLOCK_SIZE).put(y).put(z);
@@ -164,6 +167,7 @@ public class RenderProcessor extends SimpleApplication {
 						vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
 						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
+						
 						for(int m=0; m<8; m++) {
 							normals.put(0).put(0).put(10);
 						}
@@ -217,13 +221,12 @@ public class RenderProcessor extends SimpleApplication {
 		// Position p7 = new Position(-1,0,-1,0);
 
 		getChunk(p1);
-		System.out.println("SENT REQUEST");
-		getChunk(p2);
-		getChunk(p3);
-		getChunk(p4);
-		// getChunk(p5);
-		// getChunk(p6);
-		// getChunk(p7);
+		//getChunk(p2);
+		//getChunk(p3);
+		//getChunk(p4);
+		//getChunk(p5);
+		//getChunk(p6);
+		//getChunk(p7);
 	}
 
 	private void localChunkTest() {
@@ -252,6 +255,17 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		GeometryBatchFactory.optimize(worldNode);
 	}
+	
+	private FloatBuffer getDirectFloatBuffer (int size) {
+		ByteBuffer temp = ByteBuffer.allocateDirect(size);
+		return temp.asFloatBuffer();
+	}
+	
+	private IntBuffer getDirectIntBuffer (int size) {
+		ByteBuffer temp = ByteBuffer.allocateDirect(size);
+		return temp.asIntBuffer();
+	}
+	
 	
 	private void setupFlashlight () {
 		spot = new SpotLight();
@@ -283,22 +297,20 @@ public class RenderProcessor extends SimpleApplication {
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
 	}
-
 	
-	
-	public Material getMaterial(short nVal) {
+	private Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
-		case 1:
+		case 1:/*
 			mat = new Material(assetManager,
 					"Common/MatDefs/Light/Lighting.j3md");
 			mat.setBoolean("UseMaterialColors", true);
 			mat.setColor("Ambient", ColorRGBA.Green);
 			mat.setColor("Diffuse", ColorRGBA.Green);
-			
-			/*mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			mat.setColor("Color", ColorRGBA.Green);
 			*/
+			mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			mat.setColor("Color", ColorRGBA.Green);
+			
 		}
 		return mat;
 	}
