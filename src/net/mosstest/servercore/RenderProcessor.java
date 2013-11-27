@@ -357,9 +357,6 @@ public class RenderProcessor extends SimpleApplication {
 			player.setChunkPosition (xchk, ychk, zchk);
 			player.setPositionOffsets (xoffset, yoffset, zoffset);
 		}
-		
-		System.out.println("Player chunk position: "+xchk+","+ychk+","+zchk);
-		System.out.println("Player position offsets: "+xoffset+","+yoffset+","+zoffset);
 	}
 
 	private void rotateCamera(float value, Vector3f axis) {
