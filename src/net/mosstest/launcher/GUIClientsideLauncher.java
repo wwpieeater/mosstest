@@ -54,6 +54,7 @@ public class GUIClientsideLauncher {
 	 * Launch the application.
 	 */
 	public static void main(String[] args) {
+		logger.info("Mosstest client starting...");
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException
