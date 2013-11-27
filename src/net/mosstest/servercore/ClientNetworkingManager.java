@@ -16,7 +16,11 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
+import org.apache.log4j.Logger;
+
 public class ClientNetworkingManager {
+
+	static Logger logger = Logger.getLogger(ClientNetworkingManager.class);
 	// There's a potential DoS attack here but it can only be mounted by the
 	// server, so you might as well just not use that server. No security
 	// threat except small client hang, won't fix.
@@ -144,7 +148,7 @@ public class ClientNetworkingManager {
 							pckt.getData());
 					if (!pckt.getAddress().equals(
 							ClientNetworkingManager.this.endpoint)) {
-						System.out.println("received mismatched packet source"); //$NON-NLS-1$
+						logger.warn("A UDP packet was received with a mismatched origin IP."); //$NON-NLS-1$
 						continue recvLoop;
 					}
 					DataInputStream dos = new DataInputStream(bufStr);
@@ -153,7 +157,7 @@ public class ClientNetworkingManager {
 					if (magic == CommonNetworking.magic)
 						sendAck(dos.readUnsignedShort());
 					if (!(magic == CommonNetworking.magic || magic == CommonNetworking.magicNoAck)) {
-						System.out.println("bad magic"); //$NON-NLS-1$
+						logger.warn("A packet was received with an invalid magic number and has been dropped.");
 						continue recvLoop;
 					}
 					int length = dos.readUnsignedByte();
@@ -400,6 +404,7 @@ public class ClientNetworkingManager {
 									Messages.getString("ClientNetworkingManager.ERR_NETWORK_TIMEOUT"), //$NON-NLS-1$
 									Messages.getString("ClientNetworkingManager.DESC_NETWORK_TIMEOUT"), //$NON-NLS-1$
 									true);
+					logger.error("The connection to the server has timed out or otherwise failed.");
 
 				}
 				try {

@@ -3,7 +3,7 @@ package net.mosstest.servercore;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Position;
 
-public interface IRenderPreparator {
+public interface IRenderPreparator extends PlayerCommunicator{
 
 	public void setRenderProcessor(RenderProcessor rend);
 

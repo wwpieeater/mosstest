@@ -1,11 +1,15 @@
 package net.mosstest.servercore;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class MossDebugUtils {
 
+	static Logger logger = Logger.getLogger(MossDebugUtils.class);
 	private static final String[] propertiesToGet = { "awt.toolkit", //$NON-NLS-1$
 			"file.encoding", "file.separator", "java.class.version", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			"java.home", "java.runtime.name", "java.runtime.version", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -17,10 +21,26 @@ public class MossDebugUtils {
 
 	};
 
+	public static String writeStracktrace(Exception e) {
+		String fName = Integer.toString(System.identityHashCode(e), 16) + "@"
+				+ System.currentTimeMillis();
+		File write = new File("stacktraces/"+fName+".txt");
+		try {
+			new File("stacktraces").mkdirs();
+			write.createNewFile();
+			FileWriter writer = new FileWriter(write);
+			writer.write(getDebugInformation(e));
+			writer.close();
+		} catch (Exception e1) {
+			logger.fatal(e1.getClass().getName() + " caught trying to write stacktrace of an existing exception. Message: "+e1.getMessage());
+		}
+		return write.getAbsolutePath();
+	}
+
 	public static String getDebugInformation(Exception e) {
 		StringBuilder s = new StringBuilder(
-				MossDebugUtils.getGitConfig("git.commit.id") + " on "+ MossDebugUtils.getGitConfig("git.branch")+ "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		s.append(Messages.getString("MossDebugUtils.MSG_BUILT_ON")+ MossDebugUtils.getGitConfig(Messages.getString("MossDebugUtils.27"))+"\r\n\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				MossDebugUtils.getGitConfig("git.commit.id") + " on " + MossDebugUtils.getGitConfig("git.branch") + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+		s.append(Messages.getString("MossDebugUtils.MSG_BUILT_ON") + MossDebugUtils.getGitConfig(Messages.getString("MossDebugUtils.27")) + "\r\n\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 		s.append(Messages.getString("MossDebugUtils.MSG_EXCEPTION_CAUGHT")); //$NON-NLS-1$
 		for (StackTraceElement ste : e.getStackTrace()) {
 			s.append(ste.toString()).append("\r\n"); //$NON-NLS-1$
@@ -40,7 +60,8 @@ public class MossDebugUtils {
 				+ "\r\n"); //$NON-NLS-1$
 		long maxMemory = Runtime.getRuntime().maxMemory();
 		s.append(Messages.getString("MossDebugUtils.MSG_MAXMEM") //$NON-NLS-1$
-				+ (maxMemory == Long.MAX_VALUE ? Messages.getString("MossDebugUtils.MSG_MEM_NO_LIMIT") : maxMemory) //$NON-NLS-1$
+				+ (maxMemory == Long.MAX_VALUE ? Messages
+						.getString("MossDebugUtils.MSG_MEM_NO_LIMIT") : maxMemory) //$NON-NLS-1$
 				+ "\r\n"); //$NON-NLS-1$
 		s.append(Messages.getString("MossDebugUtils.MSG_TOTAL_MEM") + Runtime.getRuntime().totalMemory() //$NON-NLS-1$
 				+ "\r\n"); //$NON-NLS-1$
@@ -74,7 +95,5 @@ public class MossDebugUtils {
 
 	}
 
-	public static void main(String[] args) {
-		System.out.println(getDebugInformation(new Exception()));
-	}
+	
 }

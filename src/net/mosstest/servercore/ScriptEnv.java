@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import net.mosstest.scripting.MossScriptEnv;
 
+import org.apache.log4j.Logger;
 import org.mozilla.javascript.ClassShutter;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -24,6 +25,8 @@ import org.mozilla.javascript.WrapFactory;
  * @author rarkenin
  */
 public class ScriptEnv {
+
+	static Logger logger = Logger.getLogger(MossDebugUtils.class);
 	ScriptableObject globalScope;
 
 	private static class ScriptClassShutter implements ClassShutter {
@@ -69,7 +72,7 @@ public class ScriptEnv {
 		} catch (IOException e) {
 			return ScriptResult.RESULT_ERROR;
 		} catch (RhinoException e) {
-			System.out.println(e.getMessage());
+			logger.error("A script error has occured: "+e.getMessage());
 			throw new MossWorldLoadException(
 					Messages.getString("ScriptEnv.ERR_SCRIPT_ERR") + e.getMessage() + "\r\n" + e.getScriptStackTrace()); //$NON-NLS-1$ //$NON-NLS-2$
 		}

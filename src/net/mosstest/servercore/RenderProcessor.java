@@ -305,7 +305,7 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	
 	private void setupPlayer () {
-		player = new Player ("Test Guy", 100);
+		player = new Player ("Test Guy");
 		player.setPositionOffsets (0,0,0);
 		player.setChunkPosition(0,0,0);
 	}

@@ -5,6 +5,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
+
 import net.mosstest.scripting.EventProcessingCompletedSignal;
 import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossEventHandler;
@@ -25,6 +27,8 @@ import net.mosstest.scripting.MossEvent.EvtType;
  * 
  */
 public class EventProcessor {
+
+	static Logger logger = Logger.getLogger(EventProcessor.class);
 	ArrayBlockingQueue<MossEvent> eventQueue = new ArrayBlockingQueue<>(
 			EngineSettings.getInt("eventQueueCapacity", 40), false); //$NON-NLS-1$
 	protected final int maxEventThreads = EngineSettings.getInt(
@@ -52,7 +56,7 @@ public class EventProcessor {
 				@Override
 				public void run() {
 
-					System.out.println("manager thread started"); //$NON-NLS-1$
+					logger.info("The manager thread has been started."); //$NON-NLS-1$
 					int ticks = 0;
 					int ticksBusy = 0;
 					int lSampleInterval = EventProcessor.this.sampleInterval;
@@ -62,7 +66,6 @@ public class EventProcessor {
 					Thread[] threads = new Thread[EventProcessor.this.maxEventThreads];
 
 					for (int i = 0; i < EventProcessor.this.initialEventThreads; i++) {
-						System.out.println("foo"); //$NON-NLS-1$
 						int c = EventProcessor.this.currentThreads.get();
 						threads[c] = new Thread(
 								EventProcessor.this.eventProcessorGroup,
@@ -70,15 +73,13 @@ public class EventProcessor {
 
 									@Override
 									public void run() {
-										System.out
-												.println(Messages.getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
+										logger.debug(Messages.getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
 										processEvents();
 									}
 
 								});
 						threads[c].start();
 
-						System.out.println("PostRun"); //$NON-NLS-1$
 						EventProcessor.this.currentThreads.incrementAndGet();
 
 					}
@@ -107,7 +108,7 @@ public class EventProcessor {
 
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) lDownshift / (float) lSamples)) {
-								System.out.println((Messages.getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
+								logger.info((Messages.getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
 								EventProcessor.this.eventQueue
 										.add(new MossEvent(
 												MossEvent.EvtType.EVT_THREADSTOP,
@@ -132,7 +133,6 @@ public class EventProcessor {
 	private MossScriptEnv ev;
 
 	void processEvents() {
-		System.out.println("Worker thread entered"); //$NON-NLS-1$
 		boolean run = true; // Not synchronized as only used locally
 		queueLoop: while (run) {
 			try {
@@ -160,7 +160,7 @@ public class EventProcessor {
 			} catch (InterruptedException e) {
 				// thread struck, shut down the operation.
 			}
-			System.out.println("Reached end of thread code"); //$NON-NLS-1$
+			logger.info("A thread is shutting down."); //$NON-NLS-1$
 			this.currentThreads.decrementAndGet();
 		}
 
