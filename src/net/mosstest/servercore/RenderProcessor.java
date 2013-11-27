@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.logging.Level;
 
 import jme3tools.optimize.GeometryBatchFactory;
 
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import net.mosstest.scripting.INodeParams;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.MapNode;
+import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
 
 public class RenderProcessor extends SimpleApplication {
@@ -61,10 +63,12 @@ public class RenderProcessor extends SimpleApplication {
 
 	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
+	public Player player;;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
 	public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
+		java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
 		settings.setResolution(800, 600);
@@ -83,6 +87,7 @@ public class RenderProcessor extends SimpleApplication {
 	
 	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
+		System.out.println("INITIALIZING PREPARATOR");
 		rPreparator.setRenderProcessor(this);
 		rPreparator.start();
 	}
@@ -95,9 +100,10 @@ public class RenderProcessor extends SimpleApplication {
 		setupFlashlight();
 		setupSunlight();
 		//setupLamplight();
+		setupPlayer();
 		
-		//localChunkTest();
-		preparatorChunkTest();
+		localChunkTest();
+		//preparatorChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -156,8 +162,8 @@ public class RenderProcessor extends SimpleApplication {
 						float x = (float) ((pos.x + (CHUNK_OFFSET * pos.x)) - BLOCK_OFFSET_FROM_CENTER + (i * BLOCK_SIZE));
 						float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
 						float z = (float) ((pos.z + (CHUNK_OFFSET * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + (k * BLOCK_SIZE));
-						System.out.println(x+","+y+","+z);
-						System.out.println(pos.x+","+pos.y+","+pos.z+"\n");
+						//System.out.println(x+","+y+","+z);
+						//System.out.println(pos.x+","+pos.y+","+pos.z+"\n");
 						
 						vertices.put(x).put(y).put(z); //Front face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z);
@@ -265,7 +271,7 @@ public class RenderProcessor extends SimpleApplication {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
 		return temp.asIntBuffer();
 	}
-	
+
 	
 	private void setupFlashlight () {
 		spot = new SpotLight();
@@ -298,6 +304,12 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.attachChild(worldNode);
 	}
 	
+	private void setupPlayer () {
+		player = new Player ("Test Guy", 100);
+		player.setPositionOffsets (0,0,0);
+		player.setChunkPosition(0,0,0);
+	}
+	
 	private Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
@@ -327,6 +339,10 @@ public class RenderProcessor extends SimpleApplication {
 								* transVector.y))
 				.addLocal(-cx * transVector.y, 0f, cx * transVector.x)
 				.addLocal(0f, -cy, 0f));
+		
+		System.out.println("World position: "+worldNode.getLocalTranslation());
+		System.out.println("Camera position: "+cam.getLocation());
+		System.out.println("Player position: "+player.xoffset+","+player.yoffset+","+player.zoffset);
 	}
 
 	private void rotateCamera(float value, Vector3f axis) {

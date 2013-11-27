@@ -27,7 +27,7 @@ public class Player {
 	 */
 	public final Object antiCheatDataLock= new Object();
 	
-	private Player(String name, int maxHealth) {
+	public Player(String name, int maxHealth) {
 		this.name=name;
 		this.inventories.put("default", new MossInventory(96, 8, 6)); //$NON-NLS-1$
 	}
@@ -39,6 +39,18 @@ public class Player {
 	public void respawn() {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	public void setChunkPosition (int x, int y, int z) {
+		xchk = x;
+		ychk = y;
+		zchk = z;
+	}
+	
+	public void setPositionOffsets (double x, double y, double z) {
+		xoffset = x;
+		yoffset = y;
+		zoffset = z;
 	}
 
 }
