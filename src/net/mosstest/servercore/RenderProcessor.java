@@ -103,11 +103,11 @@ public class RenderProcessor extends SimpleApplication {
 		//setupLamplight();
 		setupPlayer();
 		
-		localChunkTest();
-		//preparatorChunkTest();
+		preparatorChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
+		//localChunkTest();
 	}
 
 	@Override
@@ -127,9 +127,9 @@ public class RenderProcessor extends SimpleApplication {
 			System.out.println("Thread shutting down");
 		}
 		else if (myEvent instanceof MossRenderChunkEvent) {
-			System.out.println("GOT AN EVENT TO RENDER A CHUNK");
 			renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
 					((MossRenderChunkEvent) myEvent).getPos());
+			GeometryBatchFactory.optimize(worldNode);
 		}
 	}
 	
@@ -149,7 +149,6 @@ public class RenderProcessor extends SimpleApplication {
 		FloatBuffer normals = getDirectFloatBuffer(1000000);
 		IntBuffer indices = getDirectIntBuffer(1000000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
-		
 		
 		
 		for (byte i = 0; i < 16; i++) {
@@ -392,6 +391,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
 		inputManager.addMapping("Back", new KeyTrigger(KeyInput.KEY_S));
+		inputManager.addMapping("TestFeature", new KeyTrigger(KeyInput.KEY_P));
 
 		inputManager.addMapping("CAM_Left", new MouseAxisTrigger(
 				MouseInput.AXIS_X, true), new KeyTrigger(KeyInput.KEY_LEFT));
@@ -415,6 +415,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addListener(analogListener, "CAM_Right");
 		inputManager.addListener(analogListener, "CAM_Up");
 		inputManager.addListener(analogListener, "CAM_Down");
+		inputManager.addListener(actionListener, "TestFeature");
 	}
 
 	private AnalogListener analogListener = new AnalogListener() {
@@ -471,6 +472,10 @@ public class RenderProcessor extends SimpleApplication {
 			} else if (name.equals("Back") && !keyPressed
 					&& locChanges[2] == -SPEED) {
 				locChanges[2] = 0;
+			}
+			
+			if (name.equals("TestFeature") && keyPressed) {
+				System.err.println("\nDEBUGGING FEATURE\n");
 			}
 		}
 	};
