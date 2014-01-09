@@ -11,14 +11,11 @@ import net.mosstest.scripting.ScriptableDatabase;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
-
-import com.jme3.system.AppSettings;
 
 public class MossWorld {
 
-	static Logger logger = Logger.getLogger(MossDebugUtils.class);
+	static Logger logger = Logger.getLogger(MossWorld.class);
 	private MossGame game;
 	private File baseDir;
 	private XMLConfiguration worldCfg;
@@ -29,8 +26,10 @@ public class MossWorld {
 	private ScriptEnv sEnv;
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
+	
 	@SuppressWarnings("unused")
 	private ServerNetworkingManager snv;
+	
 	volatile boolean run = true;
 	private FuturesProcessor fp;
 	private INodeManager nm;
@@ -112,6 +111,7 @@ public class MossWorld {
 			}*/
 		} //else {
 		/*	*/this.rp = new LocalRenderPreparator(this.rend, this.nc);
+		this.rp.setNodeManager(nm);
 		/*	*/this.rend = RenderProcessor.init(this.nm, this.rp);
 		//}
 

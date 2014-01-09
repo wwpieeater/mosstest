@@ -5,12 +5,14 @@ import java.util.concurrent.ArrayBlockingQueue;
 import org.apache.log4j.Logger;
 
 import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
+import net.mosstest.scripting.SimplexMapGenerator;
 
 public class LocalRenderPreparator implements IRenderPreparator {
 
-	static Logger logger = Logger.getLogger(MossDebugUtils.class);
+	static Logger logger = Logger.getLogger(LocalRenderPreparator.class);
 	public class ChunkLookupRunnable implements Runnable {
 
 		@Override
@@ -48,6 +50,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
 	// private HashMap<Position, Position> outstandingChunks = new HashMap<>();
 
 	private Thread lookupThread = new Thread(new ChunkLookupRunnable());
+	private INodeManager nm;
 
 	@Override
 	public MapChunk requestChunk(Position pos) throws MapGeneratorException,
@@ -83,6 +86,12 @@ public class LocalRenderPreparator implements IRenderPreparator {
 
 	@Override
 	public void start() {
+		try {
+			MapGenerators.setDefaultMapGenerator(new SimplexMapGenerator(), nm, 108080, new Object[0]);
+		} catch (MapGeneratorException e) {
+			// FIXME Auto-generated catch block
+			e.printStackTrace();
+		}
 		logger.info(Messages
 				.getString("LocalRenderPreparator.START_MSG")); //$NON-NLS-1$
 		this.lookupThread.start();
@@ -94,6 +103,12 @@ public class LocalRenderPreparator implements IRenderPreparator {
 		this.rend = rend;
 	}
 
+	@Override
+	public void setNodeManager(INodeManager nm) {
+		this.nm = nm;
+	}
+
+	
 	@Override
 	public void forceSetPosition(Player pl, int cx, int cy, int cz,
 			double offsetx, double offsety, double offsetz) throws InterruptedException {
