@@ -47,9 +47,10 @@ public class RenderProcessor extends SimpleApplication {
 	private final float SPEED = 3f;
 	private final float PLAYER_HEIGHT = 25;
 	private final float BLOCK_SIZE = 20f;
+	private final float CHUNK_SIZE = 16*BLOCK_SIZE;
 	private final float ROTATION_SPEED = 1f;
 	private final double BLOCK_OFFSET_FROM_CENTER = 8 * BLOCK_SIZE;
-	private final double CHUNK_OFFSET = 16 * BLOCK_SIZE;
+	private final double CHUNK_OFFSET = 8 * BLOCK_SIZE;
 	private float[] locChanges = { 0, 0, 0 };
 	private double lastTime;
 	private boolean invertY = false;
@@ -102,11 +103,11 @@ public class RenderProcessor extends SimpleApplication {
 		//setupLamplight();
 		setupPlayer();
 		
-		localChunkTest();
-		//preparatorChunkTest();
+		preparatorChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
+		//localChunkTest();
 	}
 
 	@Override
@@ -116,7 +117,7 @@ public class RenderProcessor extends SimpleApplication {
 	 */
 	public void simpleUpdate(float tpf) {
 		if (lastTime + 10 < System.currentTimeMillis()) {
-			moveWorld(locChanges[0], locChanges[1], locChanges[2]);
+			move(locChanges[0], locChanges[1], locChanges[2]);
 			lastTime = System.currentTimeMillis();
 		}
 
@@ -126,9 +127,9 @@ public class RenderProcessor extends SimpleApplication {
 			System.out.println("Thread shutting down");
 		}
 		else if (myEvent instanceof MossRenderChunkEvent) {
-			System.out.println("GOT AN EVENT TO RENDER A CHUNK");
 			renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
 					((MossRenderChunkEvent) myEvent).getPos());
+			GeometryBatchFactory.optimize(worldNode);
 		}
 	}
 	
@@ -148,7 +149,8 @@ public class RenderProcessor extends SimpleApplication {
 		FloatBuffer normals = getDirectFloatBuffer(1000000);
 		IntBuffer indices = getDirectIntBuffer(1000000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
-
+		
+		
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
@@ -159,9 +161,9 @@ public class RenderProcessor extends SimpleApplication {
 					
 					else {
 						
-						float x = (float) ((pos.x + (CHUNK_OFFSET * pos.x)) - BLOCK_OFFSET_FROM_CENTER + (i * BLOCK_SIZE));
+						float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
 						float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
-						float z = (float) ((pos.z + (CHUNK_OFFSET * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + (k * BLOCK_SIZE));
+						float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
 						//System.out.println(x+","+y+","+z);
 						//System.out.println(pos.x+","+pos.y+","+pos.z+"\n");
 						
@@ -272,7 +274,6 @@ public class RenderProcessor extends SimpleApplication {
 		return temp.asIntBuffer();
 	}
 
-	
 	private void setupFlashlight () {
 		spot = new SpotLight();
 		spot.setSpotRange(300f);
@@ -308,6 +309,7 @@ public class RenderProcessor extends SimpleApplication {
 		player = new Player ("Test Guy");
 		player.setPositionOffsets (0,0,0);
 		player.setChunkPosition(0,0,0);
+		cam.setLocation(new Vector3f(0,0,0));
 	}
 	
 	private Material getMaterial(short nVal) {
@@ -327,7 +329,7 @@ public class RenderProcessor extends SimpleApplication {
 		return mat;
 	}
 	
-	private void moveWorld(float cx, float cy, float cz) {
+	private void move(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
 				cam.getDirection().z);
@@ -340,9 +342,20 @@ public class RenderProcessor extends SimpleApplication {
 				.addLocal(-cx * transVector.y, 0f, cx * transVector.x)
 				.addLocal(0f, -cy, 0f));
 		
-		System.out.println("World position: "+worldNode.getLocalTranslation());
-		System.out.println("Camera position: "+cam.getLocation());
-		System.out.println("Player position: "+player.xoffset+","+player.yoffset+","+player.zoffset);
+		double xpos = -(worldNode.getLocalTranslation().x);
+		double ypos = -(worldNode.getLocalTranslation().y);
+		double zpos = -(worldNode.getLocalTranslation().z);
+		int xchk = (int)Math.floor(xpos / (CHUNK_SIZE));
+		int ychk = (int)Math.floor(ypos / (CHUNK_SIZE));
+		int zchk = (int)Math.floor(zpos / (CHUNK_SIZE));
+		double xoffset = (xpos % CHUNK_SIZE)/BLOCK_SIZE;
+		double yoffset = (ypos % CHUNK_SIZE)/BLOCK_SIZE;
+		double zoffset = (zpos % CHUNK_SIZE)/BLOCK_SIZE;
+		
+		synchronized(player.antiCheatDataLock){
+			player.setChunkPosition (xchk, ychk, zchk);
+			player.setPositionOffsets (xoffset, yoffset, zoffset);
+		}
 	}
 
 	private void rotateCamera(float value, Vector3f axis) {
@@ -367,6 +380,10 @@ public class RenderProcessor extends SimpleApplication {
 		spot.setDirection(cam.getDirection());
 	}
 
+	private void waitFor () {
+		//TODO (what do i do here?)
+	}
+	
 	private void initKeyBindings() {
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
 		inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_LSHIFT));
@@ -374,6 +391,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
 		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
 		inputManager.addMapping("Back", new KeyTrigger(KeyInput.KEY_S));
+		inputManager.addMapping("TestFeature", new KeyTrigger(KeyInput.KEY_P));
 
 		inputManager.addMapping("CAM_Left", new MouseAxisTrigger(
 				MouseInput.AXIS_X, true), new KeyTrigger(KeyInput.KEY_LEFT));
@@ -397,6 +415,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addListener(analogListener, "CAM_Right");
 		inputManager.addListener(analogListener, "CAM_Up");
 		inputManager.addListener(analogListener, "CAM_Down");
+		inputManager.addListener(actionListener, "TestFeature");
 	}
 
 	private AnalogListener analogListener = new AnalogListener() {
@@ -453,6 +472,10 @@ public class RenderProcessor extends SimpleApplication {
 			} else if (name.equals("Back") && !keyPressed
 					&& locChanges[2] == -SPEED) {
 				locChanges[2] = 0;
+			}
+			
+			if (name.equals("TestFeature") && keyPressed) {
+				System.err.println("\nDEBUGGING FEATURE\n");
 			}
 		}
 	};
