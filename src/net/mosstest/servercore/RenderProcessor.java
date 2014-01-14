@@ -36,6 +36,8 @@ import com.jme3.math.ColorRGBA;
 
 import java.util.Arrays;
 
+import org.apache.log4j.Logger;
+
 import net.mosstest.scripting.INodeParams;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.MapNode;
@@ -44,6 +46,8 @@ import net.mosstest.scripting.Position;
 
 public class RenderProcessor extends SimpleApplication {
 
+	static Logger logger = Logger.getLogger(RenderProcessor.class);
+	
 	private final float SPEED = 3f;
 	private final float PLAYER_HEIGHT = 25;
 	private final float BLOCK_SIZE = 20f;
@@ -88,7 +92,7 @@ public class RenderProcessor extends SimpleApplication {
 	
 	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
-		System.out.println("INITIALIZING PREPARATOR");
+		logger.info("The renderer is starting its preparator, which is of type "+prep.getClass().getSimpleName()+".");
 		rPreparator.setRenderProcessor(this);
 		rPreparator.start();
 	}
@@ -124,7 +128,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.setCursorVisible(false);
 		MossRenderEvent myEvent = renderEventQueue.poll();
 		if (myEvent instanceof MossRenderStopEvent) {
-			System.out.println("Thread shutting down");
+			logger.info("The renderer thread is shutting down.");
 		}
 		else if (myEvent instanceof MossRenderChunkEvent) {
 			renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
@@ -157,10 +161,10 @@ public class RenderProcessor extends SimpleApplication {
 					int nVal = chk.getNodeId(i, j, k);
 					//MapNode node = nManager.getNode((short) nVal);
 					//Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {System.out.println("GOT A 0");return;}
+					if (nVal == 0) {/*System.out.println("GOT A 0");*/}
 					
 					else {
-						
+						//System.out.println("GOT A 1");
 						float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
 						float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
 						float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
@@ -224,17 +228,17 @@ public class RenderProcessor extends SimpleApplication {
 		Position p2 = new Position(1, 0, 0, 0);
 		Position p3 = new Position(0, 0, 1, 0);
 		Position p4 = new Position(1, 0, 1, 0);
-		// Position p5 = new Position(-1,0,0,0);
-		// Position p6 = new Position(0,0,-1,0);
-		// Position p7 = new Position(-1,0,-1,0);
+		Position p5 = new Position(-1,0,0,0);
+		Position p6 = new Position(0,0,-1,0);
+		Position p7 = new Position(-1,0,-1,0);
 
 		getChunk(p1);
 		getChunk(p2);
 		getChunk(p3);
-		//getChunk(p4);
-		//getChunk(p5);
-		//getChunk(p6);
-		//getChunk(p7);
+		getChunk(p4);
+		getChunk(p5);
+		getChunk(p6);
+		getChunk(p7);
 	}
 
 	private void localChunkTest() {
@@ -306,7 +310,7 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	
 	private void setupPlayer () {
-		player = new Player ("Test Guy", 100);
+		player = new Player ("Test Guy");
 		player.setPositionOffsets (0,0,0);
 		player.setChunkPosition(0,0,0);
 		cam.setLocation(new Vector3f(0,0,0));
@@ -322,8 +326,10 @@ public class RenderProcessor extends SimpleApplication {
 			mat.setColor("Ambient", ColorRGBA.Green);
 			mat.setColor("Diffuse", ColorRGBA.Green);
 			*/
-			mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-			mat.setColor("Color", ColorRGBA.Green);
+			//mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+			mat= new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+			mat.setColor("Diffuse", ColorRGBA.Green);
+			mat.setColor("Specular",ColorRGBA.Red);
 			
 		}
 		return mat;

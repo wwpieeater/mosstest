@@ -1,5 +1,6 @@
 package net.mosstest.launcher;
 
+
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 

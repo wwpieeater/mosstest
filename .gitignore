@@ -28,3 +28,4 @@ COMMIT_EDITMSG
 /build/output
 /data/worlds
 src/git.properties
+/stacktraces

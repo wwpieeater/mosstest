@@ -11,11 +11,11 @@ import net.mosstest.scripting.ScriptableDatabase;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
-import org.apache.commons.lang.NotImplementedException;
-
-import com.jme3.system.AppSettings;
+import org.apache.log4j.Logger;
 
 public class MossWorld {
+
+	static Logger logger = Logger.getLogger(MossWorld.class);
 	private MossGame game;
 	private File baseDir;
 	private XMLConfiguration worldCfg;
@@ -26,8 +26,10 @@ public class MossWorld {
 	private ScriptEnv sEnv;
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
+	
 	@SuppressWarnings("unused")
 	private ServerNetworkingManager snv;
+	
 	volatile boolean run = true;
 	private FuturesProcessor fp;
 	private INodeManager nm;
@@ -100,7 +102,7 @@ public class MossWorld {
 		}
 		this.evp = new EventProcessor(this.mossEnv);
 		if (port >= 0) {
-			System.out.println(Messages.getString("MossWorld.NO_NETWORKING_NOW")); //$NON-NLS-1$
+			logger.error(Messages.getString("MossWorld.NO_NETWORKING_NOW")); //$NON-NLS-1$
 			/*try {
 				this.snv = new ServerNetworkingManager(port, this);
 			} catch (IOException e) {
@@ -109,6 +111,7 @@ public class MossWorld {
 			}*/
 		} //else {
 		/*	*/this.rp = new LocalRenderPreparator(this.rend, this.nc);
+		this.rp.setNodeManager(nm);
 		/*	*/this.rend = RenderProcessor.init(this.nm, this.rp);
 		//}
 

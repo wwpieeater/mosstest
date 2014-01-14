@@ -2,10 +2,17 @@ package net.mosstest.servercore;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
+import org.apache.log4j.Logger;
+
 import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.MapGenerators;
+import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
+import net.mosstest.scripting.SimplexMapGenerator;
 
 public class LocalRenderPreparator implements IRenderPreparator {
+
+	static Logger logger = Logger.getLogger(LocalRenderPreparator.class);
 	public class ChunkLookupRunnable implements Runnable {
 
 		@Override
@@ -14,8 +21,10 @@ public class LocalRenderPreparator implements IRenderPreparator {
 				try {
 					Position requested = LocalRenderPreparator.this.chunkRequests
 							.take();
-					System.out.println(Messages.getString("LocalRenderPreparator.MSG_REQUESTED") + requested.x + "," //$NON-NLS-1$ //$NON-NLS-2$
-							+ requested.y + "," + requested.z); //$NON-NLS-1$
+					System.out
+							.println(Messages
+									.getString("LocalRenderPreparator.MSG_REQUESTED") + requested.x + "," //$NON-NLS-1$ //$NON-NLS-2$
+									+ requested.y + "," + requested.z); //$NON-NLS-1$
 					MapChunk chk = LocalRenderPreparator.this.nc
 							.getChunk(requested);
 					chk.pos = requested;
@@ -24,14 +33,15 @@ public class LocalRenderPreparator implements IRenderPreparator {
 				} catch (InterruptedException e) {
 					// pass
 				} catch (MapGeneratorException e) {
-					System.out
-							.print(Messages.getString("LocalRenderPreparator.MG_EXCEPT")); //$NON-NLS-1$
+					logger.error(Messages
+							.getString("LocalRenderPreparator.MG_EXCEPT")); //$NON-NLS-1$
 				}
 			}
 		}
 
 	}
 
+	private Player localPlayer;
 	private RenderProcessor rend;
 	private NodeCache nc;
 	private volatile boolean run = true;
@@ -40,13 +50,14 @@ public class LocalRenderPreparator implements IRenderPreparator {
 	// private HashMap<Position, Position> outstandingChunks = new HashMap<>();
 
 	private Thread lookupThread = new Thread(new ChunkLookupRunnable());
+	private INodeManager nm;
 
 	@Override
 	public MapChunk requestChunk(Position pos) throws MapGeneratorException,
 			InterruptedException {
 		try {
 			MapChunk chk = this.nc.getChunkFailFast(pos);
-			System.out.println(chk == null ? "null chunk failfast" : chk //$NON-NLS-1$
+			logger.trace(chk == null ? "Chunk is null" : "Chunk obtained is: "+chk //$NON-NLS-1$
 					.toString());
 			if (chk == null) {
 				this.chunkRequests.put(pos);
@@ -75,7 +86,14 @@ public class LocalRenderPreparator implements IRenderPreparator {
 
 	@Override
 	public void start() {
-		System.out.println(Messages.getString("LocalRenderPreparator.START_MSG")); //$NON-NLS-1$
+		try {
+			MapGenerators.setDefaultMapGenerator(new SimplexMapGenerator(), nm, 108080, new Object[0]);
+		} catch (MapGeneratorException e) {
+			// FIXME Auto-generated catch block
+			e.printStackTrace();
+		}
+		logger.info(Messages
+				.getString("LocalRenderPreparator.START_MSG")); //$NON-NLS-1$
 		this.lookupThread.start();
 
 	}
@@ -83,6 +101,22 @@ public class LocalRenderPreparator implements IRenderPreparator {
 	@Override
 	public void setRenderProcessor(RenderProcessor rend) {
 		this.rend = rend;
+	}
+
+	@Override
+	public void setNodeManager(INodeManager nm) {
+		this.nm = nm;
+	}
+
+	
+	@Override
+	public void forceSetPosition(Player pl, int cx, int cy, int cz,
+			double offsetx, double offsety, double offsetz) throws InterruptedException {
+		if (!pl.equals(this.localPlayer))
+			return;
+		MossRenderSetPositionEvent mrspe = new MossRenderSetPositionEvent(
+				offsetx, offsety, offsetz, cx, cy, cz);
+		this.rend.renderEventQueue.put(mrspe);
 	}
 
 	// TODO: Handle player movement, other server->client events affecting

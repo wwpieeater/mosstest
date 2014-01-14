@@ -123,6 +123,7 @@ public class GUIBugReportDialog extends JDialog {
 		}
 		{
 			JPanel descPanel = new JPanel();
+			descPanel.setMinimumSize(new Dimension(80, 150));
 			contentPanel.add(descPanel);
 			descPanel.setLayout(new BorderLayout(0, 0));
 			{
@@ -143,10 +144,6 @@ public class GUIBugReportDialog extends JDialog {
 							.setText(Messages.getString("GUIBugReportDialog.DLG_BUG_DESC_DEFAULT")); //$NON-NLS-1$
 				}
 			}
-		}
-		{
-			JScrollPane scrollPane = new JScrollPane();
-			this.contentPanel.add(scrollPane);
 		}
 		{
 			JPanel techInfoPanel = new JPanel();
@@ -176,10 +173,6 @@ public class GUIBugReportDialog extends JDialog {
 					textArea.setText(Messages.getString("GUIBugReportDialog.NOTICE_INFO_INCLUDED")+traceback); //$NON-NLS-1$
 				}
 			}
-		}
-		{
-			JScrollPane scrollPane = new JScrollPane();
-			this.contentPanel.add(scrollPane);
 		}
 		{
 			JPanel buttonPane = new JPanel();
