@@ -229,8 +229,8 @@ public class RenderProcessor extends SimpleApplication {
 		// Position p7 = new Position(-1,0,-1,0);
 
 		getChunk(p1);
-		//getChunk(p2);
-		//getChunk(p3);
+		getChunk(p2);
+		getChunk(p3);
 		//getChunk(p4);
 		//getChunk(p5);
 		//getChunk(p6);
