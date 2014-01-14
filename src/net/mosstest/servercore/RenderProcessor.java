@@ -164,12 +164,9 @@ public class RenderProcessor extends SimpleApplication {
 					if (nVal == 0) {/*System.out.println("GOT A 0");*/}
 					
 					else {
-						//System.out.println("GOT A 1");
 						float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-						float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
-						float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
-						//System.out.println(x+","+y+","+z);
-						//System.out.println(pos.x+","+pos.y+","+pos.z+"\n");
+						float z = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
+						float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
 						
 						vertices.put(x).put(y).put(z); //Front face
 						vertices.put(x).put(y - BLOCK_SIZE).put(z);
