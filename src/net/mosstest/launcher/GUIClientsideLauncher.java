@@ -2,13 +2,17 @@ package net.mosstest.launcher;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dialog.ModalExclusionType;
+import java.awt.Dialog.ModalityType;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,10 +31,14 @@ import org.apache.log4j.Logger;
 
 import net.mosstest.servercore.MossDebugUtils;
 import net.mosstest.servercore.MossWorld;
+import net.mosstest.servercore.MosstestSecurityManager;
 
 public class GUIClientsideLauncher {
 	static Logger logger = Logger.getLogger(GUIClientsideLauncher.class);
 	private SingleplayerListTableModel mdl;
+	static {
+		System.setSecurityManager(MosstestSecurityManager.instance);
+	}
 
 	public static class SingleplayerListEntry {
 
@@ -47,13 +55,15 @@ public class GUIClientsideLauncher {
 
 	}
 
-	private JFrame frmMosstestClientLauncher;
+	private JDialog frmMosstestClientLauncher;
 	private JTable table;
 
 	/**
 	 * Launch the application.
+	 * @throws InterruptedException 
+	 * @throws InvocationTargetException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InvocationTargetException, InterruptedException {
 		logger.info("Mosstest client starting...");
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -62,7 +72,8 @@ public class GUIClientsideLauncher {
 			logger.warn(Messages
 					.getString("GUIClientsideLauncher.WARN_SET_LAF")); //$NON-NLS-1$
 		}
-		EventQueue.invokeLater(new Runnable() {
+		
+		EventQueue.invokeAndWait(new Runnable() {
 			public void run() {
 				try {
 					ArrayList<SingleplayerListEntry> entries = new ArrayList<SingleplayerListEntry>();
@@ -96,12 +107,14 @@ public class GUIClientsideLauncher {
 	 * @param singleplayerEntries
 	 */
 	private void initialize(ArrayList<SingleplayerListEntry> singleplayerEntries) {
-		this.frmMosstestClientLauncher = new JFrame();
+		this.frmMosstestClientLauncher = new JDialog();
+		this.frmMosstestClientLauncher.setModal(true);
+		this.frmMosstestClientLauncher.setModalityType(ModalityType.APPLICATION_MODAL);
 		this.frmMosstestClientLauncher.setTitle(Messages
 				.getString("GUIClientsideLauncher.DLG_TITLE")); //$NON-NLS-1$
 		this.frmMosstestClientLauncher.setBounds(100, 100, 800, 480);
 		this.frmMosstestClientLauncher
-				.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
 		JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 		this.frmMosstestClientLauncher.getContentPane().add(tabbedPane,
@@ -309,7 +322,7 @@ public class GUIClientsideLauncher {
 		scrollPane
 				.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
 		aboutTab.add(scrollPane);
-
+		frmMosstestClientLauncher.setVisible(true);
 	}
 
 	class SingleplayerListTableModel extends AbstractTableModel {

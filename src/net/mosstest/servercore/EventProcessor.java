@@ -13,6 +13,7 @@ import net.mosstest.scripting.MossEventHandler;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
 import net.mosstest.scripting.MossEvent.EvtType;
+import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 
 /**
  * 
@@ -130,9 +131,11 @@ public class EventProcessor {
 					}
 				}
 			}, Messages.getString("EventProcessor.THREAD_NAME_MGR")); //$NON-NLS-1$
-	private MossScriptEnv ev;
+	private final MossScriptEnv ev;
+	private final ThreadContext tc;
 
 	void processEvents() {
+		MosstestSecurityManager.instance.setThreadContext(this.tc);
 		boolean run = true; // Not synchronized as only used locally
 		queueLoop: while (run) {
 			try {
@@ -172,9 +175,11 @@ public class EventProcessor {
 	 * @param ev
 	 *            A script environment populated with event handlers.
 	 */
-	public EventProcessor(MossScriptEnv ev) {
+	public EventProcessor(MossScriptEnv ev, ThreadContext tc) {
 		this.ev = ev;
+		this.tc = tc;
 		this.manager.start();
+		
 	}
 
 }

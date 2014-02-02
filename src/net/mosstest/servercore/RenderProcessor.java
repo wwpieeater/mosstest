@@ -73,11 +73,12 @@ public class RenderProcessor extends SimpleApplication {
 			24000, false);
 
 	public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
-		java.util.logging.Logger.getLogger("").setLevel(Level.SEVERE);
+		java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
-		settings.setResolution(800, 600);
+		settings.setResolution(1024, 1024);
 		settings.setSamples(2);
+		settings.setFullscreen(false);
 		app.setSettings(settings);
 		app.setShowSettings(false);
 		app.initManager(manager);
@@ -104,7 +105,7 @@ public class RenderProcessor extends SimpleApplication {
 		setupWorldNode ();
 		setupFlashlight();
 		setupSunlight();
-		//setupLamplight();
+		setupLamplight();
 		setupPlayer();
 		
 		preparatorChunkTest();
@@ -223,11 +224,11 @@ public class RenderProcessor extends SimpleApplication {
 	private void preparatorChunkTest() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
-		Position p3 = new Position(0, 0, 1, 0);
-		Position p4 = new Position(1, 0, 1, 0);
+		Position p3 = new Position(0, 1, 0, 0);
+		Position p4 = new Position(1, 1, 0, 0);
 		Position p5 = new Position(-1,0,0,0);
-		Position p6 = new Position(0,0,-1,0);
-		Position p7 = new Position(-1,0,-1,0);
+		Position p6 = new Position(0,-1,0,0);
+		Position p7 = new Position(-1,-1,0,0);
 
 		getChunk(p1);
 		getChunk(p2);
@@ -326,7 +327,7 @@ public class RenderProcessor extends SimpleApplication {
 			//mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
 			mat= new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 			mat.setColor("Diffuse", ColorRGBA.Green);
-			mat.setColor("Specular",ColorRGBA.Red);
+			mat.setColor("Specular",ColorRGBA.Green);
 			
 		}
 		return mat;

@@ -8,12 +8,16 @@ import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
+import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
 
 public class MossWorld {
+	static {
+		System.setSecurityManager(MosstestSecurityManager.instance);
+	}
 
 	static Logger logger = Logger.getLogger(MossWorld.class);
 	private MossGame game;
@@ -87,7 +91,7 @@ public class MossWorld {
 		this.nm = new LocalNodeManager(this.db.nodes);
 		//this.db = new MapDatabase(this.baseDir);
 		try {
-			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 1337);
+			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 8448);
 		} catch (MapGeneratorException e) {
 			System.err.println(Messages.getString("MossWorld.MG_SELECT_FAILURE")); //$NON-NLS-1$
 			System.exit(4);
@@ -100,7 +104,7 @@ public class MossWorld {
 		for (MossScript sc : scripts) {
 			this.sEnv.runScript(sc);
 		}
-		this.evp = new EventProcessor(this.mossEnv);
+		this.evp = new EventProcessor(this.mossEnv, ThreadContext.CONTEXT_SCRIPT);
 		if (port >= 0) {
 			logger.error(Messages.getString("MossWorld.NO_NETWORKING_NOW")); //$NON-NLS-1$
 			/*try {

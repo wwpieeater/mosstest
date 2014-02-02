@@ -10,6 +10,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.RhinoException;
+import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrapFactory;
@@ -25,7 +26,9 @@ import org.mozilla.javascript.WrapFactory;
  * @author rarkenin
  */
 public class ScriptEnv {
-
+	public static final String sandboxerScript = "java = undefined;\r\n" + 
+			"Packages = undefined;\r\n" + 
+			"org = undefined;";
 	static Logger logger = Logger.getLogger(MossDebugUtils.class);
 	ScriptableObject globalScope;
 
@@ -67,7 +70,7 @@ public class ScriptEnv {
 	public ScriptResult runScript(MossScript script)
 			throws MossWorldLoadException {
 		try {
-			this.cx.evaluateReader(this.globalScope, script.getReader(),
+			Script sc = this.cx.compileReader(script.getReader(),
 					script.file.toString(), 0, null);
 		} catch (IOException e) {
 			return ScriptResult.RESULT_ERROR;
