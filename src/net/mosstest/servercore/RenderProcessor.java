@@ -60,6 +60,7 @@ public class RenderProcessor extends SimpleApplication {
 	private boolean invertY = false;
 	
 	private Vector3f initialUpVec;
+	private Object renderKey;
 	private Node worldNode;
 	private SpotLight spot;
 	private PointLight lamp;
@@ -81,13 +82,14 @@ public class RenderProcessor extends SimpleApplication {
 		settings.setFullscreen(false);
 		app.setSettings(settings);
 		app.setShowSettings(false);
-		app.initManager(manager);
+		app.initNodeManager(manager);
 		app.initPreparator(preparator);
+		app.initSecurityLock();
 		app.start();
 		return app;
 	}
 
-	private void initManager (INodeManager manager) {
+	private void initNodeManager (INodeManager manager) {
 		nManager = manager;
 	}
 	
@@ -98,10 +100,15 @@ public class RenderProcessor extends SimpleApplication {
 		rPreparator.start();
 	}
 
+	private void initSecurityLock () {
+		renderKey = new Object();
+	}
+	
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
 		
+		acquireLock();
 		setupWorldNode ();
 		setupFlashlight();
 		setupSunlight();
@@ -216,11 +223,7 @@ public class RenderProcessor extends SimpleApplication {
 		/*RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
 		allChunks.put(pos, thisChunk);*/
 	}
-	
-	private void calculateAndStoreSurfaceNormal (float x, float y, float z, FloatBuffer normals) {
-		
-	}
-	
+
 	private void preparatorChunkTest() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
@@ -384,8 +387,12 @@ public class RenderProcessor extends SimpleApplication {
 		spot.setDirection(cam.getDirection());
 	}
 
-	private void waitFor () {
-		//TODO (what do i do here?)
+	private void acquireLock () {
+		MosstestSecurityManager.instance.lock(renderKey, null);
+	}
+	
+	private void releaseLock () {
+		MosstestSecurityManager.instance.unlock(renderKey);
 	}
 	
 	private void initKeyBindings() {
