@@ -33,7 +33,7 @@ public class MossTool extends MossItem {
 		INTERACT_MASS,
 
 		/**
-		 * Interact with a soft object, i.e. a hand.
+		 * Interact with a soft object, i.e. a hand or a pile of leaves.
 		 */
 		INTERACT_FLESHY,
 
