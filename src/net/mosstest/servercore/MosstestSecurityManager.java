@@ -33,7 +33,7 @@ public class MosstestSecurityManager extends SecurityManager {
 		return this.connectedPeer;
 	}
 
-	private InheritableThreadLocal<Object> lock;
+	private InheritableThreadLocal<Object> lock = new InheritableThreadLocal<Object>();
 
 	public void lock(Object key, ThreadContext tc) {
 		if (this.lock.get() != null) {

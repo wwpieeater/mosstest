@@ -124,6 +124,21 @@ public class MapNode {
 		DRAW_PLANTLIKE,
 
 		/**
+		 * Drawtype for glass. The node should only have boundaries drawn if it
+		 * is contacting a node of a differing draw type <i>or a different glass
+		 * node</i>.
+		 */
+		DRAW_GLASS,
+
+		/**
+		 * The node is to be drawn as a flat plane in the bottom of the cubic
+		 * area for this node unless an adjacent node to the side and UP one
+		 * unit from this one also contains an identical node. In that case this
+		 * node shall be drawn as a diagonal plane to connect to that node.
+		 */
+		DRAW_RAIL,
+
+		/**
 		 * Do not draw the node at all.
 		 */
 		DRAW_NONE
