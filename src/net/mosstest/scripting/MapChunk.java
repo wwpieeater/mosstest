@@ -113,7 +113,11 @@ public class MapChunk {
 	public void setNode(byte x, byte y, byte z, short node) {
 		this.lightNodes[x][y][z] = node;
 	}
-
+	
+	public int[][][] getNodes () {
+		return lightNodes;
+	}
+	
 	public byte[] writeLight(boolean compressed) {
 
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();

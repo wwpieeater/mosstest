@@ -5,8 +5,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
 
 import jme3tools.optimize.GeometryBatchFactory;
@@ -69,7 +67,7 @@ public class RenderProcessor extends SimpleApplication {
 
 	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
-	public Player player;;
+	public Player player;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
@@ -161,54 +159,51 @@ public class RenderProcessor extends SimpleApplication {
 		FloatBuffer normals = getDirectFloatBuffer(1000000);
 		IntBuffer indices = getDirectIntBuffer(1000000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
-		
-		
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
-					int nVal = chk.getNodeId(i, j, k);
-					//MapNode node = nManager.getNode((short) nVal);
-					//Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {/*System.out.println("GOT A 0");*/}
+					if (isNodeVisible(chk.getNodes(), i, j, k)) {
 					
-					else {
-						float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-						float z = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
-						float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
+						int nVal = chk.getNodeId(i, j, k);
+						//MapNode node = nManager.getNode((short) nVal);
+						//Material mat = getMaterial((short) nVal);
+						if (nVal == 0) {/*System.out.println("GOT A 0");*/}
 						
-						vertices.put(x).put(y).put(z); //Front face
-						vertices.put(x).put(y - BLOCK_SIZE).put(z);
-						vertices.put(x + BLOCK_SIZE).put(y).put(z);
-						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z); //Top Face
-						vertices.put(x).put(y).put(z + BLOCK_SIZE);
-						vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
-						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
-						vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
-						
-						for(int m=0; m<8; m++) {
-							normals.put(0).put(0).put(10);
+						else {
+							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
+							float z = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
+							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							
+							vertices.put(x).put(y).put(z); //Front face
+							vertices.put(x).put(y - BLOCK_SIZE).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z); //Top Face
+							vertices.put(x).put(y).put(z + BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
+							vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
+							
+							for(int m=0; m<8; m++) {
+								normals.put(0).put(0).put(10);
+							}
+							
+							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 1).put(vertexIndexCounter + 0);//front
+							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 0).put(vertexIndexCounter + 2);
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 2).put(vertexIndexCounter + 0);//top
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 5).put(vertexIndexCounter + 2);
+							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 2).put(vertexIndexCounter + 6);//right
+							indices.put(vertexIndexCounter + 2).put(vertexIndexCounter + 5).put(vertexIndexCounter + 6);
+							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 1).put(vertexIndexCounter + 7);//left
+							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 7).put(vertexIndexCounter + 4);
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//back
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
+							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 6).put(vertexIndexCounter + 7);//bottom
+							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 3).put(vertexIndexCounter + 6);
+							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
+							//nodesInChunk[i][j][k] = geom;
+							vertexIndexCounter += 8;
 						}
-						
-						indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 1).put(vertexIndexCounter + 0);//front
-						indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 0).put(vertexIndexCounter + 2);
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 2).put(vertexIndexCounter + 0);//top
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 5).put(vertexIndexCounter + 2);
-						indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 2).put(vertexIndexCounter + 6);//right
-						indices.put(vertexIndexCounter + 2).put(vertexIndexCounter + 5).put(vertexIndexCounter + 6);
-						indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 1).put(vertexIndexCounter + 7);//left
-						indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 7).put(vertexIndexCounter + 4);
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//back
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
-						indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 6).put(vertexIndexCounter + 7);//bottom
-						indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 3).put(vertexIndexCounter + 6);
-						
-						
-						
-						//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
-						//nodesInChunk[i][j][k] = geom;
-						vertexIndexCounter += 8;
 					}
-
 				}
 			}
 		}
@@ -387,6 +382,14 @@ public class RenderProcessor extends SimpleApplication {
 		spot.setDirection(cam.getDirection());
 	}
 
+	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
+		if (i == 0 || j == 0 || k == 0 || i == chunk.length-1 || j == chunk[0].length-1 || k == chunk[0][0].length-1) {
+			return false;
+		}
+		return !(chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
+			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
+	}
+	
 	private void acquireLock () {
 		MosstestSecurityManager.instance.lock(renderKey, null);
 	}
