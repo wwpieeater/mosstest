@@ -88,7 +88,7 @@ public class DefaultNodeParams implements INodeParams {
 
 	//FIXME move to interact params
 	@Override
-	public double calcInteractProperties(InteractType key) {
+	public double calcInteractProperties(InteractType key, double strength) {
 		return 1;
 	}
 }

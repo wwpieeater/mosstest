@@ -208,17 +208,24 @@ public interface INodeParams {
 	 *            The player.
 	 * @param distance
 	 *            The distance from the camera to the node.
-	 * @return
+	 * @return Whether the aim ray should hit this node.
 	 */
 	public abstract boolean shouldHitAimRay(Player player, double distance);
 
 	/**
-	 * Calculate a dig property. These are generally 0 for inability to dig to 1
-	 * for digging the node in one second.
+	 * Calculate a dig property, as a double: 0 for inability to dig, 1 for
+	 * digging the node in one second (where dig time is the 1/return value).
+	 * Negative values signify instant digging.
 	 * 
 	 * @param key
-	 * @return
+	 *            The interact type
+	 * @param interactStrength
+	 *            How strong the tool is (where 1 corresponds to the wooden
+	 *            pick/hand).
+	 * @return The reciprocal of the dig time, 0 for non-diggability, or
+	 *         negative values for instant digging.
 	 */
-	public abstract double calcInteractProperties(MossTool.InteractType key);
+	public abstract double calcInteractProperties(MossTool.InteractType key,
+			double interactStrength);
 
 }

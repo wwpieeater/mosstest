@@ -1,5 +1,11 @@
 package net.mosstest.scripting;
 
+/**
+ * 
+ * @deprecated Use net.mosstest.scripting.handlers.* instead.
+ * 
+ */
+@Deprecated
 public interface MossEventHandler {
 	/**
 	 * Process an event
@@ -10,5 +16,6 @@ public interface MossEventHandler {
 	 *         the next handler.
 	 * @throws MossScriptException
 	 */
+
 	boolean processEvent(MossEvent myEvent) throws MossScriptException;
 }

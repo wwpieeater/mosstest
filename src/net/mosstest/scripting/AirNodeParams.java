@@ -96,7 +96,7 @@ public class AirNodeParams implements INodeParams {
 	}
 
 	@Override
-	public double calcInteractProperties(InteractType key) {
+	public double calcInteractProperties(InteractType key, double strength) {
 		// TODO Auto-generated method stub
 		return 0;
 	}

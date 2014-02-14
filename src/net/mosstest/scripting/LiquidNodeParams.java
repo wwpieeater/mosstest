@@ -1,6 +1,5 @@
 package net.mosstest.scripting;
 
-
 public interface LiquidNodeParams extends INodeParams {
 
 	/**
@@ -18,7 +17,7 @@ public interface LiquidNodeParams extends INodeParams {
 	 * flowRate=drainRate the liquid will be effectively finite.
 	 * 
 	 * @param pos
-	 * @return
+	 * @return How many full nodes should be filled by a flow in one second.
 	 */
 	public double calcDrainRate(NodePosition pos);
 
@@ -32,8 +31,11 @@ public interface LiquidNodeParams extends INodeParams {
 
 	/**
 	 * Tell if a liquid area should fill with source(level 0)
-	 * @param contacting Number of sources contacting.
-	 * @return Boolean, true if it should.
+	 * 
+	 * @param contactingSources Number of source nodes contacting.
+	 * @param contactingFlowings
+	 *            Number of flowing nodes contacting.
+	 * @return Boolean, true if it should fill, and false otherwise.
 	 */
 	public boolean shouldFill(int contactingSources, int contactingFlowings);
 

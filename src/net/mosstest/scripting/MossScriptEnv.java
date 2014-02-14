@@ -347,11 +347,10 @@ public class MossScriptEnv {
 	/**
 	 * Sets the health on an entity or player.
 	 * 
-	 * @param ent
-	 *            The entity to set health on.
+	 * @param p
+	 *            The player to set health on.
 	 * @param health
-	 *            An integer representing the amount of health to set, from 0 to
-	 *            {@link Entity#maxHealth()}.
+	 *            A positive integer representing the amount of health to set.
 	 */
 	public void setHp(Player p, int health) {
 		// TODO Once we have players doing stuff
@@ -428,7 +427,7 @@ public class MossScriptEnv {
 	 * 
 	 * @param pos
 	 *            The location at which to get the node
-	 * @return
+	 * @return A MapNode object representing the node at that location.
 	 * @throws MapGeneratorException
 	 */
 	public MapNode getNode(NodePosition pos) throws MapGeneratorException {
@@ -449,7 +448,7 @@ public class MossScriptEnv {
 	 * @param params
 	 *            An implementation of the {@link LiquidNodeParams} interface
 	 *            detailing the action of the node.
-	 *            {@link DefaultLiquidNodeParams} is a default that is
+	 *            {@link LiquidSourceNodeParams} is a default that is
 	 *            applicable to most liquids with near-water viscosity.
 	 * @param textures
 	 *            A string stating the filename of the textures image.
@@ -495,21 +494,22 @@ public class MossScriptEnv {
 	 *             registering.
 	 */
 	public LiquidNode registerLiquid(String sysname, String userFacingName,
-			LiquidNodeParams params, LiquidNodeParams sourceParams, String textures, int light)
-			throws MossWorldLoadException {
-		LiquidNode nd = new LiquidNode(sourceParams, textures, sysname, userFacingName,
-				light);
+			LiquidNodeParams params, LiquidNodeParams sourceParams,
+			String textures, int light) throws MossWorldLoadException {
+		LiquidNode nd = new LiquidNode(sourceParams, textures, sysname,
+				userFacingName, light);
 		this.nm.putNode(nd);
-		nd.level=0;
+		nd.level = 0;
 		for (int i = 1; i < 8; i++) {
-			LiquidNode innerNd=new LiquidNode(params, textures, sysname+"$LEVEL$"+i, userFacingName, light); //$NON-NLS-1$
-			innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i/8f)-0.5f);
-			nd.liquidLevels[i]=innerNd;
-			innerNd.liquidLevels=nd.liquidLevels;
-			innerNd.level=i;
+			LiquidNode innerNd = new LiquidNode(params, textures, sysname
+					+ "$LEVEL$" + i, userFacingName, light); //$NON-NLS-1$
+			innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i / 8f) - 0.5f);
+			nd.liquidLevels[i] = innerNd;
+			innerNd.liquidLevels = nd.liquidLevels;
+			innerNd.level = i;
 			this.nm.putNode(innerNd);
 		}
-		nd.liquidLevels[0]=nd;
+		nd.liquidLevels[0] = nd;
 		return nd;
 	}
 
@@ -576,23 +576,22 @@ public class MossScriptEnv {
 	public LiquidNode registerLiquidDefParams(String sysname,
 			String userFacingName, String textures, int light)
 			throws MossWorldLoadException {
-		LiquidNode nd = new LiquidNode(new LiquidSourceNodeParams(), textures, sysname, userFacingName,
-				light);
+		LiquidNode nd = new LiquidNode(new LiquidSourceNodeParams(), textures,
+				sysname, userFacingName, light);
 		this.nm.putNode(nd);
-		nd.level=0;
+		nd.level = 0;
 		for (int i = 1; i < 8; i++) {
-			LiquidNode innerNd=new LiquidNode(new LiquidFlowingNodeParams(), textures, sysname+"$LEVEL$"+i, userFacingName, light); //$NON-NLS-1$
-			innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i/8f)-0.5f);
-			nd.liquidLevels[i]=innerNd;
-			innerNd.liquidLevels=nd.liquidLevels;
-			innerNd.level=i;
+			LiquidNode innerNd = new LiquidNode(new LiquidFlowingNodeParams(),
+					textures, sysname + "$LEVEL$" + i, userFacingName, light); //$NON-NLS-1$
+			innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i / 8f) - 0.5f);
+			nd.liquidLevels[i] = innerNd;
+			innerNd.liquidLevels = nd.liquidLevels;
+			innerNd.level = i;
 			this.nm.putNode(innerNd);
 		}
-		nd.liquidLevels[0]=nd;
+		nd.liquidLevels[0] = nd;
 		return nd;
 	}
-
-
 
 	public MossInventory getInvByName(Player player, String name) {
 		return null;
