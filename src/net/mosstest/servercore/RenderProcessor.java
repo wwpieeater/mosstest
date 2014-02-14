@@ -155,10 +155,10 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(250000);
-		FloatBuffer normals = getDirectFloatBuffer(250000);
-		IntBuffer indices = getDirectIntBuffer(250000);
-		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
+		FloatBuffer vertices = getDirectFloatBuffer(150000);
+		FloatBuffer normals = getDirectFloatBuffer(150000);
+		IntBuffer indices = getDirectIntBuffer(150000);
+		RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
@@ -200,7 +200,7 @@ public class RenderProcessor extends SimpleApplication {
 							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 6).put(vertexIndexCounter + 7);//bottom
 							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 3).put(vertexIndexCounter + 6);
 							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
-							//nodesInChunk[i][j][k] = geom;
+							//renderNodes[i][j][k] = geom;
 							vertexIndexCounter += 8;
 						}
 					}
@@ -215,8 +215,8 @@ public class RenderProcessor extends SimpleApplication {
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
 		geom.setMaterial(mat);
 		worldNode.attachChild(geom);
-		/*RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
-		allChunks.put(pos, thisChunk);*/
+		RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
+		allChunks.put(pos, currentChunk);
 	}
 
 	private void preparatorChunkTest() {
@@ -235,33 +235,6 @@ public class RenderProcessor extends SimpleApplication {
 		getChunk(p5);
 		getChunk(p6);
 		getChunk(p7);
-	}
-
-	private void localChunkTest() {
-		for(int i=0; i<1; i++) {
-			for(int j=0; j<1; j++) {
-				for(int k=0; k<1; k++) {
-					Position pos = new Position(i, j, k, 0);
-					boolean[][][] modifiedNodes = new boolean[16][16][16];
-					for(boolean[][] m : modifiedNodes) {
-						for(boolean[] n : m) {
-							Arrays.fill(n, false);
-						}
-					}
-					
-					int[][][] nodeIds = new int[16][16][16];
-					for(int[][] m : nodeIds) {
-						for (int[] n : m) {
-							Arrays.fill(n, 1);
-						}
-					}
-					
-					MapChunk chunk = new MapChunk (pos, nodeIds, modifiedNodes);
-					renderChunk(chunk, pos);
-				}
-			}
-		}
-		GeometryBatchFactory.optimize(worldNode);
 	}
 	
 	private FloatBuffer getDirectFloatBuffer (int size) {
@@ -389,12 +362,7 @@ public class RenderProcessor extends SimpleApplication {
 		return (chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
 			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
 	}
-	
-	private boolean isNodeVisibleD (int[][][] chunk, int i, int j, int k) {
-		//dummy method
-		return true;
-	}
-	
+
 	private void acquireLock () {
 		MosstestSecurityManager.instance.lock(renderKey, null);
 	}
