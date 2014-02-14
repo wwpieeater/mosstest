@@ -75,7 +75,7 @@ public class RenderProcessor extends SimpleApplication {
 		java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
-		settings.setResolution(1024, 1024);
+		settings.setResolution(800, 600);
 		settings.setSamples(2);
 		settings.setFullscreen(false);
 		app.setSettings(settings);
@@ -106,7 +106,7 @@ public class RenderProcessor extends SimpleApplication {
 	public void simpleInitApp() {
 		lastTime = 0;
 		
-		acquireLock();
+		//acquireLock();
 		setupWorldNode ();
 		setupFlashlight();
 		setupSunlight();
@@ -155,9 +155,9 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(1000000);
-		FloatBuffer normals = getDirectFloatBuffer(1000000);
-		IntBuffer indices = getDirectIntBuffer(1000000);
+		FloatBuffer vertices = getDirectFloatBuffer(250000);
+		FloatBuffer normals = getDirectFloatBuffer(250000);
+		IntBuffer indices = getDirectIntBuffer(250000);
 		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
@@ -384,10 +384,15 @@ public class RenderProcessor extends SimpleApplication {
 
 	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
 		if (i == 0 || j == 0 || k == 0 || i == chunk.length-1 || j == chunk[0].length-1 || k == chunk[0][0].length-1) {
-			return false;
+			return true;
 		}
-		return !(chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
+		return (chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
 			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
+	}
+	
+	private boolean isNodeVisibleD (int[][][] chunk, int i, int j, int k) {
+		//dummy method
+		return true;
 	}
 	
 	private void acquireLock () {
