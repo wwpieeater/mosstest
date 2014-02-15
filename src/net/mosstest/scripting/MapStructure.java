@@ -1,7 +1,15 @@
 package net.mosstest.scripting;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MapStructure.
+ */
 public abstract class MapStructure {
+	
+	/** The mse. */
 	protected final MossScriptEnv mse;
+	
+	/** The seed. */
 	protected final long seed;
 	/**
 	 * Gets a node at a certain position relative to the offset.
@@ -42,8 +50,10 @@ public abstract class MapStructure {
 	public abstract int getZOffset();
 
 	/**
-	 * @param mse
-	 * @param seed
+	 * Instantiates a new map structure.
+	 *
+	 * @param mse the mse
+	 * @param seed the seed
 	 */
 	public MapStructure(MossScriptEnv mse, long seed) {
 		this.mse = mse;

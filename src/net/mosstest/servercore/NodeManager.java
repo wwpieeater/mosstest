@@ -14,12 +14,25 @@ import org.iq80.leveldb.DB;
 
 import com.google.common.collect.HashBiMap;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class NodeManager.
+ */
 public class NodeManager {
+	
+	/** The defined nodes. */
 	private ArrayList<MapNode> definedNodes = new ArrayList<>();
+	
+	/** The def node by name. */
 	private HashMap<String, MapNode> defNodeByName = new HashMap<>();
+	
+	/** The pending. */
 	private HashBiMap<Short, String> pending = HashBiMap.create();
+	
+	/** The node db. */
 	private DB nodeDb;
 
+	/** The Constant unknownFallbackNode. */
 	private static final MapNode unknownFallbackNode = new MapNode("unknown.png", "sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), 1); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	
 	static {
@@ -29,10 +42,23 @@ public class NodeManager {
 		this.definedNodes.add(this.unknownFallbackNode);
 	}
 
+	/**
+	 * Gets the node.
+	 *
+	 * @param nodeId the node id
+	 * @return the node
+	 */
 	public MapNode getNode(short nodeId) {
 		return this.definedNodes.get(nodeId);
 	}
 
+	/**
+	 * Put node.
+	 *
+	 * @param node the node
+	 * @return the short
+	 * @throws MossWorldLoadException the moss world load exception
+	 */
 	public short putNode(MapNode node) throws MossWorldLoadException {
 		if (this.pending.containsValue(node.nodeName)) {
 			node.setNodeId(this.pending.inverse().get(node.nodeName));
@@ -55,17 +81,36 @@ public class NodeManager {
 		return node.getNodeId();
 	}
 
+	/**
+	 * Put node alias.
+	 *
+	 * @param alias the alias
+	 * @param dst the dst
+	 */
 	public void putNodeAlias(String alias, String dst) {
 		MapNode dstNode = this.defNodeByName.get(dst);
 		this.defNodeByName.put(alias, dstNode);
 	}
 
+	/**
+	 * Gets the node.
+	 *
+	 * @param string the string
+	 * @param isModified the is modified
+	 * @return the node
+	 */
 	public MapNode getNode(String string, boolean isModified) {
 		MapNode r = this.defNodeByName.get(string);
 		return r==null?this.unknownFallbackNode:r;
 	}
 
 	
+	/**
+	 * Gets the node.
+	 *
+	 * @param string the string
+	 * @return the node
+	 */
 	public MapNode getNode(String string) {
 
 		MapNode r = this.defNodeByName.get(string);
@@ -73,7 +118,9 @@ public class NodeManager {
 	}
 
 	/**
-	 * 
+	 * Instantiates a new node manager.
+	 *
+	 * @param nodedb the nodedb
 	 */
 	public NodeManager(DB nodedb) {
 		this.nodeDb = nodedb;
@@ -84,6 +131,11 @@ public class NodeManager {
 		}
 	}
 
+	/**
+	 * Gets the unknown fallback node.
+	 *
+	 * @return the unknown fallback node
+	 */
 	public static MapNode getUnknownFallbackNode() {
 		return unknownFallbackNode;
 	}

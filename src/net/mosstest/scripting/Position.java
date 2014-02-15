@@ -6,14 +6,35 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class Position.
+ */
 public class Position {
 
-	public int x;
-	public int y;
-	public int z;
-	public int realm;
+	/** The x. */
+	public final int x;
+	
+	/** The y. */
+	public final int y;
+	
+	/** The z. */
+	public final int z;
+	
+	/** The realm. */
+	public final int realm;
+	
+	/** The is valid. */
 	transient boolean isValid = true;
 
+	/**
+	 * Instantiates a new position.
+	 *
+	 * @param x the x
+	 * @param y the y
+	 * @param z the z
+	 * @param realm the realm
+	 */
 	public Position(int x, int y, int z, int realm) {
 		this.x = x;
 		this.y = y;
@@ -22,6 +43,12 @@ public class Position {
 		this.isValid = true;
 	}
 
+	/**
+	 * Instantiates a new position.
+	 *
+	 * @param bytes the bytes
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public Position(byte[] bytes) throws IOException {
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 		DataInputStream dis = new DataInputStream(bis);
@@ -32,12 +59,14 @@ public class Position {
 		this.isValid = true;
 	}
 
-	public Position() {
-		this.isValid = false;
-	}
 
+
+	/** The Constant serialVersionUID. */
 	static final long serialVersionUID = 1128980133700001337L;
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -65,6 +94,9 @@ public class Position {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -76,6 +108,11 @@ public class Position {
 		return result;
 	}
 
+	/**
+	 * To bytes.
+	 *
+	 * @return the byte[]
+	 */
 	public byte[] toBytes() {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -94,15 +131,30 @@ public class Position {
 		return new byte[] {};
 	}
 
+	/**
+	 * Gets the x.
+	 *
+	 * @return the x
+	 */
 	public int getX() {
 		return this.x;
 	}
 
+	/**
+	 * Gets the y.
+	 *
+	 * @return the y
+	 */
 	public int getY() {
 		return this.y;
 	}
 
 
+	/**
+	 * Gets the z.
+	 *
+	 * @return the z
+	 */
 	public int getZ() {
 		return this.z;
 	}

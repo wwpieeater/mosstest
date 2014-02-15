@@ -7,18 +7,43 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+// TODO: Auto-generated Javadoc
 //make sure this name matches the filename
+/**
+ * The Class ToClientAuthRequested.
+ */
 public class ToClientAuthRequested extends ToClientCommand {
 	// From the fields of the packet
+	/** The auth type. */
 	AuthType authType;
+	
+	/** The auth param. */
 	byte[] authParam;
 
 	// create thingies like this for choices
+	/**
+	 * The Enum AuthType.
+	 */
 	enum AuthType {
-		AUTH_NIL, AUTH_PLAIN, AUTH_HASH_SHA512, AUTH_CHALLENGE_RESPONSE
+		
+		/** The auth nil. */
+		AUTH_NIL, 
+ /** The auth plain. */
+ AUTH_PLAIN, 
+ /** The AUT h_ has h_ sh a512. */
+ AUTH_HASH_SHA512, 
+ /** The auth challenge response. */
+ AUTH_CHALLENGE_RESPONSE
 	}
 
 	// Change the name of the below method to match the file name
+	/**
+	 * Instantiates a new to client auth requested.
+	 *
+	 * @param buf the buf
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 * @throws MalformedPacketException the malformed packet exception
+	 */
 	public ToClientAuthRequested(byte[] buf) throws IOException,
 			MalformedPacketException {
 
@@ -59,12 +84,24 @@ public class ToClientAuthRequested extends ToClientCommand {
 	}
 	
 	//And now the second thingy we need to add:
+	/**
+	 * Instantiates a new to client auth requested.
+	 *
+	 * @param authType the auth type
+	 * @param authParam the auth param
+	 */
 	public ToClientAuthRequested(AuthType authType, byte[] authParam) {
 		this.authType=authType;
 		this.authParam=authParam;
 	}
 	
 	//and the last thing. This is simply a reverse of the first thingy with parentheses we added.
+	/**
+	 * To byte array.
+	 *
+	 * @return the byte[]
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public byte[] toByteArray() throws IOException{
 		//prepare by using this line always
 		ByteArrayOutputStream bos=new ByteArrayOutputStream();

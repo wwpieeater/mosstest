@@ -6,33 +6,72 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import net.mosstest.servercore.SessionManager;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class AntiCheatController.
+ */
 public class AntiCheatController {
+	
+	/** The checks. */
 	protected ArrayList<AntiCheatCheck> checks = new ArrayList<>();
+	
+	/** The handlers. */
 	protected ArrayList<AntiCheatHandler> handlers = new ArrayList<>();
+	
+	/** The env. */
 	protected MossScriptEnv env;
+	
+	/** The sess. */
 	protected SessionManager sess;
+	
+	/** The run. */
 	protected volatile boolean run = false;
+	
+	/** The need deaths from. */
 	protected AtomicInteger needDeathsFrom = new AtomicInteger(0);
 
+	/**
+	 * Instantiates a new anti cheat controller.
+	 *
+	 * @param env the env
+	 * @param sess the sess
+	 */
 	public AntiCheatController(MossScriptEnv env, SessionManager sess) {
 		this.env = env;
 		this.sess = sess;
 	}
 
+	/**
+	 * Register check.
+	 *
+	 * @param chk the chk
+	 */
 	public void registerCheck(AntiCheatCheck chk) {
 		synchronized (this.checks) {
 			this.checks.add(chk);
 		}
 	}
 
+	/**
+	 * Register handler.
+	 *
+	 * @param hdl the hdl
+	 */
 	public void registerHandler(AntiCheatHandler hdl) {
 		synchronized (this.handlers) {
 			this.handlers.add(hdl);
 		}
 	}
 
+	/** The threads. */
 	private ArrayList<Thread> threads = new ArrayList<>();
 
+	/**
+	 * Start threads.
+	 *
+	 * @param threads the threads
+	 * @param priority the priority
+	 */
 	public void startThreads(int threads, int priority) {
 		this.run = true;
 		for (int i = 0; i < threads; i++) {
@@ -44,12 +83,20 @@ public class AntiCheatController {
 		}
 	}
 
+	/**
+	 * Kill threads.
+	 *
+	 * @param threads the threads
+	 */
 	public void killThreads(int threads) {
 
 		this.needDeathsFrom.addAndGet(threads);
 
 	}
 
+	/**
+	 * The Interface AntiCheatCheck.
+	 */
 	public static interface AntiCheatCheck {
 		/**
 		 * Check that a player is compliant with this anti-cheat check. This
@@ -70,6 +117,9 @@ public class AntiCheatController {
 		public int check(Player p, MossScriptEnv env);
 	}
 
+	/**
+	 * The Interface AntiCheatHandler.
+	 */
 	public static interface AntiCheatHandler {
 
 		/**
@@ -89,8 +139,14 @@ public class AntiCheatController {
 		public void handleViolation(Player p, int severity, MossScriptEnv env);
 	}
 
+	/**
+	 * The Class AntiCheatRunnable.
+	 */
 	private class AntiCheatRunnable implements Runnable {
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@Override
 		public void run() {
 

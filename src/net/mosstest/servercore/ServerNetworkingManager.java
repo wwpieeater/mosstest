@@ -15,6 +15,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+// TODO: Auto-generated Javadoc
 /**
  * Server networking manager. Now uses standard IO. This is a nasty thread pool.
  * Misuse may result in chlorine poisoning, asphyxiation, drowning, death, or
@@ -25,7 +26,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  */
 public class ServerNetworkingManager {
+	
+	/**
+	 * The Class AcceptRunnable.
+	 */
 	public class AcceptRunnable implements Runnable {
+		
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@Override
 		public void run() {
 			acLoop: while (ServerNetworkingManager.this.runConnections.get()) {
@@ -58,6 +67,13 @@ public class ServerNetworkingManager {
 
 	}
 
+	/**
+	 * Instantiates a new server networking manager.
+	 *
+	 * @param port the port
+	 * @param world the world
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public ServerNetworkingManager(int port, MossWorld world)
 			throws IOException {
 		this.bindingIdentifiers = new HashMap<>();
@@ -72,25 +88,60 @@ public class ServerNetworkingManager {
 		this.acceptThread.start();
 	}
 
+	/** The binding identifiers. */
 	private HashMap<Long, ServerSession> bindingIdentifiers;
+	
+	/** The max connections. */
 	private final int maxConnections;
+	
+	/** The svr net group. */
 	private ThreadGroup svrNetGroup = new ThreadGroup(Messages.getString("ServerNetworkingManager.THREADGROUP")); //$NON-NLS-1$
+	
+	/** The run connections. */
 	protected AtomicBoolean runConnections;
+	
+	/** The current connections. */
 	protected AtomicInteger currentConnections;
+	
+	/** The current servicing threads. */
 	protected AtomicInteger currentServicingThreads;
+	
+	/** The s sock. */
 	protected ServerSocket sSock;
+	
+	/** The connection queue. */
 	protected ArrayBlockingQueue<Socket> connectionQueue;
+	
+	/** The send thread form queue. */
 	protected ArrayBlockingQueue<ServerSession> sendThreadFormQueue;
+	
+	/** The accept thread. */
 	private Thread acceptThread;
 
+	/**
+	 * Write tcp packet.
+	 *
+	 * @param os the os
+	 * @param commandId the command id
+	 * @param payload the payload
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected static void writeTcpPacket(OutputStream os, int commandId,
 			byte[] payload) throws IOException {
 
 	}
 
+	/**
+	 * The Class SocketSendRunnable.
+	 */
 	protected class SocketSendRunnable implements Runnable {
+		
+		/** The sess. */
 		ServerSession sess;
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@Override
 		public void run() {
 			this.sess = ServerNetworkingManager.this.sendThreadFormQueue.poll();
@@ -122,12 +173,26 @@ public class ServerNetworkingManager {
 
 		}
 
+		/**
+		 * Send packet default.
+		 *
+		 * @param commandId the command id
+		 * @param payload the payload
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private void sendPacketDefault(int commandId, byte[] payload)
 				throws IOException {
 			sendImpl(commandId, payload, this.sess.bulkSocket);
 
 		}
 
+		/**
+		 * Send packet low latency.
+		 *
+		 * @param commandId the command id
+		 * @param payload the payload
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		@SuppressWarnings("resource")
 		private void sendPacketLowLatency(int commandId, byte[] payload)
 				throws IOException {
@@ -136,6 +201,14 @@ public class ServerNetworkingManager {
 			sendImpl(commandId, payload, targetSocket);
 		}
 
+		/**
+		 * Send impl.
+		 *
+		 * @param commandId the command id
+		 * @param payload the payload
+		 * @param targetSocket the target socket
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private void sendImpl(int commandId, byte[] payload, Socket targetSocket)
 				throws IOException {
 
@@ -152,6 +225,14 @@ public class ServerNetworkingManager {
 
 		}
 
+		/**
+		 * Send packet udp.
+		 *
+		 * @param commandId the command id
+		 * @param payload the payload
+		 * @param needsAck the needs ack
+		 * @throws IOException Signals that an I/O exception has occurred.
+		 */
 		private void sendPacketUdp(int commandId, byte[] payload,
 				boolean needsAck) throws IOException {
 			if (this.sess.dgramSocket == null)
@@ -171,8 +252,14 @@ public class ServerNetworkingManager {
 
 	}
 
+	/**
+	 * The Class SocketRecvRunnable.
+	 */
 	private class SocketRecvRunnable implements Runnable {
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@SuppressWarnings("resource")
 		@Override
 		public void run() {

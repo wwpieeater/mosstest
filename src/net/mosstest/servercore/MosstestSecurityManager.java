@@ -6,9 +6,18 @@ import java.security.Permission;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MosstestSecurityManager.
+ */
 public class MosstestSecurityManager extends SecurityManager {
+	
+	/** The logger. */
 	static Logger logger = Logger.getLogger(MosstestSecurityManager.class);
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPermission(java.security.Permission)
+	 */
 	@Override
 	public void checkPermission(Permission perm) {
 		System.err.println(perm.toString());
@@ -21,20 +30,36 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPermission(java.security.Permission, java.lang.Object)
+	 */
 	@Override
 	public void checkPermission(Permission perm, Object context) {
 
 		checkPermission(perm);
 	}
 
+	/** The Constant instance. */
 	public static final MosstestSecurityManager instance = new MosstestSecurityManager();
 
+	/**
+	 * Gets the connected peer.
+	 *
+	 * @return the connected peer
+	 */
 	public String getConnectedPeer() {
 		return this.connectedPeer;
 	}
 
+	/** The lock. */
 	private InheritableThreadLocal<Object> lock = new InheritableThreadLocal<Object>();
 
+	/**
+	 * Lock.
+	 *
+	 * @param key the key
+	 * @param tc the tc
+	 */
 	public void lock(Object key, ThreadContext tc) {
 		if (this.lock.get() != null) {
 			logger.error("The security manager prevented an attempt to lock it on an already-locked thread.");
@@ -45,6 +70,11 @@ public class MosstestSecurityManager extends SecurityManager {
 		this.threadContext.set(tc);
 	}
 
+	/**
+	 * Unlock.
+	 *
+	 * @param key the key
+	 */
 	public void unlock(Object key) {
 		if (this.lock.get() != key) {
 			logger.error("The security manager prevented an attempt to unlock it using a mismatched key.");
@@ -54,6 +84,11 @@ public class MosstestSecurityManager extends SecurityManager {
 		this.threadContext.set(ThreadContext.CONTEXT_ENGINE);
 	}
 
+	/**
+	 * Sets the connected peer.
+	 *
+	 * @param connectedPeer the new connected peer
+	 */
 	public void setConnectedPeer(String connectedPeer) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 			logger.warn("MosstestSecurityManager prevented a non-engine-context thread from changing the connected peer.");
@@ -64,10 +99,20 @@ public class MosstestSecurityManager extends SecurityManager {
 		this.connectedPeer = connectedPeer;
 	}
 
+	/**
+	 * Gets the thread context.
+	 *
+	 * @return the thread context
+	 */
 	public ThreadContext getThreadContext() {
 		return this.threadContext.get();
 	}
 
+	/**
+	 * Sets the thread context.
+	 *
+	 * @param tc the new thread context
+	 */
 	public void setThreadContext(ThreadContext tc) {
 		if (this.threadContext.get() == null) {
 			logger.warn("A thread has started without inheriting a thread context and has been elevated");
@@ -86,12 +131,25 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/**
+	 * The Enum ThreadContext.
+	 */
 	public enum ThreadContext {
-		CONTEXT_ENGINE, CONTEXT_SCRIPT, CONTEXT_CLIENT, CONTEXT_LOCKDOWN
+		
+		/** The context engine. */
+		CONTEXT_ENGINE, 
+ /** The context script. */
+ CONTEXT_SCRIPT, 
+ /** The context client. */
+ CONTEXT_CLIENT, 
+ /** The context lockdown. */
+ CONTEXT_LOCKDOWN
 	}
 
+	/** The connected peer. */
 	private String connectedPeer = null;
 
+	/** The thread context. */
 	private InheritableThreadLocal<ThreadContext> threadContext = new InheritableThreadLocal<MosstestSecurityManager.ThreadContext>() {
 		@Override
 		protected ThreadContext initialValue() {
@@ -105,6 +163,9 @@ public class MosstestSecurityManager extends SecurityManager {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkCreateClassLoader()
+	 */
 	@Override
 	public void checkCreateClassLoader() {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -120,6 +181,9 @@ public class MosstestSecurityManager extends SecurityManager {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkAccess(java.lang.Thread)
+	 */
 	@Override
 	public void checkAccess(Thread t) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -133,6 +197,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkAccess(java.lang.ThreadGroup)
+	 */
 	@Override
 	public void checkAccess(ThreadGroup g) {
 		System.err.println(this.threadContext.get());
@@ -147,6 +214,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkExit(int)
+	 */
 	@Override
 	public void checkExit(int status) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -160,6 +230,9 @@ public class MosstestSecurityManager extends SecurityManager {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkExec(java.lang.String)
+	 */
 	@Override
 	public void checkExec(String cmd) {
 
@@ -168,6 +241,9 @@ public class MosstestSecurityManager extends SecurityManager {
 				"MosstestSecurityManager does not allow any script or portion of the engine to start a new process");
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkLink(java.lang.String)
+	 */
 	@Override
 	public void checkLink(String lib) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -180,6 +256,9 @@ public class MosstestSecurityManager extends SecurityManager {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkRead(java.io.FileDescriptor)
+	 */
 	@Override
 	public void checkRead(FileDescriptor fd) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -191,6 +270,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkRead(java.lang.String)
+	 */
 	@Override
 	public void checkRead(String file) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -202,6 +284,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkRead(java.lang.String, java.lang.Object)
+	 */
 	@Override
 	public void checkRead(String file, Object context) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -213,6 +298,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkWrite(java.io.FileDescriptor)
+	 */
 	@Override
 	public void checkWrite(FileDescriptor fd) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -224,6 +312,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkWrite(java.lang.String)
+	 */
 	@Override
 	public void checkWrite(String file) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -235,6 +326,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkDelete(java.lang.String)
+	 */
 	@Override
 	public void checkDelete(String file) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -246,6 +340,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkConnect(java.lang.String, int)
+	 */
 	@Override
 	public void checkConnect(String host, int port) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -258,6 +355,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkConnect(java.lang.String, int, java.lang.Object)
+	 */
 	@Override
 	public void checkConnect(String host, int port, Object context) {
 		if (this.threadContext.get() == ThreadContext.CONTEXT_CLIENT) {
@@ -280,6 +380,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkListen(int)
+	 */
 	@Override
 	public void checkListen(int port) {
 		if (this.threadContext.get() == ThreadContext.CONTEXT_SCRIPT) {
@@ -298,6 +401,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkAccept(java.lang.String, int)
+	 */
 	@Override
 	public void checkAccept(String host, int port) {
 		if (this.threadContext.get() == ThreadContext.CONTEXT_SCRIPT) {
@@ -316,6 +422,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkMulticast(java.net.InetAddress)
+	 */
 	@Override
 	public void checkMulticast(InetAddress maddr) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -327,6 +436,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkMulticast(java.net.InetAddress, byte)
+	 */
 	@Override
 	public void checkMulticast(InetAddress maddr, byte ttl) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -338,6 +450,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPropertiesAccess()
+	 */
 	@Override
 	public void checkPropertiesAccess() {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -349,6 +464,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPropertyAccess(java.lang.String)
+	 */
 	@Override
 	public void checkPropertyAccess(String key) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -360,6 +478,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkTopLevelWindow(java.lang.Object)
+	 */
 	@Override
 	public boolean checkTopLevelWindow(Object window) {
 		if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
@@ -371,6 +492,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		return true;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPrintJobAccess()
+	 */
 	@Override
 	public void checkPrintJobAccess() {
 
@@ -379,6 +503,9 @@ public class MosstestSecurityManager extends SecurityManager {
 				"Print job access is not allowed for the engine or scripts");
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkSystemClipboardAccess()
+	 */
 	@Override
 	public void checkSystemClipboardAccess() {
 		if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
@@ -389,6 +516,9 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkAwtEventQueueAccess()
+	 */
 	@Override
 	public void checkAwtEventQueueAccess() {
 		if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
@@ -399,16 +529,25 @@ public class MosstestSecurityManager extends SecurityManager {
 		}
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPackageAccess(java.lang.String)
+	 */
 	@Override
 	public void checkPackageAccess(String pkg) {
 		super.checkPackageAccess(pkg);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkPackageDefinition(java.lang.String)
+	 */
 	@Override
 	public void checkPackageDefinition(String pkg) {
 		super.checkPackageDefinition(pkg);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkSetFactory()
+	 */
 	@Override
 	public void checkSetFactory() {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
@@ -420,19 +559,41 @@ public class MosstestSecurityManager extends SecurityManager {
 		super.checkSetFactory();
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkMemberAccess(java.lang.Class, int)
+	 */
 	@Override
 	public void checkMemberAccess(Class<?> clazz, int which) {
 		super.checkMemberAccess(clazz, which);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#checkSecurityAccess(java.lang.String)
+	 */
 	@Override
 	public void checkSecurityAccess(String target) {
 		super.checkSecurityAccess(target);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.SecurityManager#getThreadGroup()
+	 */
 	@Override
 	public ThreadGroup getThreadGroup() {
 		return super.getThreadGroup();
+	}
+
+	/**
+	 * Check mosstest control.
+	 */
+	public void checkMosstestControl() {
+		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
+
+			logger.warn("MosstestSecurityManager has prevented a plugin from controlling certain portions of the Mosstest engine.");
+			throw new SecurityException(
+					"Non-engine threads may not set java system factories");
+		}
+		super.checkSetFactory();
 	}
 
 }

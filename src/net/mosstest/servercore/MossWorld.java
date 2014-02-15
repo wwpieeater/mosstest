@@ -8,6 +8,7 @@ import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
+import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 
 import org.apache.commons.configuration.ConfigurationException;
@@ -121,7 +122,7 @@ public class MossWorld {
 
 	}
 
-	public void enqueueEvent(MossEvent e) throws InterruptedException {
+	public void enqueueEvent(IMossEvent e) throws InterruptedException {
 		this.evp.eventQueue.put(e);
 	}
 

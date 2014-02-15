@@ -3,9 +3,21 @@ package net.mosstest.scripting;
 import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FlatMapGenerator.
+ */
 public class FlatMapGenerator implements IMapGenerator {
+	
+	/** The seed. */
 	long seed;
+	
+	/** The nm. */
 	INodeManager nm;
+	
+	/* (non-Javadoc)
+	 * @see net.mosstest.scripting.IMapGenerator#init(long, net.mosstest.servercore.INodeManager, java.lang.Object[])
+	 */
 	@Override
 	public void init(long seed, INodeManager nm, Object... params)
 			throws MapGeneratorException {
@@ -13,6 +25,9 @@ public class FlatMapGenerator implements IMapGenerator {
 		this.nm=nm;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.scripting.IMapGenerator#generateChunk(net.mosstest.scripting.Position)
+	 */
 	@Override
 	public MapChunk generateChunk(Position pos)
 			throws MapGeneratorException {
@@ -37,6 +52,9 @@ public class FlatMapGenerator implements IMapGenerator {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.scripting.IMapGenerator#fillInChunk(int[][][], net.mosstest.scripting.Position)
+	 */
 	@Override
 	public void fillInChunk(int[][][] lightNodes, Position pos)
 			throws MapGeneratorException {
@@ -59,6 +77,9 @@ public class FlatMapGenerator implements IMapGenerator {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.scripting.IMapGenerator#registerOre(net.mosstest.scripting.MapNode, double, double, double, int, java.lang.Object[])
+	 */
 	@Override
 	public void registerOre(MapNode oreNode, double minDepth,
 			double rarity, double clumping, int seed, Object... params) {

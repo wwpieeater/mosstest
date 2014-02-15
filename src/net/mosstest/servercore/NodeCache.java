@@ -7,10 +7,25 @@ import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Position;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class NodeCache.
+ */
 public class NodeCache {
 
+	/** The chunks. */
 	private HashMap<Position, SoftReference<MapChunk>> chunks = new HashMap<>();
+	
+	/** The db. */
 	private MapDatabase db ;
+	
+	/**
+	 * Gets the chunk.
+	 *
+	 * @param pos the pos
+	 * @return the chunk
+	 * @throws MapGeneratorException the map generator exception
+	 */
 	public MapChunk getChunk(Position pos) throws MapGeneratorException {
 		synchronized (this.chunks) {
 			synchronized (MapDatabase.class) {
@@ -27,6 +42,12 @@ public class NodeCache {
 	}
 	
 	
+	/**
+	 * Gets the chunk fail fast.
+	 *
+	 * @param pos the pos
+	 * @return the chunk fail fast
+	 */
 	public MapChunk getChunkFailFast(Position pos) {
 		SoftReference<MapChunk> ref = this.chunks.get(pos);
 		return (ref==null?null:ref.get());
@@ -44,6 +65,12 @@ public class NodeCache {
 	//	}
 	//}
 
+	/**
+	 * Sets the chunk client.
+	 *
+	 * @param pos the pos
+	 * @param chunk the chunk
+	 */
 	public void setChunkClient(Position pos, MapChunk chunk) {
 		synchronized (this.chunks) {
 			synchronized (MapDatabase.class) {
@@ -56,6 +83,12 @@ public class NodeCache {
 	
 	
 
+	/**
+	 * Sets the chunk.
+	 *
+	 * @param pos the pos
+	 * @param chunk the chunk
+	 */
 	public void setChunk(Position pos, MapChunk chunk) {
 		synchronized (this.chunks) {
 			synchronized (MapDatabase.class) {
@@ -65,10 +98,22 @@ public class NodeCache {
 		}
 
 	}
+	
+	/**
+	 * Instantiates a new node cache.
+	 *
+	 * @param db the db
+	 */
 	public NodeCache(MapDatabase db) {
 		this.db =db;
 	}
 
+	/**
+	 * Gets the chunk no generate.
+	 *
+	 * @param chunk the chunk
+	 * @return the chunk no generate
+	 */
 	public MapChunk getChunkNoGenerate(Position chunk) {
 		synchronized (this.chunks) {
 			 return this.chunks.get(chunk).get();

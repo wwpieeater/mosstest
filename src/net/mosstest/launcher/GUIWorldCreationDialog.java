@@ -22,15 +22,31 @@ import java.awt.event.ActionEvent;
 import java.awt.GridLayout;
 import java.awt.Dimension;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GUIWorldCreationDialog.
+ */
 public class GUIWorldCreationDialog extends JDialog {
+	
+	/** The dlg result. */
 	boolean dlgResult= false;
+	
+	/** The content panel. */
 	private final JPanel contentPanel = new JPanel();
+	
+	/** The combo box. */
 	JComboBox<String> comboBox;
+	
+	/** The input desc. */
 	JTextField inputDesc;
+	
+	/** The name field. */
 	JTextField nameField;
 
 	/**
 	 * Launch the application.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
 		try {

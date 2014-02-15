@@ -2,8 +2,22 @@ package net.mosstest.scripting;
 
 import net.mosstest.servercore.MossFile;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossTool.
+ */
 public class MossTool extends MossItem {
 
+	/**
+	 * Instantiates a new moss tool.
+	 *
+	 * @param invTex the inv tex
+	 * @param wieldTex the wield tex
+	 * @param invWeight the inv weight
+	 * @param mayStack the may stack
+	 * @param displayName the display name
+	 * @param technicalName the technical name
+	 */
 	public MossTool(String invTex, String wieldTex, double invWeight,
 			boolean mayStack, String displayName, String technicalName) {
 		super(invTex, wieldTex, invWeight, mayStack, displayName, technicalName);
@@ -11,6 +25,9 @@ public class MossTool extends MossItem {
 
 
 
+	/**
+	 * The Enum InteractType.
+	 */
 	public enum InteractType {
 		/**
 		 * Interact by cracking, i.e. by a pickaxe.
@@ -37,15 +54,23 @@ public class MossTool extends MossItem {
 		 */
 		INTERACT_FLESHY,
 
-		/**
-		 * Interact as a hard block
-		 */
+		/** Interact as a hard block. */
 		INTERACT_BLOCKY,
 	}
 
 
 	
+	/**
+	 * The Interface IToolParams.
+	 */
 	public interface IToolParams {
+		
+		/**
+		 * Wear tool dig.
+		 *
+		 * @param dug the dug
+		 * @return the double
+		 */
 		public double wearToolDig(MapNode dug);
 	}
 }

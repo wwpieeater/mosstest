@@ -6,20 +6,44 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.BitSet;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossRemoteFile.
+ */
 public class MossRemoteFile extends MossFile {
+	
+	/**
+	 * The Class IncompleteFileException.
+	 */
 	public class IncompleteFileException extends IOException {
 
 
+		/** The Constant serialVersionUID. */
 		private static final long serialVersionUID = -4932174729349395760L;
 
 	}
 
+	/** The Constant CHUNK_LENGTH. */
 	public static final int CHUNK_LENGTH = 65536;
 
+	/** The num chunks. */
 	public final int numChunks;
+	
+	/** The length. */
 	public final int length;
+	
+	/** The chunks done. */
 	private BitSet chunksDone;
 
+	/**
+	 * Instantiates a new moss remote file.
+	 *
+	 * @param cacheDir the cache dir
+	 * @param dirName the dir name
+	 * @param resourceName the resource name
+	 * @param length the length
+	 * @throws FileNotFoundException the file not found exception
+	 */
 	public MossRemoteFile(File cacheDir, String dirName, String resourceName,
 			int length) throws FileNotFoundException {
 		// super call to establish fields.
@@ -33,13 +57,20 @@ public class MossRemoteFile extends MossFile {
 		this.chunksDone = new BitSet(this.numChunks);
 	}
 
+	/** The file. */
 	private File file;
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#getRandAccessCopy()
+	 */
 	@Override
 	public RandomAccessFile getRandAccessCopy() throws FileNotFoundException {
 		return new RandomAccessFile(this.file, "rwd"); //$NON-NLS-1$
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#readChunk(int)
+	 */
 	public byte[] readChunk(int chk) throws IOException {
 		if ((chk < 0) || (chk > 65535))
 			throw new IllegalArgumentException(
@@ -52,6 +83,13 @@ public class MossRemoteFile extends MossFile {
 		return buf;
 	}
 
+	/**
+	 * Write chunk.
+	 *
+	 * @param chk the chk
+	 * @param data the data
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public void writeChunk(int chk, byte[] data) throws IOException {
 		// this will check if the chunk is the last one. If it is then it will
 		// use only the correct number of bytes. Otherwise it will use
@@ -66,6 +104,9 @@ public class MossRemoteFile extends MossFile {
 		rf.close();
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#getSize()
+	 */
 	@Override
 	public long getSize() {
 
@@ -73,11 +114,19 @@ public class MossRemoteFile extends MossFile {
 
 	}
 	
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#getFile()
+	 */
 	public File getFile() throws IncompleteFileException {
 		if(!this.isReady()) throw new IncompleteFileException();
 		return this.file;
 	}
 
+	/**
+	 * Checks if is ready.
+	 *
+	 * @return true, if is ready
+	 */
 	public boolean isReady() {
 		return (this.chunksDone.cardinality()==this.numChunks);
 	}

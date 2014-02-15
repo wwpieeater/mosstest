@@ -44,34 +44,83 @@ import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class RenderProcessor.
+ */
 public class RenderProcessor extends SimpleApplication {
 
+	/** The logger. */
 	static Logger logger = Logger.getLogger(RenderProcessor.class);
 	
+	/** The speed. */
 	private final float SPEED = 3f;
+	
+	/** The player height. */
 	private final float PLAYER_HEIGHT = 25;
+	
+	/** The block size. */
 	private final float BLOCK_SIZE = 20f;
+	
+	/** The chunk size. */
 	private final float CHUNK_SIZE = 16*BLOCK_SIZE;
+	
+	/** The rotation speed. */
 	private final float ROTATION_SPEED = 1f;
+	
+	/** The block offset from center. */
 	private final double BLOCK_OFFSET_FROM_CENTER = 8 * BLOCK_SIZE;
+	
+	/** The chunk offset. */
 	private final double CHUNK_OFFSET = 8 * BLOCK_SIZE;
+	
+	/** The loc changes. */
 	private float[] locChanges = { 0, 0, 0 };
+	
+	/** The last time. */
 	private double lastTime;
+	
+	/** The invert y. */
 	private boolean invertY = false;
 	
+	/** The initial up vec. */
 	private Vector3f initialUpVec;
+	
+	/** The world node. */
 	private Node worldNode;
+	
+	/** The spot. */
 	private SpotLight spot;
+	
+	/** The lamp. */
 	private PointLight lamp;
+	
+	/** The sun. */
 	private DirectionalLight sun;
+	
+	/** The all chunks. */
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 
+	/** The n manager. */
 	public INodeManager nManager;
+	
+	/** The r preparator. */
 	public IRenderPreparator rPreparator;
+	
+	/** The player. */
 	public Player player;;
+	
+	/** The render event queue. */
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
+	/**
+	 * Inits the.
+	 *
+	 * @param manager the manager
+	 * @param preparator the preparator
+	 * @return the render processor
+	 */
 	public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
 		java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 		RenderProcessor app = new RenderProcessor();
@@ -87,10 +136,20 @@ public class RenderProcessor extends SimpleApplication {
 		return app;
 	}
 
+	/**
+	 * Inits the manager.
+	 *
+	 * @param manager the manager
+	 */
 	private void initManager (INodeManager manager) {
 		nManager = manager;
 	}
 	
+	/**
+	 * Inits the preparator.
+	 *
+	 * @param prep the prep
+	 */
 	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
 		logger.info("The renderer is starting its preparator, which is of type "+prep.getClass().getSimpleName()+".");
@@ -98,6 +157,9 @@ public class RenderProcessor extends SimpleApplication {
 		rPreparator.start();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.jme3.app.SimpleApplication#simpleInitApp()
+	 */
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
@@ -115,6 +177,9 @@ public class RenderProcessor extends SimpleApplication {
 		//localChunkTest();
 	}
 
+	/* (non-Javadoc)
+	 * @see com.jme3.app.SimpleApplication#simpleUpdate(float)
+	 */
 	@Override
 	/**
 	 * Constant running loop that's built into SimpleApplication.
@@ -138,6 +203,12 @@ public class RenderProcessor extends SimpleApplication {
 		}
 	}
 	
+	/**
+	 * Gets the chunk.
+	 *
+	 * @param pos the pos
+	 * @return the chunk
+	 */
 	public void getChunk (Position pos) {
 		MapChunk maybe = null;
 		try {maybe = rPreparator.requestChunk(pos);} 
@@ -146,6 +217,12 @@ public class RenderProcessor extends SimpleApplication {
 		if (maybe != null) {renderChunk(maybe, pos);}
 	}
 	
+	/**
+	 * Render chunk.
+	 *
+	 * @param chk the chk
+	 * @param pos the pos
+	 */
 	public void renderChunk(MapChunk chk, Position pos) {
 		int vertexIndexCounter = 0;
 		
@@ -217,10 +294,21 @@ public class RenderProcessor extends SimpleApplication {
 		allChunks.put(pos, thisChunk);*/
 	}
 	
+	/**
+	 * Calculate and store surface normal.
+	 *
+	 * @param x the x
+	 * @param y the y
+	 * @param z the z
+	 * @param normals the normals
+	 */
 	private void calculateAndStoreSurfaceNormal (float x, float y, float z, FloatBuffer normals) {
 		
 	}
 	
+	/**
+	 * Preparator chunk test.
+	 */
 	private void preparatorChunkTest() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
@@ -239,6 +327,9 @@ public class RenderProcessor extends SimpleApplication {
 		getChunk(p7);
 	}
 
+	/**
+	 * Local chunk test.
+	 */
 	private void localChunkTest() {
 		for(int i=0; i<1; i++) {
 			for(int j=0; j<1; j++) {
@@ -266,16 +357,31 @@ public class RenderProcessor extends SimpleApplication {
 		GeometryBatchFactory.optimize(worldNode);
 	}
 	
+	/**
+	 * Gets the direct float buffer.
+	 *
+	 * @param size the size
+	 * @return the direct float buffer
+	 */
 	private FloatBuffer getDirectFloatBuffer (int size) {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
 		return temp.asFloatBuffer();
 	}
 	
+	/**
+	 * Gets the direct int buffer.
+	 *
+	 * @param size the size
+	 * @return the direct int buffer
+	 */
 	private IntBuffer getDirectIntBuffer (int size) {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
 		return temp.asIntBuffer();
 	}
 
+	/**
+	 * Setup flashlight.
+	 */
 	private void setupFlashlight () {
 		spot = new SpotLight();
 		spot.setSpotRange(300f);
@@ -287,6 +393,9 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(spot);
 	}
 	
+	/**
+	 * Setup sunlight.
+	 */
 	private void setupSunlight () {
 		sun = new DirectionalLight();
 		sun.setColor(ColorRGBA.White);
@@ -294,6 +403,9 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(sun);
 	}
 	
+	/**
+	 * Setup lamplight.
+	 */
 	private void setupLamplight () {
 		lamp = new PointLight();
 		lamp.setColor(ColorRGBA.Yellow);
@@ -302,11 +414,17 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(lamp);
 	}
 	
+	/**
+	 * Setup world node.
+	 */
 	private void setupWorldNode () {
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
 	}
 	
+	/**
+	 * Setup player.
+	 */
 	private void setupPlayer () {
 		player = new Player ("Test Guy");
 		player.setPositionOffsets (0,0,0);
@@ -314,6 +432,12 @@ public class RenderProcessor extends SimpleApplication {
 		cam.setLocation(new Vector3f(0,0,0));
 	}
 	
+	/**
+	 * Gets the material.
+	 *
+	 * @param nVal the n val
+	 * @return the material
+	 */
 	private Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
@@ -333,6 +457,13 @@ public class RenderProcessor extends SimpleApplication {
 		return mat;
 	}
 	
+	/**
+	 * Move.
+	 *
+	 * @param cx the cx
+	 * @param cy the cy
+	 * @param cz the cz
+	 */
 	private void move(float cx, float cy, float cz) {
 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
@@ -362,6 +493,12 @@ public class RenderProcessor extends SimpleApplication {
 		}
 	}
 
+	/**
+	 * Rotate camera.
+	 *
+	 * @param value the value
+	 * @param axis the axis
+	 */
 	private void rotateCamera(float value, Vector3f axis) {
 
 		Matrix3f mat = new Matrix3f();
@@ -384,10 +521,16 @@ public class RenderProcessor extends SimpleApplication {
 		spot.setDirection(cam.getDirection());
 	}
 
+	/**
+	 * Wait for.
+	 */
 	private void waitFor () {
 		//TODO (what do i do here?)
 	}
 	
+	/**
+	 * Inits the key bindings.
+	 */
 	private void initKeyBindings() {
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
 		inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_LSHIFT));
@@ -422,6 +565,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addListener(actionListener, "TestFeature");
 	}
 
+	/** The analog listener. */
 	private AnalogListener analogListener = new AnalogListener() {
 
 		public void onAnalog(String name, float value, float tpf) {
@@ -436,6 +580,8 @@ public class RenderProcessor extends SimpleApplication {
 			}
 		}
 	};
+	
+	/** The action listener. */
 	private ActionListener actionListener = new ActionListener() {
 		public void onAction(String name, boolean keyPressed, float tpf) {
 			if (name.equals("Jump") && keyPressed/* && jumpSPEED == 0 */) {

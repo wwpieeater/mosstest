@@ -2,14 +2,23 @@ package net.mosstest.servercore;
 import org.apache.commons.cli.Options;
 
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossTest.
+ */
 public class MossTest {
 
+	/**
+	 * Instantiates a new moss test.
+	 */
 	public MossTest() {
 		// TODO Auto-generated constructor stub
 	}
 
 	/**
-	 * @param args
+	 * The main method.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
 		Options options=new Options();

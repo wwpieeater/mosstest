@@ -5,9 +5,23 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossLocalFile.
+ */
 public class MossLocalFile extends MossFile {
+	
+	/** The Constant CHUNK_LENGTH. */
 	public static final int CHUNK_LENGTH = 65536;
 
+	/**
+	 * Instantiates a new moss local file.
+	 *
+	 * @param baseDir the base dir
+	 * @param dirName the dir name
+	 * @param resourceName the resource name
+	 * @throws FileNotFoundException the file not found exception
+	 */
 	public MossLocalFile(File baseDir, String dirName, String resourceName) throws FileNotFoundException {
 		// super call to establish fields.
 		super(dirName, resourceName);
@@ -17,13 +31,20 @@ public class MossLocalFile extends MossFile {
 		this.file = new File(this.file, resourceName);
 	}
 
+	/** The file. */
 	private File file;
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#getRandAccessCopy()
+	 */
 	@Override
 	public RandomAccessFile getRandAccessCopy() throws FileNotFoundException {
 		return new RandomAccessFile(this.file, "r"); //$NON-NLS-1$
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#readChunk(int)
+	 */
 	public byte[] readChunk(int chk) throws IOException {
 		if ((chk < 0) || (chk > 65535))
 			throw new IllegalArgumentException(
@@ -36,6 +57,9 @@ public class MossLocalFile extends MossFile {
 		return buf;
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#getSize()
+	 */
 	@Override
 	public long getSize() {
 
@@ -43,6 +67,9 @@ public class MossLocalFile extends MossFile {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see net.mosstest.servercore.MossFile#getFile()
+	 */
 	public File getFile() {
 		return this.file;
 	}

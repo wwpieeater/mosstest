@@ -7,13 +7,30 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeMap;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class FuturesProcessor.
+ */
 public class FuturesProcessor {
+	
+	/** The r. */
 	Random r = new Random();
+	
+	/** The jobs. */
 	TreeMap<Long, Job> jobs = new TreeMap<>();
+	
+	/** The next wakeup. */
 	volatile long nextWakeup = System.currentTimeMillis();
 
+	/** The futures thread. */
 	public Thread futuresThread = new Thread(new FuturesRunnable(), Messages.getString("FuturesProcessor.FUTURES_THREAD")); //$NON-NLS-1$
 
+	/**
+	 * Run once.
+	 *
+	 * @param delayMillis the delay millis
+	 * @param runnable the runnable
+	 */
 	public synchronized void runOnce(long delayMillis, Runnable runnable) {
 		Job tJob = new Job(System.currentTimeMillis() + delayMillis, 0, 0, 1.0,
 				false, runnable);
@@ -23,6 +40,14 @@ public class FuturesProcessor {
 		this.futuresThread.interrupt();
 	}
 
+	/**
+	 * Register abm.
+	 *
+	 * @param delayMillis the delay millis
+	 * @param delayJitterMillis the delay jitter millis
+	 * @param probability the probability
+	 * @param runnable the runnable
+	 */
 	public synchronized void registerAbm(long delayMillis,
 			long delayJitterMillis, double probability, Runnable runnable) {
 		Job tJob = new Job(System.currentTimeMillis(), delayMillis,
@@ -35,14 +60,24 @@ public class FuturesProcessor {
 										// the lock
 	}
 
+	/**
+	 * Start.
+	 */
 	public void start() {
 		this.futuresThread.start();
 	}
 
+	/** The run. */
 	private volatile boolean run = true;
 
+	/**
+	 * The Class FuturesRunnable.
+	 */
 	public class FuturesRunnable implements Runnable {
 
+		/* (non-Javadoc)
+		 * @see java.lang.Runnable#run()
+		 */
 		@Override
 		public void run() {
 			while (FuturesProcessor.this.run) {
@@ -85,22 +120,41 @@ public class FuturesProcessor {
 
 	}
 
+	/**
+	 * The Class Job.
+	 */
 	public class Job {
+		
+		/** The first invocation. */
 		long firstInvocation;
+		
+		/** The delay. */
 		long delay;
+		
+		/** The delay jitter. */
 		long delayJitter;
+		
+		/** The probability. */
 		double probability;
+		
+		/** The renew. */
 		boolean renew;
+		
+		/** The r. */
 		Runnable r;
+		
+		/** The next invocation. */
 		volatile long nextInvocation;
 
 		/**
-		 * @param firstInvocation
-		 * @param delay
-		 * @param delayJitter
-		 * @param probability
-		 * @param renew
-		 * @param r
+		 * Instantiates a new job.
+		 *
+		 * @param firstInvocation the first invocation
+		 * @param delay the delay
+		 * @param delayJitter the delay jitter
+		 * @param probability the probability
+		 * @param renew the renew
+		 * @param r the r
 		 */
 		public Job(long firstInvocation, long delay, long delayJitter,
 				double probability, boolean renew, Runnable r) {

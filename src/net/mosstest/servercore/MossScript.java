@@ -4,9 +4,21 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossScript.
+ */
 public class MossScript {
+	
+	/** The file. */
 	MossFile file;
 
+	/**
+	 * Instantiates a new moss script.
+	 *
+	 * @param file the file
+	 * @throws MossWorldLoadException the moss world load exception
+	 */
 	public MossScript(MossFile file) throws MossWorldLoadException {
 		this.file = file;
 		try {
@@ -19,6 +31,12 @@ public class MossScript {
 		}
 	}
 
+	/**
+	 * Gets the reader.
+	 *
+	 * @return the reader
+	 * @throws MossWorldLoadException the moss world load exception
+	 */
 	Reader getReader() throws MossWorldLoadException {
 		try {
 			return new FileReader(this.file.getFile());

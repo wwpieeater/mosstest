@@ -4,15 +4,36 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossInventory.
+ */
 public class MossInventory {
+	
+	/** The max stack size. */
 	final int maxStackSize;
+	
+	/** The stacks. */
 	final MossItem.Stack[][] stacks;
 
+	/**
+	 * Instantiates a new moss inventory.
+	 *
+	 * @param maxStackSize the max stack size
+	 * @param rows the rows
+	 * @param cols the cols
+	 */
 	public MossInventory(int maxStackSize, int rows, int cols) {
 		this.maxStackSize = maxStackSize;
 		this.stacks = new MossItem.Stack[rows][cols];
 	}
 
+	/**
+	 * To bytes.
+	 *
+	 * @return the byte[]
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public byte[] toBytes() throws IOException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
@@ -29,6 +50,12 @@ public class MossInventory {
 		return bos.toByteArray();
 	}
 	
+	/**
+	 * Adds the item.
+	 *
+	 * @param stack the stack
+	 * @return the double
+	 */
 	public synchronized double addItem(MossItem.Stack stack) {
 		double added = 0;
 		double maxAddable = stack.item.mayStack ? this.maxStackSize : 1;
