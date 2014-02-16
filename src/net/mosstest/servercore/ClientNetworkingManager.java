@@ -18,36 +18,79 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ClientNetworkingManager.
+ */
 public class ClientNetworkingManager {
 
+	/** The logger. */
 	static Logger logger = Logger.getLogger(ClientNetworkingManager.class);
 	// There's a potential DoS attack here but it can only be mounted by the
 	// server, so you might as well just not use that server. No security
 	// threat except small client hang, won't fix.
+	/** The run threads. */
 	protected AtomicBoolean runThreads = new AtomicBoolean(true);
+	
+	/** The bulk data socket. */
 	protected Socket bulkDataSocket = new Socket();
+	
+	/** The low latency stream socket. */
 	protected Socket lowLatencyStreamSocket = new Socket();
+	
+	/** The udp socket. */
 	protected DatagramSocket udpSocket;
+	
+	/** The bulk data out. */
 	protected DataOutputStream bulkDataOut;
+	
+	/** The lowlatency data out. */
 	protected DataOutputStream lowlatencyDataOut;
+	
+	/** The bulk data in. */
 	protected DataInputStream bulkDataIn;
+	
+	/** The lowlatency data in. */
 	protected DataInputStream lowlatencyDataIn;
+	
+	/** The udp on. */
 	protected boolean udpOn = false;
+	
+	/** The fast link ackd. */
 	protected AtomicBoolean fastLinkAckd = new AtomicBoolean(false);
+	
+	/** The endpoint. */
 	protected final InetAddress endpoint;
+	
+	/** The port. */
 	protected int port;
+	
+	/** The last bulk out. */
 	protected AtomicLong lastBulkOut = new AtomicLong();
+	
+	/** The last bulk in. */
 	protected AtomicLong lastBulkIn = new AtomicLong();
+	
+	/** The last fast out. */
 	protected AtomicLong lastFastOut = new AtomicLong();
+	
+	/** The last fast in. */
 	protected AtomicLong lastFastIn = new AtomicLong();
+	
+	/** The last udp out. */
 	protected AtomicLong lastUdpOut = new AtomicLong();
+	
+	/** The last udp in. */
 	protected AtomicLong lastUdpIn = new AtomicLong();
 	/*
 	 * Should be no need for another lowlatency queue unless we find poor
 	 * performance
 	 */
+	/** The packets. */
 	public ArrayBlockingQueue<MossNetPacket> packets = new ArrayBlockingQueue<>(
 			1024);
+	
+	/** The bulk read handler. */
 	protected Thread bulkReadHandler = new Thread(new Runnable() {
 
 		@Override
@@ -93,6 +136,8 @@ public class ClientNetworkingManager {
 
 		}
 	}, "ClientBulkRecv"); //$NON-NLS-1$
+	
+	/** The fast read handler. */
 	protected Thread fastReadHandler = new Thread(new Runnable() {
 		// TODO
 		@Override
@@ -132,8 +177,14 @@ public class ClientNetworkingManager {
 
 		}
 	}, "ClientBulkRecv"); //$NON-NLS-1$
+	
+	/** The party quenched. */
 	protected AtomicBoolean partyQuenched = new AtomicBoolean(false);
+	
+	/** The quenched since. */
 	AtomicLong quenchedSince = new AtomicLong(0);
+	
+	/** The dgram read handler. */
 	protected Thread dgramReadHandler = new Thread(new Runnable() {
 		// TODO--spanish for "all"
 		@Override
@@ -181,11 +232,26 @@ public class ClientNetworkingManager {
 		}
 	}, "ClientDgramRecv"); //$NON-NLS-1$
 
+	/** The bulk stream in. */
 	protected InputStream bulkStreamIn;
+	
+	/** The bulk stream out. */
 	protected OutputStream bulkStreamOut;
+	
+	/** The fast stream in. */
 	protected InputStream fastStreamIn;
+	
+	/** The fast stream out. */
 	protected OutputStream fastStreamOut;
 
+	/**
+	 * Instantiates a new client networking manager.
+	 *
+	 * @param endpoint the endpoint
+	 * @param port the port
+	 * @param useUdp the use udp
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public ClientNetworkingManager(String endpoint, int port, boolean useUdp)
 			throws IOException {
 		this.endpoint = InetAddress.getByName(endpoint);
@@ -228,16 +294,27 @@ public class ClientNetworkingManager {
 		this.netTimeoutThread.start();
 	}
 
+	/**
+	 * Send ack.
+	 *
+	 * @param seqnum the seqnum
+	 */
 	protected void sendAck(int seqnum) {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Send tos udp conn.
+	 */
 	protected void sendTosUdpConn() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/**
+	 * Send quench.
+	 */
 	protected void sendQuench() {
 		// TODO Sends a request for the server to back off with data and skip
 		// non-essential data.
@@ -246,13 +323,9 @@ public class ClientNetworkingManager {
 
 	/**
 	 * Send a packet, dispatching to the correct socket.
-	 * 
-	 * @param commandId
-	 *            Byte representing command ID.
-	 * @param payload
-	 *            The data to send.
-	 * @param latencyPrio
-	 * @throws IOException
+	 *
+	 * @param p the p
+	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
 	protected void sendPacket(MossNetPacket p) throws IOException {
 		if(this.partyQuenched.get()&&!p.isImportant) return;
@@ -268,6 +341,13 @@ public class ClientNetworkingManager {
 
 	}
 
+	/**
+	 * Send packet default.
+	 *
+	 * @param commandId the command id
+	 * @param payload the payload
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void sendPacketDefault(int commandId, byte[] payload)
 			throws IOException {
 		this.lastBulkOut.set(System.currentTimeMillis());
@@ -289,6 +369,11 @@ public class ClientNetworkingManager {
 		}
 	}
 
+	/**
+	 * Default reinit.
+	 *
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void defaultReinit() throws IOException {
 		this.bulkDataIn.close();
 		this.bulkDataOut.close();
@@ -307,6 +392,9 @@ public class ClientNetworkingManager {
 
 	}
 
+	/**
+	 * Perform bulk reconnect.
+	 */
 	protected void performBulkReconnect() {
 		synchronized (this.bulkDataOut) {
 			// PERFORM RECONNECTION
@@ -314,6 +402,13 @@ public class ClientNetworkingManager {
 
 	}
 
+	/**
+	 * Send packet low latency.
+	 *
+	 * @param commandId the command id
+	 * @param payload the payload
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void sendPacketLowLatency(int commandId, byte[] payload)
 			throws IOException {
 		if (!this.fastLinkAckd.get()) {
@@ -340,6 +435,14 @@ public class ClientNetworkingManager {
 		}
 	}
 
+	/**
+	 * Send packet udp.
+	 *
+	 * @param commandId the command id
+	 * @param payload the payload
+	 * @param needsAck the needs ack
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	protected void sendPacketUdp(int commandId, byte[] payload, boolean needsAck)
 			throws IOException {
 		this.lastUdpOut.set(System.currentTimeMillis());
@@ -351,29 +454,59 @@ public class ClientNetworkingManager {
 
 	}
 
+	/**
+	 * Enqueue packet.
+	 *
+	 * @param p the p
+	 * @throws InterruptedException the interrupted exception
+	 */
 	public void enqueuePacket(MossNetPacket p) throws InterruptedException {
 		this.sendQueue.put(p);
 	}
 
+	/**
+	 * The Class StateMachine.
+	 */
 	protected class StateMachine {
+		
+		/** The Constant DISCONNECTED. */
 		static final int DISCONNECTED = 0;
+		
+		/** The Constant LINK. */
 		static final int LINK = 1;
+		
+		/** The Constant AUTH. */
 		static final int AUTH = 2;
+		
+		/** The Constant RESOURCE_XFER. */
 		static final int RESOURCE_XFER = 3;
+		
+		/** The Constant ESTABLISHED. */
 		static final int ESTABLISHED = 4;
+		
+		/** The Constant DENIED. */
 		static final int DENIED = 5;
+		
+		/** The Constant TIMEDOUT. */
 		static final int TIMEDOUT = 6;
+		
+		/** The cur status. */
 		int curStatus = 0;
 	}
 
+	/**
+	 * Begin connect handshake.
+	 */
 	public void beginConnectHandshake() {
 		// TODO Auto-generated method stub
 
 	}
 
+	/** The send queue. */
 	final ArrayBlockingQueue<MossNetPacket> sendQueue = new ArrayBlockingQueue<>(
 			1024);
 
+	/** The send queue thread. */
 	private Thread sendQueueThread = new Thread(new Runnable() {
 
 		@Override
@@ -389,6 +522,7 @@ public class ClientNetworkingManager {
 		}
 	}, Messages.getString("ClientNetworkingManager.THREAD_QUEUEING")); //$NON-NLS-1$
 
+	/** The net timeout thread. */
 	private Thread netTimeoutThread = new Thread(new Runnable() {
 
 		@Override

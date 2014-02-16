@@ -7,9 +7,16 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossDebugUtils.
+ */
 public class MossDebugUtils {
 
+	/** The logger. */
 	static Logger logger = Logger.getLogger(MossDebugUtils.class);
+	
+	/** The Constant propertiesToGet. */
 	private static final String[] propertiesToGet = { "awt.toolkit", //$NON-NLS-1$
 			"file.encoding", "file.separator", "java.class.version", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			"java.home", "java.runtime.name", "java.runtime.version", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -21,6 +28,12 @@ public class MossDebugUtils {
 
 	};
 
+	/**
+	 * Write stracktrace.
+	 *
+	 * @param e the e
+	 * @return the string
+	 */
 	public static String writeStracktrace(Exception e) {
 		String fName = Integer.toString(System.identityHashCode(e), 16) + "@"
 				+ System.currentTimeMillis();
@@ -37,6 +50,12 @@ public class MossDebugUtils {
 		return write.getAbsolutePath();
 	}
 
+	/**
+	 * Gets the debug information.
+	 *
+	 * @param e the e
+	 * @return the debug information
+	 */
 	public static String getDebugInformation(Exception e) {
 		StringBuilder s = new StringBuilder(
 				MossDebugUtils.getGitConfig("git.commit.id") + " on " + MossDebugUtils.getGitConfig("git.branch") + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
@@ -50,6 +69,11 @@ public class MossDebugUtils {
 		return s.toString();
 	}
 
+	/**
+	 * Gets the os details.
+	 *
+	 * @return the os details
+	 */
 	public static String getOsDetails() {
 		StringBuilder s = new StringBuilder();
 
@@ -82,6 +106,12 @@ public class MossDebugUtils {
 		return s.toString();
 	}
 
+	/**
+	 * Gets the git config.
+	 *
+	 * @param cfgKey the cfg key
+	 * @return the git config
+	 */
 	private static String getGitConfig(String cfgKey) {
 
 		Properties properties = new Properties();

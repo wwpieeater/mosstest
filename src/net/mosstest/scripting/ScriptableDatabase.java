@@ -11,14 +11,32 @@ import org.apache.commons.lang.ArrayUtils;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ScriptableDatabase.
+ */
 public class ScriptableDatabase {
 
+	/** The base dir. */
 	File baseDir;
+	
+	/**
+	 * Instantiates a new scriptable database.
+	 *
+	 * @param baseDir the base dir
+	 */
 	public ScriptableDatabase(File baseDir) {
 		this.baseDir = baseDir;
 
 	}
 
+	/**
+	 * Gets the db.
+	 *
+	 * @param name the name
+	 * @return the db
+	 * @throws IOException Signals that an I/O exception has occurred.
+	 */
 	public DBase getDb(String name) throws IOException {
 		if (!name.matches("[a-zA-Z]{1,32}")) { //$NON-NLS-1$
 			throw new IllegalArgumentException(Messages.getString("ScriptableDatabase.DB_NAME_INVALID")); //$NON-NLS-1$
@@ -30,10 +48,20 @@ public class ScriptableDatabase {
 
 	}
 
+	/**
+	 * The Class DBase.
+	 */
 	public class DBase {
 		// this class will contain a database that scripts may access.
+		/** The inner db. */
 		private final DB innerDb;
 
+		/**
+		 * Instantiates a new d base.
+		 *
+		 * @param innerDb the inner db
+		 * @param name the name
+		 */
 		DBase(DB innerDb, String name) {
 			this.innerDb = innerDb;
 		}
@@ -42,8 +70,8 @@ public class ScriptableDatabase {
 		 * Get a piece of string data with a string key, or <code>null</code> if
 		 * the datum cannot be found. String keys are exclusive from all other
 		 * key types.
-		 * 
-		 * @param key
+		 *
+		 * @param key the key
 		 * @return A string representing the stored data.
 		 */
 		public String getDatum(String key) {
@@ -68,8 +96,9 @@ public class ScriptableDatabase {
 		 * Get a piece of string data with a position and string key, or
 		 * <code>null</code> if the datum cannot be found. Position keys are
 		 * exclusive from all other key types.
-		 * 
-		 * @param key
+		 *
+		 * @param pos the pos
+		 * @param key the key
 		 * @return The found data.
 		 */
 		public String getPositionDatum(NodePosition pos, String key) {

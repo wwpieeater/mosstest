@@ -27,6 +27,7 @@
 
 package toxi.math.noise;
 
+// TODO: Auto-generated Javadoc
 /**
  * Simplex Noise in 2D, 3D and 4D. Based on the example code of this paper:
  * http://staffwww.itn.liu.se/~stegu/simplexnoise/simplexnoise.pdf
@@ -37,7 +38,10 @@ package toxi.math.noise;
  */
 public class SimplexNoise {
 
+    /** The Constant SQRT3. */
     private static final double SQRT3 = Math.sqrt(3.0);
+    
+    /** The Constant SQRT5. */
     private static final double SQRT5 = Math.sqrt(5.0);
 
     /**
@@ -45,31 +49,41 @@ public class SimplexNoise {
      * pre-multiplied.
      */
     private static final double F2 = 0.5 * (SQRT3 - 1.0);
+    
+    /** The Constant G2. */
     private static final double G2 = (3.0 - SQRT3) / 6.0;
+    
+    /** The Constant G22. */
     private static final double G22 = G2 * 2.0 - 1;
 
+    /** The Constant F3. */
     private static final double F3 = 1.0 / 3.0;
+    
+    /** The Constant G3. */
     private static final double G3 = 1.0 / 6.0;
 
+    /** The Constant F4. */
     private static final double F4 = (SQRT5 - 1.0) / 4.0;
+    
+    /** The Constant G4. */
     private static final double G4 = (5.0 - SQRT5) / 20.0;
+    
+    /** The Constant G42. */
     private static final double G42 = G4 * 2.0;
+    
+    /** The Constant G43. */
     private static final double G43 = G4 * 3.0;
+    
+    /** The Constant G44. */
     private static final double G44 = G4 * 4.0 - 1.0;
 
-    /**
-     * Gradient vectors for 3D (pointing to mid points of all edges of a unit
-     * cube)
-     */
+    /** Gradient vectors for 3D (pointing to mid points of all edges of a unit cube). */
     private static final int[][] grad3 = { { 1, 1, 0 }, { -1, 1, 0 },
             { 1, -1, 0 }, { -1, -1, 0 }, { 1, 0, 1 }, { -1, 0, 1 },
             { 1, 0, -1 }, { -1, 0, -1 }, { 0, 1, 1 }, { 0, -1, 1 },
             { 0, 1, -1 }, { 0, -1, -1 } };
 
-    /**
-     * Gradient vectors for 4D (pointing to mid points of all edges of a unit 4D
-     * hypercube)
-     */
+    /** Gradient vectors for 4D (pointing to mid points of all edges of a unit 4D hypercube). */
     private static final int[][] grad4 = { { 0, 1, 1, 1 }, { 0, 1, 1, -1 },
             { 0, 1, -1, 1 }, { 0, 1, -1, -1 }, { 0, -1, 1, 1 },
             { 0, -1, 1, -1 }, { 0, -1, -1, 1 }, { 0, -1, -1, -1 },
@@ -82,9 +96,7 @@ public class SimplexNoise {
             { -1, 1, 1, 0 }, { -1, 1, -1, 0 }, { -1, -1, 1, 0 },
             { -1, -1, -1, 0 } };
 
-    /**
-     * Permutation table
-     */
+    /** Permutation table. */
     private static final int[] p = { 151, 160, 137, 91, 90, 15, 131, 13, 201,
             95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37,
             240, 21, 10, 23, 190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62,
@@ -104,10 +116,7 @@ public class SimplexNoise {
             176, 115, 121, 50, 45, 127, 4, 150, 254, 138, 236, 205, 93, 222,
             114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180 };
 
-    /**
-     * To remove the need for index wrapping, double the permutation table
-     * length
-     */
+    /** To remove the need for index wrapping, double the permutation table length. */
     private static int[] perm = new int[0x200];
     /**
      * A lookup table to traverse the simplex around a given point in 4D.
@@ -139,11 +148,10 @@ public class SimplexNoise {
 
     /**
      * Computes dot product in 2D.
-     * 
-     * @param g
-     *            2-vector (grid offset)
-     * @param x
-     * @param y
+     *
+     * @param g            2-vector (grid offset)
+     * @param x the x
+     * @param y the y
      * @return dot product
      */
     private static double dot(int g[], double x, double y) {
@@ -152,12 +160,11 @@ public class SimplexNoise {
 
     /**
      * Computes dot product in 3D.
-     * 
-     * @param g
-     *            3-vector (grid offset)
-     * @param x
-     * @param y
-     * @param z
+     *
+     * @param g            3-vector (grid offset)
+     * @param x the x
+     * @param y the y
+     * @param z the z
      * @return dot product
      */
     private static double dot(int g[], double x, double y, double z) {
@@ -166,13 +173,12 @@ public class SimplexNoise {
 
     /**
      * Computes dot product in 4D.
-     * 
-     * @param g
-     *            4-vector (grid offset)
-     * @param x
-     * @param y
-     * @param z
-     * @param w
+     *
+     * @param g            4-vector (grid offset)
+     * @param x the x
+     * @param y the y
+     * @param z the z
+     * @param w the w
      * @return dot product
      */
     private static double dot(int g[], double x, double y, double z, double w) {
@@ -181,10 +187,9 @@ public class SimplexNoise {
 
     /**
      * This method is a *lot* faster than using (int)Math.floor(x).
-     * 
-     * @param x
-     *            value to be floored
-     * @return
+     *
+     * @param x            value to be floored
+     * @return the int
      */
     private static final int fastfloor(double x) {
         return x >= 0 ? (int) x : (int) x - 1;

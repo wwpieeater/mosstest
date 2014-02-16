@@ -9,7 +9,19 @@ import net.mosstest.scripting.Position;
 import net.mosstest.scripting.SimplexMapGenerator;
 import net.mosstest.servercore.MapGeneratorException;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MapGenProfilerEntryPoint.
+ */
 public class MapGenProfilerEntryPoint {
+	
+	/**
+	 * The main method.
+	 *
+	 * @param args the arguments
+	 * @throws MapGeneratorException the map generator exception
+	 * @throws InterruptedException the interrupted exception
+	 */
 	public static void main(String[] args) throws MapGeneratorException, InterruptedException {
 		int chks = 0;
 		Thread.sleep(10000); // sleep to allow profiler launch

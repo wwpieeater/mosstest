@@ -5,17 +5,20 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.log4j.Logger;
-
-import net.mosstest.scripting.EventProcessingCompletedSignal;
-import net.mosstest.scripting.MossEvent;
-import net.mosstest.scripting.MossEventHandler;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
-import net.mosstest.scripting.MossEvent.EvtType;
+import net.mosstest.scripting.events.IMossEvent;
+import net.mosstest.scripting.events.MossNodeChangeEvent;
+import net.mosstest.scripting.events.ThreadStopEvent;
+import net.mosstest.scripting.handlers.MossEventHandler;
+import net.mosstest.scripting.handlers.MossNodeChangeHandler;
 import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 
+import org.apache.log4j.Logger;
+
+// TODO: Auto-generated Javadoc
 /**
+ * The Class EventProcessor.
  * 
  * @author rarkenin, hexafraction
  * 
@@ -25,28 +28,39 @@ import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
  *         Java well, you may want to stick to only accessing the queue as
  *         otherwise asphyxiation, drowning, or chlorine poisoning may occur.
  *         USE ACCESS METHODS OTHER THAN THE QUEUE AT YOUR OWN RISK.
- * 
  */
 public class EventProcessor {
 
 	static Logger logger = Logger.getLogger(EventProcessor.class);
-	ArrayBlockingQueue<MossEvent> eventQueue = new ArrayBlockingQueue<>(
+
+	ArrayBlockingQueue<IMossEvent> eventQueue = new ArrayBlockingQueue<>(
 			EngineSettings.getInt("eventQueueCapacity", 40), false); //$NON-NLS-1$
+
 	protected final int maxEventThreads = EngineSettings.getInt(
 			"maxEventThreads", 8); //$NON-NLS-1$
+
 	protected final int initialEventThreads = EngineSettings.getInt(
 			"initialEventThreads", 8); //$NON-NLS-1$
-	ThreadGroup eventProcessorGroup = new ThreadGroup(Messages.getString("EventProcessor.THREADGROUP")); //$NON-NLS-1$
+
+	ThreadGroup eventProcessorGroup = new ThreadGroup(
+			Messages.getString("EventProcessor.THREADGROUP")); //$NON-NLS-1$
+
 	protected AtomicBoolean runManager = new AtomicBoolean(true);
+
 	protected final int sampleInterval = EngineSettings.getInt(
 			"eventQueueTuneSampleInterval", 100); //$NON-NLS-1$
+
 	protected final int upshift = EngineSettings.getInt(
 			"eventQueueTuneUpshift", 90); //$NON-NLS-1$
+
 	protected final int downshift = EngineSettings.getInt(
 			"eventQueueTuneDownshift", 10); //$NON-NLS-1$
+
 	protected final int samples = EngineSettings.getInt(
 			"eventQueueTuneSamples", 100); //$NON-NLS-1$
+
 	protected final AtomicInteger currentThreads = new AtomicInteger(0);
+
 	private Thread manager = new Thread(this.eventProcessorGroup,
 			new Runnable() {
 				/**
@@ -74,7 +88,8 @@ public class EventProcessor {
 
 									@Override
 									public void run() {
-										logger.debug(Messages.getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
+										logger.debug(Messages
+												.getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
 										processEvents();
 									}
 
@@ -98,8 +113,8 @@ public class EventProcessor {
 
 											@Override
 											public void run() {
-												System.out
-														.println(Messages.getString("EventProcessor.MSG_ADD_DYNAMIC")); //$NON-NLS-1$
+												System.out.println(Messages
+														.getString("EventProcessor.MSG_ADD_DYNAMIC")); //$NON-NLS-1$
 												processEvents();
 											}
 
@@ -109,15 +124,10 @@ public class EventProcessor {
 
 							}
 							if (((float) ticksBusy / (float) ticks) < ((float) lDownshift / (float) lSamples)) {
-								logger.info((Messages.getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
+								logger.info((Messages
+										.getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
 								EventProcessor.this.eventQueue
-										.add(new MossEvent(
-												MossEvent.EvtType.EVT_THREADSTOP,
-												null, null, null, null, null,
-												null, null, 0, null,
-												new ScriptSandboxBorderToken(
-														84,
-														EventProcessor.class)));
+										.add(new ThreadStopEvent());
 
 							}
 							ticks = 0;
@@ -131,33 +141,26 @@ public class EventProcessor {
 					}
 				}
 			}, Messages.getString("EventProcessor.THREAD_NAME_MGR")); //$NON-NLS-1$
+
 	private final MossScriptEnv ev;
+
 	private final ThreadContext tc;
 
+	/**
+	 * Process events.
+	 */
 	void processEvents() {
 		MosstestSecurityManager.instance.setThreadContext(this.tc);
 		boolean run = true; // Not synchronized as only used locally
 		queueLoop: while (run) {
 			try {
-				MossEvent myEvent = this.eventQueue.take();
+				IMossEvent myEvent = this.eventQueue.take();
 				{// Section for actually handling the events
-					if (myEvent.type == EvtType.EVT_THREADSTOP) {
+					if (myEvent instanceof ThreadStopEvent) {
 						this.currentThreads.decrementAndGet();
 						return;
 					}
-					ArrayList<MossEventHandler> evtHandlerList = this.ev
-							.getHandlers(myEvent.type,
-									new ScriptSandboxBorderToken(84,
-											EventProcessor.class));
-					try {
-						for (MossEventHandler ourHandler : evtHandlerList) {
-							if (ourHandler.processEvent(myEvent))
-								continue queueLoop;
-						}
-						DefaultEventHandlers.processEvent(myEvent, this.ev);
-					} catch (MossScriptException e) {
-						// Event processing complete, pass
-					}
+					dispatchEvent(myEvent);
 				}
 
 			} catch (InterruptedException e) {
@@ -169,17 +172,53 @@ public class EventProcessor {
 
 	}
 
+	private void dispatchEvent(IMossEvent evt) {
+		ArrayList<MossEventHandler> evtHandlerList = this.ev
+				.getEventHandlers(evt.getClass());
+		try {
+			for (MossEventHandler ourHandler : evtHandlerList) {
+				if (dispatchEventInner(ourHandler, evt)) {
+					// continue loop
+				}
+			}
+			DefaultEventHandlers.processEvent(evt, this.ev);
+		} catch (MossScriptException | IllegalArgumentException e) {
+			logger.warn(e.getClass().getName() + " upon processing event: "
+					+ e.getMessage());
+		}
+	}
+
+	private boolean dispatchEventInner(MossEventHandler ourHandler,
+			IMossEvent evt) throws IllegalArgumentException {
+		try {
+			if (evt instanceof MossNodeChangeEvent) {
+
+				return ((MossNodeChangeHandler) ourHandler)
+						.onAction((MossNodeChangeEvent) evt);
+
+			} else
+				throw new IllegalArgumentException(
+						"The event passed in was not a type that Mosstest is equipped to handle.");
+
+		} catch (ClassCastException e) {
+			throw new IllegalArgumentException(
+					"The event handler did not match in type with the event.");
+		}
+	}
+
 	/**
 	 * Constructs a new event processor.
 	 * 
 	 * @param ev
 	 *            A script environment populated with event handlers.
+	 * @param tc
+	 *            the tc
 	 */
 	public EventProcessor(MossScriptEnv ev, ThreadContext tc) {
 		this.ev = ev;
 		this.tc = tc;
 		this.manager.start();
-		
+
 	}
 
 }

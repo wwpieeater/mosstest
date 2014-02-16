@@ -14,7 +14,13 @@ import org.iq80.leveldb.DB;
 
 import com.google.common.collect.HashBiMap;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class LocalNodeManager.
+ */
 public class LocalNodeManager extends AbstractNodeManager {
+	
+	/** The node db. */
 	private DB nodeDb;
 
 	/* (non-Javadoc)
@@ -80,7 +86,9 @@ public class LocalNodeManager extends AbstractNodeManager {
 	}
 
 	/**
-	 * 
+	 * Instantiates a new local node manager.
+	 *
+	 * @param nodedb the nodedb
 	 */
 	public LocalNodeManager(DB nodedb) {
 		this.nodeDb = nodedb;

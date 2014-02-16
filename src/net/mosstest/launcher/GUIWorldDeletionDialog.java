@@ -13,12 +13,22 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GUIWorldDeletionDialog.
+ */
 public class GUIWorldDeletionDialog extends JDialog {
+	
+	/** The dlg result. */
 	boolean dlgResult=false;
+	
+	/** The content panel. */
 	private final JPanel contentPanel = new JPanel();
 
 	/**
 	 * Launch the application.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
 		try {
@@ -32,6 +42,8 @@ public class GUIWorldDeletionDialog extends JDialog {
 
 	/**
 	 * Create the dialog.
+	 *
+	 * @param worldName the world name
 	 */
 	public GUIWorldDeletionDialog(String worldName) {
 		setTitle(Messages.getString("GUIWorldDeletionDialog.DLG_TITLE")); //$NON-NLS-1$

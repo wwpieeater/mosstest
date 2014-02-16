@@ -82,6 +82,7 @@ import net.mosstest.sandbox.util.Enumeration;
 import net.mosstest.sandbox.util.ResourceBundle;
 import net.mosstest.sandbox.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
+// TODO: Auto-generated Javadoc
 /**
  * Class for scripts to instantiate and access the static methods of various approved classes.
  * @author rarkenin
@@ -89,6 +90,7 @@ import net.mosstest.sandbox.util.concurrent.atomic.AtomicReferenceFieldUpdater;
  */
 public class JavaApi {
 	
+	/** The Constant qualifiedClasses. */
 	private static final HashMap<String, SandboxClass> qualifiedClasses=new HashMap<String, SandboxClass>(){{
 		put("java.lang.Object", new SandboxClass<Object>(java.lang.Object.class, true, true, false, false)); //$NON-NLS-1$
 		put("java.lang.String", new SandboxClass<String>(java.lang.String.class, true, true, false, false)); //$NON-NLS-1$
@@ -222,11 +224,37 @@ public class JavaApi {
 		put("java.util.EnumMap", new SandboxClass<EnumMap>(java.util.EnumMap.class, true, true, false, false)); //$NON-NLS-1$
 	}};
 	
+	/**
+	 * Gets the single instance of JavaApi.
+	 *
+	 * @param clazz the clazz
+	 * @param constructorParams the constructor params
+	 * @return single instance of JavaApi
+	 * @throws NoSuchMethodException the no such method exception
+	 * @throws SecurityException the security exception
+	 * @throws InstantiationException the instantiation exception
+	 * @throws IllegalAccessException the illegal access exception
+	 * @throws IllegalArgumentException the illegal argument exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
 	public static Object getInstance(String clazz, Object... constructorParams) throws NoSuchMethodException, SecurityException, InstantiationException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		SandboxClass<?> sc=qualifiedClasses.get(clazz);
 		return sc.getInstance(constructorParams);
 	}
 	
+	/**
+	 * Invoke static.
+	 *
+	 * @param clazz the clazz
+	 * @param method the method
+	 * @param parameters the parameters
+	 * @return the object
+	 * @throws NoSuchMethodException the no such method exception
+	 * @throws SecurityException the security exception
+	 * @throws IllegalAccessException the illegal access exception
+	 * @throws IllegalArgumentException the illegal argument exception
+	 * @throws InvocationTargetException the invocation target exception
+	 */
 	public static Object invokeStatic(String clazz, String method,
 			Object... parameters) throws NoSuchMethodException, SecurityException, IllegalAccessException, IllegalArgumentException, InvocationTargetException {
 		SandboxClass<?> sc=qualifiedClasses.get(clazz);

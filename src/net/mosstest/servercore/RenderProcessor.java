@@ -42,10 +42,10 @@ import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
 
+
 public class RenderProcessor extends SimpleApplication {
 
 	static Logger logger = Logger.getLogger(RenderProcessor.class);
-	
 	private final float SPEED = 3f;
 	private final float PLAYER_HEIGHT = 25;
 	private final float BLOCK_SIZE = 20f;
@@ -56,7 +56,6 @@ public class RenderProcessor extends SimpleApplication {
 	private float[] locChanges = { 0, 0, 0 };
 	private double lastTime;
 	private boolean invertY = false;
-	
 	private Vector3f initialUpVec;
 	private Object renderKey;
 	private Node worldNode;
@@ -64,7 +63,6 @@ public class RenderProcessor extends SimpleApplication {
 	private PointLight lamp;
 	private DirectionalLight sun;
 	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
-
 	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
 	public Player player;
@@ -86,11 +84,10 @@ public class RenderProcessor extends SimpleApplication {
 		app.start();
 		return app;
 	}
-
 	private void initNodeManager (INodeManager manager) {
 		nManager = manager;
 	}
-	
+
 	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
 		logger.info("The renderer is starting its preparator, which is of type "+prep.getClass().getSimpleName()+".");
@@ -101,7 +98,7 @@ public class RenderProcessor extends SimpleApplication {
 	private void initSecurityLock () {
 		renderKey = new Object();
 	}
-	
+
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
@@ -121,10 +118,6 @@ public class RenderProcessor extends SimpleApplication {
 	}
 
 	@Override
-	/**
-	 * Constant running loop that's built into SimpleApplication.
-	 * Looks for new events in the renderEventQueue, moves if necessary.
-	 */
 	public void simpleUpdate(float tpf) {
 		if (lastTime + 10 < System.currentTimeMillis()) {
 			move(locChanges[0], locChanges[1], locChanges[2]);
@@ -150,7 +143,7 @@ public class RenderProcessor extends SimpleApplication {
 		catch (InterruptedException e) {e.printStackTrace();}
 		if (maybe != null) {renderChunk(maybe, pos);}
 	}
-	
+
 	public void renderChunk(MapChunk chk, Position pos) {
 		int vertexIndexCounter = 0;
 		
@@ -277,7 +270,7 @@ public class RenderProcessor extends SimpleApplication {
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
 	}
-	
+
 	private void setupPlayer () {
 		player = new Player ("Test Guy");
 		player.setPositionOffsets (0,0,0);
@@ -419,6 +412,8 @@ public class RenderProcessor extends SimpleApplication {
 			}
 		}
 	};
+	
+	/** The action listener. */
 	private ActionListener actionListener = new ActionListener() {
 		public void onAction(String name, boolean keyPressed, float tpf) {
 			if (name.equals("Jump") && keyPressed/* && jumpSPEED == 0 */) {

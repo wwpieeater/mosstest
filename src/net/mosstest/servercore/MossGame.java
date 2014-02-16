@@ -7,7 +7,18 @@ import java.util.ArrayList;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MossGame.
+ */
 public class MossGame {
+	
+	/**
+	 * Instantiates a new moss game.
+	 *
+	 * @param name the name
+	 * @throws MossWorldLoadException the moss world load exception
+	 */
 	@SuppressWarnings("nls")
 	public MossGame(String name) throws MossWorldLoadException {
 		this.baseDir = new File("data/games/" + name); //$NON-NLS-1$
@@ -34,11 +45,23 @@ public class MossGame {
 		}
 	}
 
+	/** The base dir. */
 	private File baseDir;
+	
+	/** The game cfg. */
 	private XMLConfiguration gameCfg;
+	
+	/** The cfg file. */
 	private File cfgFile;
+	
+	/** The scripts. */
 	private ArrayList<MossScript> scripts;
 
+	/**
+	 * Gets the scripts.
+	 *
+	 * @return the scripts
+	 */
 	public ArrayList<MossScript> getScripts() {
 		return this.scripts;
 	}

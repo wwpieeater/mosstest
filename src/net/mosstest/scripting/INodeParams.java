@@ -1,5 +1,6 @@
 package net.mosstest.scripting;
 
+// TODO: Auto-generated Javadoc
 /**
  * Interface to specify handlers to be called when various actions are taken by
  * players directed at a node. These handlers are called after the ones defined
@@ -11,29 +12,25 @@ package net.mosstest.scripting;
  * 
  */
 public interface INodeParams {
+	
 	/**
 	 * Function that is called when a node is punched.
-	 * 
-	 * @param player
-	 *            The player punching the node.
-	 * @param tool
-	 *            The tool being used to punch the node.
-	 * @param target
-	 *            The position of the targeted node.
-	 * @param punchedFace
-	 *            The face being punched.
+	 *
+	 * @param player            The player punching the node.
+	 * @param tool            The tool being used to punch the node.
+	 * @param target            The position of the targeted node.
+	 * @param punchedFace            The face being punched.
+	 * @throws EventProcessingCompletedSignal the event processing completed signal
 	 */
 	public abstract void onPunch(Player player, MossItem tool,
 			NodePosition target, Face punchedFace)
 			throws EventProcessingCompletedSignal;
 
 	/**
-	 * Determines if a fall should continue
-	 * 
-	 * @param player
-	 *            The player.
-	 * @param height
-	 *            The height.
+	 * Determines if a fall should continue.
+	 *
+	 * @param player            The player.
+	 * @param height            The height.
 	 * @return A boolean representing whether the fall should continue or be
 	 *         marked as a fall.
 	 */
@@ -41,19 +38,15 @@ public interface INodeParams {
 
 	/**
 	 * Called when a node is fully dug.
-	 * 
-	 * @param player
-	 *            The player digging the node.
-	 * @param tool
-	 *            The tool used to dig the node.
-	 * @param target
-	 *            The position of the node that has been dug.
-	 * @param punchedFace
-	 *            The face on which the the tool was pointed when digging was
+	 *
+	 * @param player            The player digging the node.
+	 * @param tool            The tool used to dig the node.
+	 * @param target            The position of the node that has been dug.
+	 * @param punchedFace            The face on which the the tool was pointed when digging was
 	 *            complete. Note that if a dig begins on one face but the player
 	 *            moves the aim to another face the onPunch handler may receive
 	 *            a different face than this handler.
-	 * @throws EventProcessingCompletedSignal
+	 * @throws EventProcessingCompletedSignal the event processing completed signal
 	 */
 	public abstract void onDig(Player player, MossItem tool,
 			NodePosition target, Face punchedFace)
@@ -62,12 +55,11 @@ public interface INodeParams {
 	/**
 	 * Called when a node is placed directly above, below, left, right, in front
 	 * of, or behind this node.
-	 * 
-	 * @param player
-	 *            The player placing the node.
-	 * @param target
-	 * @param placed
-	 * @throws EventProcessingCompletedSignal
+	 *
+	 * @param player            The player placing the node.
+	 * @param target the target
+	 * @param placed the placed
+	 * @throws EventProcessingCompletedSignal the event processing completed signal
 	 */
 	public abstract void onPlaceNextTo(Player player, NodePosition target,
 			NodePosition placed) throws EventProcessingCompletedSignal;
@@ -76,16 +68,12 @@ public interface INodeParams {
 	 * Called when a right-click is done on a node. Note that this is called
 	 * even if no node is placed, such as if the player is not holding anything,
 	 * or is holding a tool.
-	 * 
-	 * @param player
-	 *            Player performing the action.
-	 * @param tool
-	 *            Tool held by user in active slot during this action.
-	 * @param target
-	 *            Position of targeted node
-	 * @param clickedFace
-	 *            Face which was right-clicked.
-	 * @throws EventProcessingCompletedSignal
+	 *
+	 * @param player            Player performing the action.
+	 * @param tool            Tool held by user in active slot during this action.
+	 * @param target            Position of targeted node
+	 * @param clickedFace            Face which was right-clicked.
+	 * @throws EventProcessingCompletedSignal the event processing completed signal
 	 */
 	public abstract void onRightClick(Player player, MossItem tool,
 			NodePosition target, Face clickedFace)
@@ -94,13 +82,11 @@ public interface INodeParams {
 	/**
 	 * Called when a player steps on a node either from jumping, falling, or
 	 * walking forward.
-	 * 
-	 * @param player
-	 *            Player that steps on this node.
-	 * @param pos
-	 *            Position of node that is stepped on.
+	 *
+	 * @param player            Player that steps on this node.
+	 * @param pos            Position of node that is stepped on.
 	 * @return Currently unused.
-	 * @throws EventProcessingCompletedSignal
+	 * @throws EventProcessingCompletedSignal the event processing completed signal
 	 */
 	public abstract boolean onStepOn(Player player, NodePosition pos)
 			throws EventProcessingCompletedSignal;
@@ -108,18 +94,17 @@ public interface INodeParams {
 	/**
 	 * Calculates the height a player may jump off of this node. One node is
 	 * equal to 1.0.
-	 * 
-	 * @param player
+	 *
+	 * @param player the player
 	 * @return The height the player may jump off this node.
 	 */
 	public abstract double jumpOffHeight(Player player);
 
 	/**
 	 * Calculates the height a player will bounce when landing on this node.
-	 * 
-	 * @param player
-	 * @param fallheight
-	 *            The height from which the player has fallen.
+	 *
+	 * @param player the player
+	 * @param fallheight            The height from which the player has fallen.
 	 * @return A double value representing the height the player is to bounce.
 	 */
 	public abstract double calcBounceHeight(Player player, double fallheight);
@@ -208,17 +193,24 @@ public interface INodeParams {
 	 *            The player.
 	 * @param distance
 	 *            The distance from the camera to the node.
-	 * @return
+	 * @return Whether the aim ray should hit this node.
 	 */
 	public abstract boolean shouldHitAimRay(Player player, double distance);
 
 	/**
-	 * Calculate a dig property. These are generally 0 for inability to dig to 1
-	 * for digging the node in one second.
+	 * Calculate a dig property, as a double: 0 for inability to dig, 1 for
+	 * digging the node in one second (where dig time is the 1/return value).
+	 * Negative values signify instant digging.
 	 * 
 	 * @param key
-	 * @return
+	 *            The interact type
+	 * @param interactStrength
+	 *            How strong the tool is (where 1 corresponds to the wooden
+	 *            pick/hand).
+	 * @return The reciprocal of the dig time, 0 for non-diggability, or
+	 *         negative values for instant digging.
 	 */
-	public abstract double calcInteractProperties(MossTool.InteractType key);
+	public abstract double calcInteractProperties(MossTool.InteractType key,
+			double interactStrength);
 
 }

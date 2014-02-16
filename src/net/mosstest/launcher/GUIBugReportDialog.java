@@ -31,17 +31,34 @@ import javax.swing.SwingConstants;
 import java.awt.Point;
 import java.awt.Dialog.ModalityType;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class GUIBugReportDialog.
+ */
 public class GUIBugReportDialog extends JDialog {
 
+	/** The content panel. */
 	private final JPanel contentPanel = new JPanel();
+	
+	/** The reporter name. */
 	private JTextField reporterName;
+	
+	/** The email. */
 	private JTextField email;
+	
+	/** The problem summary. */
 	private JTextField problemSummary;
+	
+	/** The chckbx include technical information. */
 	private JCheckBox chckbxIncludeTechnicalInformation;
+	
+	/** The lbl name. */
 	private JLabel lblName;
 
 	/**
 	 * Launch the application.
+	 *
+	 * @param args the arguments
 	 */
 	public static void main(String[] args) {
 		try {
@@ -55,6 +72,8 @@ public class GUIBugReportDialog extends JDialog {
 
 	/**
 	 * Create the dialog.
+	 *
+	 * @param traceback the traceback
 	 */
 	public GUIBugReportDialog(String traceback) {
 		setModal(true);

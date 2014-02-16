@@ -16,12 +16,25 @@ import org.iq80.leveldb.DB;
 
 import com.google.common.collect.HashBiMap;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class ItemManager.
+ */
 public class ItemManager {
+	
+	/** The def items. */
 	private ArrayList<MossItem> defItems = new ArrayList<>();
+	
+	/** The def items by name. */
 	private HashMap<String, MossItem> defItemsByName = new HashMap<>();
+	
+	/** The pending. */
 	private HashBiMap<Short, String> pending = HashBiMap.create();
+	
+	/** The item db. */
 	private DB itemDb;
 
+	/** The unknown fallback item. */
 	private final MossItem unknownFallbackItem = new MossItem(
 			"item_unknown.png", "sys_hand.png", 1, true,
 			"An unidentifiable item", "sys:unknown");
@@ -32,10 +45,23 @@ public class ItemManager {
 				this.unknownFallbackItem);
 	}
 
+	/**
+	 * Gets the node.
+	 *
+	 * @param nodeId the node id
+	 * @return the node
+	 */
 	public MossItem getNode(short nodeId) {
 		return this.defItems.get(nodeId);
 	}
 
+	/**
+	 * Put node.
+	 *
+	 * @param item the item
+	 * @return the short
+	 * @throws MossWorldLoadException the moss world load exception
+	 */
 	public short putNode(MossItem item) throws MossWorldLoadException {
 		if (this.pending.containsValue(item.getTechnicalName())) {
 			item.setItemId(this.pending.inverse().get(item.getTechnicalName()));
@@ -58,16 +84,35 @@ public class ItemManager {
 		return item.getItemId();
 	}
 
+	/**
+	 * Put node alias.
+	 *
+	 * @param alias the alias
+	 * @param dst the dst
+	 */
 	public void putNodeAlias(String alias, String dst) {
 		MossItem dstItem = this.defItemsByName.get(dst);
 		this.defItemsByName.put(alias, dstItem);
 	}
 
+	/**
+	 * Gets the item.
+	 *
+	 * @param string the string
+	 * @param isModified the is modified
+	 * @return the item
+	 */
 	public MossItem getItem(String string, boolean isModified) {
 		MossItem r = this.defItemsByName.get(string);
 		return r == null ? this.unknownFallbackItem : r;
 	}
 
+	/**
+	 * Gets the item.
+	 *
+	 * @param string the string
+	 * @return the item
+	 */
 	public MossItem getItem(String string) {
 
 		MossItem r = this.defItemsByName.get(string);
@@ -75,7 +120,9 @@ public class ItemManager {
 	}
 
 	/**
-	 * 
+	 * Instantiates a new item manager.
+	 *
+	 * @param itemdb the itemdb
 	 */
 	public ItemManager(DB itemdb) {
 		this.itemDb = itemdb;
@@ -86,8 +133,15 @@ public class ItemManager {
 		}
 	}
 
+	/** The items for node. */
 	private static HashMap<MapNode, MossItem> itemsForNode = new HashMap<>();
 
+	/**
+	 * Gets the for node.
+	 *
+	 * @param nd the nd
+	 * @return the for node
+	 */
 	public static MossItem getForNode(MapNode nd) {
 		MossItem item = itemsForNode.get(nd);
 		if (item == null) {

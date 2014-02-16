@@ -15,15 +15,40 @@ import org.iq80.leveldb.DB;
 import org.iq80.leveldb.DBComparator;
 import org.iq80.leveldb.Options;
 
+// TODO: Auto-generated Javadoc
+/**
+ * The Class MapDatabase.
+ */
 public class MapDatabase {
+	
+	/** The map. */
 	DB map;
+	
+	/** The entities. */
 	DB entities;
+	
+	/** The metadata. */
 	DB metadata;
+	
+	/** The map heavies. */
 	DB mapHeavies;
+	
+	/** The landclaims. */
 	DB landclaims;
+	
+	/** The players. */
 	DB players;
+	
+	/** The nodes. */
 	public DB nodes;
 
+	/**
+	 * Instantiates a new map database.
+	 *
+	 * @param basedir the basedir
+	 * @throws MapDatabaseException the map database exception
+	 * @throws MossWorldLoadException the moss world load exception
+	 */
 	@SuppressWarnings("nls")
 	public MapDatabase(File basedir) throws MapDatabaseException,
 			MossWorldLoadException {
@@ -47,6 +72,11 @@ public class MapDatabase {
 
 	}
 
+	/**
+	 * Close.
+	 *
+	 * @throws MapDatabaseException the map database exception
+	 */
 	public void close() throws MapDatabaseException {
 		try {
 			this.map.close();
@@ -60,6 +90,13 @@ public class MapDatabase {
 		}
 	}
 
+	/**
+	 * Gets the chunk.
+	 *
+	 * @param pos the pos
+	 * @return the chunk
+	 * @throws MapGeneratorException the map generator exception
+	 */
 	public MapChunk getChunk(final Position pos) throws MapGeneratorException {
 
 		byte[] chunk = this.map.get(pos.toBytes());
@@ -78,9 +115,10 @@ public class MapDatabase {
 	}
 
 	/**
-	 * @param args
-	 * @throws MossWorldLoadException
-	 * @throws MapDatabaseException
+	 * Adds the map chunk.
+	 *
+	 * @param pos the pos
+	 * @param mapChunk the map chunk
 	 */
 
 	void addMapChunk(Position pos, MapChunk mapChunk) {
@@ -88,6 +126,12 @@ public class MapDatabase {
 
 	}
 
+	/**
+	 * Gets the heavy.
+	 *
+	 * @param pos the pos
+	 * @return the heavy
+	 */
 	public byte[] getHeavy(Position pos) {
 		return this.mapHeavies.get(pos.toBytes());
 	}
