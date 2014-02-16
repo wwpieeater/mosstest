@@ -5,8 +5,6 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
 import java.util.logging.Level;
 
 import jme3tools.optimize.GeometryBatchFactory;
@@ -85,8 +83,7 @@ public class RenderProcessor extends SimpleApplication {
 	
 	/** The initial up vec. */
 	private Vector3f initialUpVec;
-	
-	/** The world node. */
+	private Object renderKey;
 	private Node worldNode;
 	
 	/** The spot. */
@@ -106,11 +103,7 @@ public class RenderProcessor extends SimpleApplication {
 	
 	/** The r preparator. */
 	public IRenderPreparator rPreparator;
-	
-	/** The player. */
-	public Player player;;
-	
-	/** The render event queue. */
+	public Player player;
 	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
 			24000, false);
 
@@ -125,23 +118,19 @@ public class RenderProcessor extends SimpleApplication {
 		java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
 		RenderProcessor app = new RenderProcessor();
 		AppSettings settings = new AppSettings(true);
-		settings.setResolution(1024, 1024);
+		settings.setResolution(800, 600);
 		settings.setSamples(2);
 		settings.setFullscreen(false);
 		app.setSettings(settings);
 		app.setShowSettings(false);
-		app.initManager(manager);
+		app.initNodeManager(manager);
 		app.initPreparator(preparator);
+		app.initSecurityLock();
 		app.start();
 		return app;
 	}
 
-	/**
-	 * Inits the manager.
-	 *
-	 * @param manager the manager
-	 */
-	private void initManager (INodeManager manager) {
+	private void initNodeManager (INodeManager manager) {
 		nManager = manager;
 	}
 	
@@ -157,13 +146,15 @@ public class RenderProcessor extends SimpleApplication {
 		rPreparator.start();
 	}
 
-	/* (non-Javadoc)
-	 * @see com.jme3.app.SimpleApplication#simpleInitApp()
-	 */
+	private void initSecurityLock () {
+		renderKey = new Object();
+	}
+	
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
 		
+		//acquireLock();
 		setupWorldNode ();
 		setupFlashlight();
 		setupSunlight();
@@ -227,58 +218,55 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(1000000);
-		FloatBuffer normals = getDirectFloatBuffer(1000000);
-		IntBuffer indices = getDirectIntBuffer(1000000);
-		//RenderNode[][][] nodesInChunk = new RenderNode[16][16][16];
-		
-		
+		FloatBuffer vertices = getDirectFloatBuffer(150000);
+		FloatBuffer normals = getDirectFloatBuffer(150000);
+		IntBuffer indices = getDirectIntBuffer(150000);
+		RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
-					int nVal = chk.getNodeId(i, j, k);
-					//MapNode node = nManager.getNode((short) nVal);
-					//Material mat = getMaterial((short) nVal);
-					if (nVal == 0) {/*System.out.println("GOT A 0");*/}
+					if (isNodeVisible(chk.getNodes(), i, j, k)) {
 					
-					else {
-						float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-						float z = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
-						float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
+						int nVal = chk.getNodeId(i, j, k);
+						//MapNode node = nManager.getNode((short) nVal);
+						//Material mat = getMaterial((short) nVal);
+						if (nVal == 0) {/*System.out.println("GOT A 0");*/}
 						
-						vertices.put(x).put(y).put(z); //Front face
-						vertices.put(x).put(y - BLOCK_SIZE).put(z);
-						vertices.put(x + BLOCK_SIZE).put(y).put(z);
-						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z); //Top Face
-						vertices.put(x).put(y).put(z + BLOCK_SIZE);
-						vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
-						vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
-						vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
-						
-						for(int m=0; m<8; m++) {
-							normals.put(0).put(0).put(10);
+						else {
+							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
+							float z = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
+							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							
+							vertices.put(x).put(y).put(z); //Front face
+							vertices.put(x).put(y - BLOCK_SIZE).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z); //Top Face
+							vertices.put(x).put(y).put(z + BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
+							vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
+							
+							for(int m=0; m<8; m++) {
+								normals.put(0).put(0).put(10);
+							}
+							
+							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 1).put(vertexIndexCounter + 0);//front
+							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 0).put(vertexIndexCounter + 2);
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 2).put(vertexIndexCounter + 0);//top
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 5).put(vertexIndexCounter + 2);
+							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 2).put(vertexIndexCounter + 6);//right
+							indices.put(vertexIndexCounter + 2).put(vertexIndexCounter + 5).put(vertexIndexCounter + 6);
+							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 1).put(vertexIndexCounter + 7);//left
+							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 7).put(vertexIndexCounter + 4);
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//back
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
+							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 6).put(vertexIndexCounter + 7);//bottom
+							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 3).put(vertexIndexCounter + 6);
+							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
+							//renderNodes[i][j][k] = geom;
+							vertexIndexCounter += 8;
 						}
-						
-						indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 1).put(vertexIndexCounter + 0);//front
-						indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 0).put(vertexIndexCounter + 2);
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 2).put(vertexIndexCounter + 0);//top
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 5).put(vertexIndexCounter + 2);
-						indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 2).put(vertexIndexCounter + 6);//right
-						indices.put(vertexIndexCounter + 2).put(vertexIndexCounter + 5).put(vertexIndexCounter + 6);
-						indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 1).put(vertexIndexCounter + 7);//left
-						indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 7).put(vertexIndexCounter + 4);
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//back
-						indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
-						indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 6).put(vertexIndexCounter + 7);//bottom
-						indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 3).put(vertexIndexCounter + 6);
-						
-						
-						
-						//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
-						//nodesInChunk[i][j][k] = geom;
-						vertexIndexCounter += 8;
 					}
-
 				}
 			}
 		}
@@ -290,25 +278,10 @@ public class RenderProcessor extends SimpleApplication {
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
 		geom.setMaterial(mat);
 		worldNode.attachChild(geom);
-		/*RenderMapChunk thisChunk = new RenderMapChunk(nodesInChunk, x, y, z);
-		allChunks.put(pos, thisChunk);*/
+		RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
+		allChunks.put(pos, currentChunk);
 	}
-	
-	/**
-	 * Calculate and store surface normal.
-	 *
-	 * @param x the x
-	 * @param y the y
-	 * @param z the z
-	 * @param normals the normals
-	 */
-	private void calculateAndStoreSurfaceNormal (float x, float y, float z, FloatBuffer normals) {
-		
-	}
-	
-	/**
-	 * Preparator chunk test.
-	 */
+
 	private void preparatorChunkTest() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
@@ -325,36 +298,6 @@ public class RenderProcessor extends SimpleApplication {
 		getChunk(p5);
 		getChunk(p6);
 		getChunk(p7);
-	}
-
-	/**
-	 * Local chunk test.
-	 */
-	private void localChunkTest() {
-		for(int i=0; i<1; i++) {
-			for(int j=0; j<1; j++) {
-				for(int k=0; k<1; k++) {
-					Position pos = new Position(i, j, k, 0);
-					boolean[][][] modifiedNodes = new boolean[16][16][16];
-					for(boolean[][] m : modifiedNodes) {
-						for(boolean[] n : m) {
-							Arrays.fill(n, false);
-						}
-					}
-					
-					int[][][] nodeIds = new int[16][16][16];
-					for(int[][] m : nodeIds) {
-						for (int[] n : m) {
-							Arrays.fill(n, 1);
-						}
-					}
-					
-					MapChunk chunk = new MapChunk (pos, nodeIds, modifiedNodes);
-					renderChunk(chunk, pos);
-				}
-			}
-		}
-		GeometryBatchFactory.optimize(worldNode);
 	}
 	
 	/**
@@ -521,11 +464,20 @@ public class RenderProcessor extends SimpleApplication {
 		spot.setDirection(cam.getDirection());
 	}
 
-	/**
-	 * Wait for.
-	 */
-	private void waitFor () {
-		//TODO (what do i do here?)
+	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
+		if (i == 0 || j == 0 || k == 0 || i == chunk.length-1 || j == chunk[0].length-1 || k == chunk[0][0].length-1) {
+			return true;
+		}
+		return (chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
+			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
+	}
+
+	private void acquireLock () {
+		MosstestSecurityManager.instance.lock(renderKey, null);
+	}
+	
+	private void releaseLock () {
+		MosstestSecurityManager.instance.unlock(renderKey);
 	}
 	
 	/**
