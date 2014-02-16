@@ -29,3 +29,5 @@ COMMIT_EDITMSG
 /data/worlds
 src/git.properties
 /stacktraces
+/*.log
+*.log
