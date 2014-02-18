@@ -1,1 +1,9 @@
 language: java
+notifications:
+  irc:
+    channels:
+      - "chat.freenode.net#mosstest"
+    template:
+      - "%{repository_slug} (%{commit}) by %{author} on %{branch} took %{duration} : %{message}"
+      - "Change view : %{compare_url}"
+      - "Build details : %{build_url}"
