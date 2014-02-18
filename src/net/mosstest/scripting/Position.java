@@ -58,7 +58,7 @@ public class Position {
 		// DataInputStream dis = new DataInputStream(bis);
 		if (bytes.length != 16)
 			throw new IllegalArgumentException(
-					"Input array is not 12 elements long.");
+					"Input array is not 16 elements long.");
 
 		this.realm = ((0xFF & (0xFF & bytes[0])) << 24)
 				+ ((0xFF & bytes[1]) << 16) + ((0xFF & bytes[2]) << 8)

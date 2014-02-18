@@ -1,13 +1,8 @@
 package net.mosstest.tests;
 
-import static org.junit.Assert.fail;
-
-import java.io.IOException;
-
-import org.junit.Assert;
-
 import net.mosstest.scripting.Position;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 public class PositionTest {
@@ -41,11 +36,9 @@ public class PositionTest {
 							coords[k], 0);
 					byte[] bytes = pos1.toBytes();
 					Position pos2;
-System.out.println("<<<");
-System.out.println(pos1);
+
 					pos2 = new Position(bytes);
 
-System.out.println(pos2);
 					Assert.assertTrue(
 							"Position unmarshaled from byte[] fails equals() check with original position.",
 							pos1.equals(pos2));
