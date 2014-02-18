@@ -5,15 +5,15 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 
 import org.junit.Assert;
+
 import net.mosstest.scripting.Position;
 
 import org.junit.Test;
 
 public class PositionTest {
 
-	public static final int[] coords = { 0, 1, -1, 16, -16, 64, -64, 256, -256,
-			65536, -65536, Integer.MAX_VALUE, Integer.MIN_VALUE };
-
+	public static final int[] coords = { 0, 1, -1, 16, -16, 67, -66, 269, -267,
+		65601, -65601, Integer.MAX_VALUE, Integer.MIN_VALUE };
 	@Test
 	public void testHashCode() {
 		for (int i = 0; i < coords.length; i++) {
