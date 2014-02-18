@@ -13,7 +13,8 @@ import org.junit.Test;
 public class PositionTest {
 
 	public static final int[] coords = { 0, 1, -1, 16, -16, 67, -66, 269, -267,
-		65601, -65601, Integer.MAX_VALUE, Integer.MIN_VALUE };
+			65601, -65601, Integer.MAX_VALUE, Integer.MIN_VALUE };
+
 	@Test
 	public void testHashCode() {
 		for (int i = 0; i < coords.length; i++) {
@@ -40,14 +41,14 @@ public class PositionTest {
 							coords[k], 0);
 					byte[] bytes = pos1.toBytes();
 					Position pos2;
-					try {
-						pos2 = new Position(bytes);
-						Assert.assertTrue(
-								"Position nmarshaled from byte[] fails equals() check with original position.",
-								pos1.equals(pos2));
-					} catch (IOException e) {
-						fail("IOException caught in unmarshaling Position from byte[]");
-					}
+System.out.println("<<<");
+System.out.println(pos1);
+					pos2 = new Position(bytes);
+
+System.out.println(pos2);
+					Assert.assertTrue(
+							"Position unmarshaled from byte[] fails equals() check with original position.",
+							pos1.equals(pos2));
 
 				}
 			}

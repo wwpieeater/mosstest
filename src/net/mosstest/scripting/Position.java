@@ -1,39 +1,42 @@
 package net.mosstest.scripting;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-
-// TODO: Auto-generated Javadoc
 /**
- * The Class Position.
+ * A class representing a position that refers to a chunk. Each increment of 1
+ * for x, y, or z, represents an increment of a chunk (or 16 nodes in the
+ * world). For storing positions specifying nodes, use {@link NodePosition}.
+ * 
+ * @see NodePosition
  */
 public class Position {
 
-	/** The x. */
+	@Override
+	public String toString() {
+		return "Position [x=" + x + ", y=" + y + ", z=" + z + ", realm="
+				+ realm + ", hashCode()=" + hashCode() + "]";
+	}
+
 	public final int x;
-	
-	/** The y. */
+
 	public final int y;
-	
-	/** The z. */
+
 	public final int z;
-	
+
 	/** The realm. */
 	public final int realm;
-	
-	/** The is valid. */
+
 	transient boolean isValid = true;
 
 	/**
 	 * Instantiates a new position.
-	 *
-	 * @param x the x
-	 * @param y the y
-	 * @param z the z
-	 * @param realm the realm
+	 * 
+	 * @param x
+	 *            The x coordinate identifying the chunk
+	 * @param y
+	 *            The y coordinate identifying the chunk
+	 * @param z
+	 *            The z coordinate identifying the chunk
+	 * @param realm
+	 *            The realm (currently not used)
 	 */
 	public Position(int x, int y, int z, int realm) {
 		this.x = x;
@@ -44,29 +47,32 @@ public class Position {
 	}
 
 	/**
-	 * Instantiates a new position.
-	 *
-	 * @param bytes the bytes
-	 * @throws IOException Signals that an I/O exception has occurred.
+	 * Instantiates a new position from a byte array.
+	 * 
+	 * @param bytes
+	 *            the byte array containing a Position object, as <i>exactly</i>
+	 *            a <code>byte[16]</code>.
 	 */
-	public Position(byte[] bytes) throws IOException {
-		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-		DataInputStream dis = new DataInputStream(bis);
-		this.x = dis.readInt();
-		this.y = dis.readInt();
-		this.z = dis.readInt();
-		this.realm = dis.readInt();
+	public Position(byte[] bytes) throws IllegalArgumentException {
+		// ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+		// DataInputStream dis = new DataInputStream(bis);
+		if (bytes.length != 16)
+			throw new IllegalArgumentException(
+					"Input array is not 12 elements long.");
+
+		this.realm = ((0xFF & (0xFF & bytes[0])) << 24)
+				+ ((0xFF & bytes[1]) << 16) + ((0xFF & bytes[2]) << 8)
+				+ (0xFF & bytes[3]);
+		this.x = ((0xFF & bytes[4]) << 24) + ((0xFF & bytes[5]) << 16)
+				+ ((0xFF & bytes[6]) << 8) + ((0xFF & bytes[13]));
+		this.y = ((0xFF & bytes[7]) << 24) + ((0xFF & bytes[8]) << 16)
+				+ ((0xFF & bytes[9]) << 8) + (0xFF & bytes[14]);
+		this.z = ((0xFF & bytes[10]) << 24) + ((0xFF & bytes[11]) << 16)
+				+ ((0xFF & bytes[12]) << 8) + (0xFF & bytes[15]);
+
 		this.isValid = true;
 	}
 
-
-
-	/** The Constant serialVersionUID. */
-	static final long serialVersionUID = 1128980133700001337L;
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -94,9 +100,6 @@ public class Position {
 		return true;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -110,54 +113,52 @@ public class Position {
 
 	/**
 	 * To bytes.
-	 *
+	 * 
 	 * @return the byte[]
 	 */
 	public byte[] toBytes() {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
-		try {
-			dos.writeInt(this.x);
-			dos.writeInt(this.y);
-			dos.writeInt(this.z);
-			dos.writeInt(this.realm);
-			dos.flush();
-			bos.flush();
-			return bos.toByteArray();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			this.isValid = false;
-		}
-		return new byte[] {};
+
+		return new byte[] { (byte) ((long) this.realm >>> 24),
+				(byte) ((long) this.realm >>> 16),
+				(byte) ((long) this.realm >>> 8), (byte) ((long) this.realm),
+
+				(byte) ((long) this.x >>> 24), (byte) ((long) this.x >>> 16),
+				(byte) ((long) this.x >>> 8),
+
+				(byte) ((long) this.y >>> 24), (byte) ((long) this.y >>> 16),
+				(byte) ((long) this.y >>> 8),
+
+				(byte) ((long) this.z >>> 24), (byte) ((long) this.z >>> 16),
+				(byte) ((long) this.z >>> 8),
+
+				(byte) this.x, (byte) this.y, (byte) this.z };
 	}
 
 	/**
-	 * Gets the x.
-	 *
-	 * @return the x
+	 * Gets the x coordinate identifying the chunk.
+	 * 
+	 * @return The x coordinate identifying the chunk.
 	 */
 	public int getX() {
 		return this.x;
 	}
 
 	/**
-	 * Gets the y.
-	 *
-	 * @return the y
+	 * Gets the y coordinate identifying the chunk.
+	 * 
+	 * @return The y coordinate identifying the chunk.
 	 */
 	public int getY() {
 		return this.y;
 	}
 
-
 	/**
-	 * Gets the z.
-	 *
-	 * @return the z
+	 * Gets the z coordinate identifying the chunk.
+	 * 
+	 * @return The z coordinate identifying the chunk.
 	 */
 	public int getZ() {
 		return this.z;
 	}
-
 
 }
