@@ -19,6 +19,40 @@ import net.mosstest.servercore.MossWorldLoadException;
  */
 public class MapChunk {
 	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + Arrays.hashCode(this.lightNodes);
+		result = prime * result + ((this.pos == null) ? 0 : this.pos.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof MapChunk)) {
+			return false;
+		}
+		MapChunk other = (MapChunk) obj;
+		if (!Arrays.deepEquals(this.lightNodes, other.lightNodes)) {
+			return false;
+		}
+		if (this.pos == null) {
+			if (other.pos != null) {
+				return false;
+			}
+		} else if (!this.pos.equals(other.pos)) {
+			return false;
+		}
+		return true;
+	}
+
 	/** The pos. */
 	public Position pos;
 	
@@ -157,7 +191,7 @@ public class MapChunk {
 	}
 	
 	public int[][][] getNodes () {
-		return lightNodes;
+		return this.lightNodes;
 	}
 	
 	public byte[] writeLight(boolean compressed) {
