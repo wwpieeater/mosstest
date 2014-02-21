@@ -2,10 +2,9 @@ package net.mosstest.servercore;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import net.mosstest.scripting.MapGenerators;
-import net.mosstest.scripting.MossEvent;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
 import net.mosstest.scripting.events.IMossEvent;
@@ -101,8 +100,8 @@ public class MossWorld {
 		this.fp = new FuturesProcessor();
 		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp, this.nm);
 		this.sEnv = new ScriptEnv(this.mossEnv);
-		ArrayList<MossScript> scripts = this.game.getScripts();
-		for (MossScript sc : scripts) {
+		List<IMossFile> scripts = this.game.getScripts();
+		for (IMossFile sc : scripts) {
 			this.sEnv.runScript(sc);
 		}
 		this.evp = new EventProcessor(this.mossEnv, ThreadContext.CONTEXT_SCRIPT);

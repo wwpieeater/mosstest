@@ -3,16 +3,19 @@ package net.mosstest.servercore;
 import java.io.IOException;
 
 import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 
 import org.apache.log4j.Logger;
 import org.mozilla.javascript.ClassShutter;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.GeneratedClassLoader;
 import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Script;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.SecurityController;
 import org.mozilla.javascript.WrapFactory;
 
 // TODO: Auto-generated Javadoc
@@ -97,11 +100,16 @@ public class ScriptEnv {
 	 *         result.
 	 * @throws MossWorldLoadException the moss world load exception
 	 */
-	public ScriptResult runScript(MossScript script)
+	public ScriptResult runScript(IMossFile script)
 			throws MossWorldLoadException {
 		try {
 			Script sc = this.cx.compileReader(script.getReader(),
-					script.file.toString(), 0, null);
+					script.toString(), 0, null);
+			
+			Object lock = new Object();
+			MosstestSecurityManager.instance.lock(lock, ThreadContext.CONTEXT_SCRIPT);
+			sc.exec(this.cx, this.globalScope);
+			MosstestSecurityManager.instance.unlock(lock);
 		} catch (IOException e) {
 			return ScriptResult.RESULT_ERROR;
 		} catch (RhinoException e) {
@@ -111,40 +119,39 @@ public class ScriptEnv {
 		}
 		return ScriptResult.RESULT_EXECUTED;
 	}
+//
+//	/**
+//	 * A factory for creating SandboxWrap objects.
+//	 */
+//	protected static class SandboxWrapFactory extends WrapFactory {
+//		
+//		/* (non-Javadoc)
+//		 * @see org.mozilla.javascript.WrapFactory#wrapAsJavaObject(org.mozilla.javascript.Context, org.mozilla.javascript.Scriptable, java.lang.Object, java.lang.Class)
+//		 */
+//		@Override
+//		public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
+//				Object javaObject, Class<?> staticType) {
+//			return new SandboxNativeJavaObject(scope, javaObject, staticType);
+//		}
+//	}
+//
+//	/**
+//	 * A factory for creating SandboxContext objects.
+//	 */
+//	protected static class SandboxContextFactory extends ContextFactory {
+//
+//		/* (non-Javadoc)
+//		 * @see org.mozilla.javascript.ContextFactory#makeContext()
+//		 */
+//		@Override
+//		protected Context makeContext() {
+//			Context cx = super.makeContext();
+//			cx.setClassShutter(new ScriptClassShutter());
+//			cx.setWrapFactory(new SandboxWrapFactory());
+//			return cx;
+//		}
+//	}
 
-	/**
-	 * A factory for creating SandboxWrap objects.
-	 */
-	protected static class SandboxWrapFactory extends WrapFactory {
-		
-		/* (non-Javadoc)
-		 * @see org.mozilla.javascript.WrapFactory#wrapAsJavaObject(org.mozilla.javascript.Context, org.mozilla.javascript.Scriptable, java.lang.Object, java.lang.Class)
-		 */
-		@Override
-		public Scriptable wrapAsJavaObject(Context cx, Scriptable scope,
-				Object javaObject, Class<?> staticType) {
-			return new SandboxNativeJavaObject(scope, javaObject, staticType);
-		}
-	}
-
-	/**
-	 * A factory for creating SandboxContext objects.
-	 */
-	protected static class SandboxContextFactory extends ContextFactory {
-
-		/* (non-Javadoc)
-		 * @see org.mozilla.javascript.ContextFactory#makeContext()
-		 */
-		@Override
-		protected Context makeContext() {
-			Context cx = super.makeContext();
-			cx.setClassShutter(new ScriptClassShutter());
-			cx.setWrapFactory(new SandboxWrapFactory());
-			return cx;
-		}
-	}
-
-	/** The cx. */
 	private Context cx;
 
 	/**
@@ -153,7 +160,8 @@ public class ScriptEnv {
 	 * @param ev the ev
 	 */
 	public ScriptEnv(MossScriptEnv ev) {
-		ContextFactory.initGlobal(new SandboxContextFactory());
+		//ContextFactory.initGlobal(new SandboxContextFactory());
+		ContextFactory.getGlobal().initApplicationClassLoader(MossScriptEnv.class.getClassLoader());
 		this.cx = ContextFactory.getGlobal().enterContext();
 		this.globalScope = this.cx.initStandardObjects();
 		this.globalScope.put("moss", this.globalScope, ev); //$NON-NLS-1$

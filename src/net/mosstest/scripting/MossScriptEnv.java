@@ -267,6 +267,7 @@ public class MossScriptEnv {
 	 *            myscript:specialdirt. This element must already exist.
 	 */
 	public void registerNodeAlias(String alias, String dst) {
+		System.err.println("<><><><<<><><><><><><<><><");
 		this.nm.putNodeAlias(alias, dst);
 	}
 

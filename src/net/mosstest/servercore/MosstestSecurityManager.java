@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.io.File;
 import java.io.FileDescriptor;
 import java.net.InetAddress;
 import java.security.Permission;
@@ -20,7 +21,7 @@ public class MosstestSecurityManager extends SecurityManager {
 	 */
 	@Override
 	public void checkPermission(Permission perm) {
-		System.err.println(perm.toString());
+		logger.trace("Requested permssion " + perm);
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
 			logger.warn("MosstestSecurityManager prevented the use of arbitrary permissions outside engine contexts.");
@@ -168,16 +169,16 @@ public class MosstestSecurityManager extends SecurityManager {
 	 */
 	@Override
 	public void checkCreateClassLoader() {
-		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
+		//if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-			logger.warn("MosstestSecurityManager stopped an attempt to create a classloader");
-			throw new SecurityException(
-					"MosstestSecurityManager stopped an attempt to create a classloader");
+		//	logger.warn("MosstestSecurityManager stopped an attempt to create a classloader");
+		//	throw new SecurityException(
+		//			"MosstestSecurityManager stopped an attempt to create a classloader");
 
-		} else {
-			super.checkCreateClassLoader();
+		//} else {
+		//	super.checkCreateClassLoader();
 			return;
-		}
+		//}
 
 	}
 
@@ -202,7 +203,6 @@ public class MosstestSecurityManager extends SecurityManager {
 	 */
 	@Override
 	public void checkAccess(ThreadGroup g) {
-		System.err.println(this.threadContext.get());
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
 			logger.warn("MosstestSecurityManager stopped an attempt to modify a ThreadGroup");
@@ -263,7 +263,7 @@ public class MosstestSecurityManager extends SecurityManager {
 	public void checkRead(FileDescriptor fd) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-			logger.warn("MosstestSecurityManager stopped an attempt to read a file from non-core code");
+			logger.warn("1MosstestSecurityManager stopped an attempt to read a file from non-core code " + fd.toString());
 			throw new SecurityException(
 					"MosstestSecurityManager stopped an attempt to read a file from non-core code");
 
@@ -276,8 +276,7 @@ public class MosstestSecurityManager extends SecurityManager {
 	@Override
 	public void checkRead(String file) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-
-			logger.warn("MosstestSecurityManager stopped an attempt to read a file from non-core code");
+			logger.warn("MosstestSecurityManager stopped an attempt to read a file from non-core code" + file);
 			throw new SecurityException(
 					"MosstestSecurityManager stopped an attempt to read a file from non-core code");
 
@@ -291,7 +290,7 @@ public class MosstestSecurityManager extends SecurityManager {
 	public void checkRead(String file, Object context) {
 		if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-			logger.warn("MosstestSecurityManager stopped an attempt to read a file from non-core code");
+			logger.warn("3MosstestSecurityManager stopped an attempt to read a file from non-core code: " + file);
 			throw new SecurityException(
 					"MosstestSecurityManager stopped an attempt to read a file from non-core code");
 
