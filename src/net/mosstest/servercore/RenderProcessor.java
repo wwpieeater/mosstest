@@ -84,6 +84,7 @@ public class RenderProcessor extends SimpleApplication {
 		app.start();
 		return app;
 	}
+	
 	private void initNodeManager (INodeManager manager) {
 		nManager = manager;
 	}
