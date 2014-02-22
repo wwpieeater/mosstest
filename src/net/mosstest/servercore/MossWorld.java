@@ -30,10 +30,10 @@ public class MossWorld {
 	private ScriptEnv sEnv;
 	private ScriptableDatabase sdb;
 	private EventProcessor evp;
-	
+
 	@SuppressWarnings("unused")
 	private ServerNetworkingManager snv;
-	
+
 	volatile boolean run = true;
 	private FuturesProcessor fp;
 	private INodeManager nm;
@@ -53,47 +53,54 @@ public class MossWorld {
 	 * @throws MossWorldLoadException
 	 *             Thrown if the world cannot be loaded, due to inconsistency,
 	 *             missing files, or lack of system resources.
-	 * @throws MapDatabaseException 
-	 * @throws IOException 
-	 * @throws ConfigurationException 
+	 * @throws MapDatabaseException
+	 * @throws IOException
+	 * @throws ConfigurationException
 	 */
 	@SuppressWarnings("nls")
-	public MossWorld(String name, int port) throws MossWorldLoadException, MapDatabaseException, IOException, ConfigurationException {
+	public MossWorld(String name, int port) throws MossWorldLoadException,
+			MapDatabaseException, IOException, ConfigurationException {
+		//Thread.currentThread().setContextClassLoader(
+		//		MosstestSecurityManager.instance.getScriptClassLoader(Thread
+		//				.currentThread().getContextClassLoader()));
 		this.baseDir = new File("data/worlds/" + name); //$NON-NLS-1$
 		if (!this.baseDir.exists()) {
 			this.baseDir.mkdirs();
 
 		}
+
+		// Sets the security manager to trust attempts to open anything below
+		// data/scripts
+		MosstestSecurityManager.instance
+				.setTrustedBasedir(new File("scripts/"));
 		this.cfgFile = new File(this.baseDir, "world.xml"); //$NON-NLS-1$
 		if (!this.cfgFile.isFile())
-		//	try {
-				this.cfgFile.createNewFile();
-				this.worldCfg = new XMLConfiguration(this.cfgFile);
 
-				if (!this.worldCfg.containsKey("gameid")) { //$NON-NLS-1$
-					throw new MossWorldLoadException(
-							Messages.getString("MossWorld.NO_GAME_ID")); //$NON-NLS-1$
-				}
-				this.game = new MossGame(this.worldCfg.getString("gameid")); //$NON-NLS-1$
-				
-				try {
-					this.db = new MapDatabase(this.baseDir);
-				} catch (MapDatabaseException e) {
-					throw new MossWorldLoadException(
-							Messages.getString("MossWorld.ERR_DB")); //$NON-NLS-1$
-				}
-			/*} catch (IOException | ConfigurationException e) {
-				throw new MossWorldLoadException(
-						"Error in creating configuration for game " + name
-								+ ". The error wrapped was: " + e.getMessage());
-			}*/
+			this.cfgFile.createNewFile();
+		this.worldCfg = new XMLConfiguration(this.cfgFile);
+
+		if (!this.worldCfg.containsKey("gameid")) { //$NON-NLS-1$
+			throw new MossWorldLoadException(
+					Messages.getString("MossWorld.NO_GAME_ID")); //$NON-NLS-1$
+		}
+		this.game = new MossGame(this.worldCfg.getString("gameid")); //$NON-NLS-1$
+
+		try {
+			this.db = new MapDatabase(this.baseDir);
+		} catch (MapDatabaseException e) {
+			throw new MossWorldLoadException(
+					Messages.getString("MossWorld.ERR_DB")); //$NON-NLS-1$
+		}
+
 		this.nc = new NodeCache(this.db);
 		this.nm = new LocalNodeManager(this.db.nodes);
-		//this.db = new MapDatabase(this.baseDir);
+		// this.db = new MapDatabase(this.baseDir);
 		try {
-			MapGenerators.setDefaultMapGenerator(new MapGenerators.SimplexMapGenerator(), this.nm, 8448);
+			MapGenerators.setDefaultMapGenerator(
+					new MapGenerators.SimplexMapGenerator(), this.nm, 8448);
 		} catch (MapGeneratorException e) {
-			System.err.println(Messages.getString("MossWorld.MG_SELECT_FAILURE")); //$NON-NLS-1$
+			System.err.println(Messages
+					.getString("MossWorld.MG_SELECT_FAILURE")); //$NON-NLS-1$
 			System.exit(4);
 		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
@@ -104,20 +111,20 @@ public class MossWorld {
 		for (IMossFile sc : scripts) {
 			this.sEnv.runScript(sc);
 		}
-		this.evp = new EventProcessor(this.mossEnv, ThreadContext.CONTEXT_SCRIPT);
+		this.evp = new EventProcessor(this.mossEnv,
+				ThreadContext.CONTEXT_SCRIPT);
 		if (port >= 0) {
 			logger.error(Messages.getString("MossWorld.NO_NETWORKING_NOW")); //$NON-NLS-1$
-			/*try {
-				this.snv = new ServerNetworkingManager(port, this);
-			} catch (IOException e) {
-				throw new MossWorldLoadException(
-						"Failure in opening server socket for listening!");
-			}*/
-		} //else {
+			/*
+			 * try { this.snv = new ServerNetworkingManager(port, this); } catch
+			 * (IOException e) { throw new MossWorldLoadException(
+			 * "Failure in opening server socket for listening!"); }
+			 */
+		} // else {
 		/*	*/this.rp = new LocalRenderPreparator(this.rend, this.nc);
 		this.rp.setNodeManager(nm);
 		/*	*/this.rend = RenderProcessor.init(this.nm, this.rp);
-		//}
+		// }
 
 	}
 
@@ -125,7 +132,8 @@ public class MossWorld {
 		this.evp.eventQueue.put(e);
 	}
 
-	public static void main(String[] args) throws MossWorldLoadException, MapDatabaseException, ConfigurationException, IOException {
+	public static void main(String[] args) throws MossWorldLoadException,
+			MapDatabaseException, ConfigurationException, IOException {
 		MossWorld m = new MossWorld("test", -1); //$NON-NLS-1$
 
 	}
