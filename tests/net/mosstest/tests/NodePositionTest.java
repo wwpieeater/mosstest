@@ -18,9 +18,9 @@ public class NodePositionTest {
 		for (int i = 0; i < coords.length; i++) {
 			for (int j = 0; j < coords.length; j++) {
 				for (int k = 0; k < coords.length; k++) {
-					for (byte x = 0; x < 16; x++) {
-						for (byte y = 0; y < 16; y++) {
-							for (byte z = 0; z < 16; z++) {
+					for (byte x = 0; x < 16; x+=2) {
+						for (byte y = 0; y < 16; y+=2) {
+							for (byte z = 0; z < 16; z+=2) {
 								NodePosition pos1 = new NodePosition(coords[i],
 										coords[j], coords[k], 0, x, y, z);
 								NodePosition pos2 = new NodePosition(coords[i],
