@@ -412,7 +412,7 @@ public class GUIClientsideLauncher {
 		/* (non-Javadoc)
 		 * @see javax.swing.table.AbstractTableModel#getColumnClass(int)
 		 */
-		public Class getColumnClass(int c) {
+		public Class<?> getColumnClass(int c) {
 			return String.class;
 		}
 
