@@ -2,25 +2,32 @@ package net.mosstest.servercore;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
+
+import com.google.common.collect.ImmutableList;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class MossGame.
  */
 public class MossGame {
-	
+
 	/**
 	 * Instantiates a new moss game.
-	 *
-	 * @param name the name
-	 * @throws MossWorldLoadException the moss world load exception
+	 * 
+	 * @param name
+	 *            the name
+	 * @throws MossWorldLoadException
+	 *             the moss world load exception
+	 * @throws IOException
 	 */
 	@SuppressWarnings("nls")
-	public MossGame(String name) throws MossWorldLoadException {
+	public MossGame(String name) throws MossWorldLoadException, IOException {
 		this.baseDir = new File("data/games/" + name); //$NON-NLS-1$
 		this.cfgFile = new File(this.baseDir, "game.xml"); //$NON-NLS-1$
 		if (!(this.baseDir.isDirectory() && this.cfgFile.isFile())) {
@@ -37,32 +44,33 @@ public class MossGame {
 		String[] scNames = this.gameCfg.getStringArray("plugin"); //$NON-NLS-1$
 		for (String scName : scNames) {
 			try {
-				this.scripts.add(new MossScript(new MossLocalFile(new File("data/scripts/"), //$NON-NLS-1$
-						scName, "init.js"))); //$NON-NLS-1$
+				this.scripts.add(LocalFileManager.scriptsInstance
+						.getFile(scName + "/init.js")); //$NON-NLS-1$
 			} catch (FileNotFoundException e) {
-				throw new MossWorldLoadException(Messages.getString("MossGame.FILE_NOT_FOUND") + scName); //$NON-NLS-1$
-			} // TODO directory structure and proper iteration
+				throw new MossWorldLoadException(
+						Messages.getString("MossGame.FILE_NOT_FOUND") + scName); //$NON-NLS-1$
+			}
 		}
 	}
 
 	/** The base dir. */
 	private File baseDir;
-	
+
 	/** The game cfg. */
 	private XMLConfiguration gameCfg;
-	
+
 	/** The cfg file. */
 	private File cfgFile;
-	
+
 	/** The scripts. */
-	private ArrayList<MossScript> scripts;
+	private ArrayList<IMossFile> scripts;
 
 	/**
 	 * Gets the scripts.
-	 *
+	 * 
 	 * @return the scripts
 	 */
-	public ArrayList<MossScript> getScripts() {
-		return this.scripts;
+	public List<IMossFile> getScripts() {
+		return ImmutableList.copyOf(this.scripts);
 	}
 }

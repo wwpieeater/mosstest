@@ -86,7 +86,6 @@ public class SimplexMapGenerator implements IMapGenerator {
 		short dirt = this.nm.getNode("mg:dirt", false).getNodeId(); //$NON-NLS-1$
 		short stone = this.nm.getNode("mg:stone", false).getNodeId(); //$NON-NLS-1$
 		short air = 0; //this.nm.getNode("mg:air", false).getNodeId(); //$NON-NLS-1$
-		System.err.println("<<< AIR:" + air);
 		short sand = this.nm.getNode("mg:sand", false).getNodeId(); //$NON-NLS-1$
 		for (int x = 0; x < 16; x++) {
 			long globalx = pos.getX() * 16 + x;

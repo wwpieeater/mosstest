@@ -13,7 +13,6 @@ import net.mosstest.servercore.MossWorldLoadException;
 import net.mosstest.servercore.NodeCache;
 import net.mosstest.servercore.ScriptSandboxBorderToken;
 
-// TODO: Auto-generated Javadoc
 /**
  * This class is used by scripts and script-facing portions of Mosstest. Methods
  * restricted to be called from trusted Java-side shall pass a
@@ -42,11 +41,6 @@ import net.mosstest.servercore.ScriptSandboxBorderToken;
  */
 public class MossScriptEnv {
 
-	/**
-	 * Register node change handler.
-	 *
-	 * @param h the h
-	 */
 	public void registerNodeChangeHandler(MossNodeChangeHandler h) {
 		
 	}
