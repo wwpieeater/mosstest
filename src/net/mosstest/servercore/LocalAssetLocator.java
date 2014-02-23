@@ -15,7 +15,7 @@ public class LocalAssetLocator implements AssetLocator {
 	@Override
 	public AssetInfo locate(AssetManager manager, AssetKey key) {
 		if (this.lfm == null)
-			this.lfm = LocalFileManager.getFileManager("scripts");
+			this.lfm = LocalFileManager.getFileManager("moss://scripts");
 		if (this.lfm == null)
 			this.lfm = LocalFileManager.scriptsInstance;
 		try {
@@ -31,7 +31,7 @@ public class LocalAssetLocator implements AssetLocator {
 
 	@Override
 	public void setRootPath(String arg0) {
-		this.lfm = LocalFileManager.getFileManager("scripts");
+		this.lfm = LocalFileManager.getFileManager(arg0);
 	}
 
 	private static class LocalAssetInfo extends AssetInfo {
