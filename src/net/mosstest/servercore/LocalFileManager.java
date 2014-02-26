@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,7 +9,6 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,17 +23,16 @@ public class LocalFileManager implements IFileManager {
 	public static final LocalFileManager scriptsInstance;
 	private static HashMap<String, LocalFileManager> managers = new HashMap<>();
 	static {
-		scriptsInstance = new LocalFileManager(
-				new File("data/scripts"));
+		scriptsInstance = new LocalFileManager(new File("data/scripts"));
 		managers.put("scripts", scriptsInstance);
 	}
-	
-	private ArrayList<LocalFile> files;
-	
+
+	private HashMap<String, LocalFile> files;
+
 	public static LocalFileManager getFileManager(String key) {
 		return managers.get(key);
 	}
-	
+
 	private final File basedir;
 
 	static Logger logger = Logger.getLogger(LocalFileManager.class);
@@ -49,7 +48,9 @@ public class LocalFileManager implements IFileManager {
 		}
 		File f = new File(this.basedir, normalized);
 		logger.info("Got local file " + name + " as " + f.getAbsolutePath());
-		return new LocalFile(f);
+		LocalFile lf = new LocalFile(f);
+		this.files.put(name, lf);
+		return lf;
 	}
 
 	@Override
@@ -71,6 +72,7 @@ public class LocalFileManager implements IFileManager {
 
 	public LocalFileManager(File basedir) {
 		this.basedir = basedir;
+
 	}
 
 	public static String getHash(File f) throws IOException,
@@ -121,5 +123,36 @@ public class LocalFileManager implements IFileManager {
 	public List<IMossFile> getFiles() {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public IMossFile getScriptInitFile(String scName) throws IOException {
+		String normalized = FilenameUtils.normalize(scName);
+		if (normalized == null) {
+			logger.warn("Failed to normalize game resource filename: " + scName);
+
+			throw new FileNotFoundException("The filename " + scName
+					+ " could not be normalized.");
+		}
+		LocalFile scriptFile = getFile(normalized + "init.js");
+		LocalFile fileIndex = getFile(normalized + "index");
+		BufferedReader idxR = new BufferedReader(fileIndex.getReader());
+		String line = null;
+		while ((line = idxR.readLine()) != null) {
+			String normalizedLine = FilenameUtils.normalize(line.trim());
+			if (normalizedLine == null) {
+				logger.warn("Failed to normalize game resource filename from file index: "
+						+ line);
+
+				continue;
+			}
+			try {
+				// side effect of registering the file in the map
+				LocalFile listedFile = getFile(normalized + normalizedLine);
+			} catch (IOException e) {
+				logger.warn("File " + normalized + normalizedLine
+						+ " does not exist but was listed in the index");
+			}
+		}
+		return scriptFile;
 	}
 }
