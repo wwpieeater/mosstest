@@ -55,13 +55,7 @@ public class DefaultNodeParams implements INodeParams {
 		return;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.INodeParams#jumpOffHeight(net.mosstest.scripting.Player)
-	 */
-	@Override
-	public double jumpOffHeight(Player player) {
-		return 1.125;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see net.mosstest.scripting.INodeParams#calcWalkSpeed(net.mosstest.scripting.Player)
@@ -79,21 +73,7 @@ public class DefaultNodeParams implements INodeParams {
 		return 4;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.INodeParams#calcSinkIn(net.mosstest.scripting.Player, double)
-	 */
-	@Override
-	public double calcSinkIn(Player player, double fallheight) {
-		return 0;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.INodeParams#calcSinkEscape(net.mosstest.scripting.Player, double)
-	 */
-	@Override
-	public double calcSinkEscape(Player player, double fallheight) {
-		return 1;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see net.mosstest.scripting.INodeParams#calcBounceHeight(net.mosstest.scripting.Player, double)
@@ -142,5 +122,15 @@ public class DefaultNodeParams implements INodeParams {
 	@Override
 	public double calcInteractProperties(InteractType key, double strength) {
 		return 1;
+	}
+
+	@Override
+	public double calcSinkPassive(Player player, double fallheight) {
+		return 0;
+	}
+
+	@Override
+	public double calcSinkJump(Player player, double sinkheight) {
+		return 0;
 	}
 }

@@ -45,7 +45,7 @@ public class MossGame {
 		for (String scName : scNames) {
 			try {
 				this.scripts.add(LocalFileManager.scriptsInstance
-						.getFile(scName + "/init.js")); //$NON-NLS-1$
+						.getScriptInitFile(scName)); //$NON-NLS-1$
 			} catch (FileNotFoundException e) {
 				throw new MossWorldLoadException(
 						Messages.getString("MossGame.FILE_NOT_FOUND") + scName); //$NON-NLS-1$

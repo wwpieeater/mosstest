@@ -27,7 +27,7 @@ public class LocalFileManager implements IFileManager {
 		managers.put("scripts", scriptsInstance);
 	}
 
-	private HashMap<String, LocalFile> files;
+	private HashMap<String, LocalFile> files = new HashMap<>();
 
 	public static LocalFileManager getFileManager(String key) {
 		return managers.get(key);
