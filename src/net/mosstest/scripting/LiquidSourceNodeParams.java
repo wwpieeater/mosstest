@@ -40,17 +40,6 @@ public class LiquidSourceNodeParams extends DefaultNodeParams implements
 		return false;
 	}
 	
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.DefaultNodeParams#jumpOffHeight(net.mosstest.scripting.Player)
-	 */
-	@Override
-	public double jumpOffHeight(Player player) {
-		return 1.125;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.DefaultNodeParams#calcWalkSpeed(net.mosstest.scripting.Player)
-	 */
 	@Override
 	public double calcWalkSpeed(Player player) {
 		return 0.6;
@@ -64,21 +53,7 @@ public class LiquidSourceNodeParams extends DefaultNodeParams implements
 		return 0.8;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.DefaultNodeParams#calcSinkIn(net.mosstest.scripting.Player, double)
-	 */
-	@Override
-	public double calcSinkIn(Player player, double fallheight) {
-		return 0.4;
-	}
-
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.DefaultNodeParams#calcSinkEscape(net.mosstest.scripting.Player, double)
-	 */
-	@Override
-	public double calcSinkEscape(Player player, double fallheight) {
-		return 1;
-	}
+	
 
 	/* (non-Javadoc)
 	 * @see net.mosstest.scripting.DefaultNodeParams#calcBounceHeight(net.mosstest.scripting.Player, double)
@@ -104,4 +79,17 @@ public class LiquidSourceNodeParams extends DefaultNodeParams implements
 		return false;
 	}
 
+	@Override
+	public double calcSinkActive(Player player, double fallheight) {
+		return -0.8;
+	}
+	@Override
+	public double calcSinkPassive(Player player, double fallheight) {
+		return (fallheight > -0.25)?0:0.05;
+	}
+
+	@Override
+	public double calcSinkJump(Player player, double sinkheight) {
+		return (sinkheight > -0.25)?0:0.6;
+	}
 }
