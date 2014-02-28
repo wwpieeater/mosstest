@@ -1,15 +1,14 @@
 package net.mosstest.servercore;
 
+import com.google.common.collect.ImmutableList;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.XMLConfiguration;
-
-import com.google.common.collect.ImmutableList;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -42,22 +41,26 @@ public class MossGame {
 		}
 		this.scripts = new ArrayList<>();
 		String[] scNames = this.gameCfg.getStringArray("plugin"); //$NON-NLS-1$
-		for (String scName : scNames) {
-			try {
-				this.scripts.add(LocalFileManager.scriptsInstance
-						.getScriptInitFile(scName)); //$NON-NLS-1$
-			} catch (FileNotFoundException e) {
-				throw new MossWorldLoadException(
-						Messages.getString("MossGame.FILE_NOT_FOUND") + scName); //$NON-NLS-1$
-			}
-		}
-	}
+        for (String scName : scNames)
+            try {
+                this.scripts.add(LocalFileManager.scriptsInstance
+                        .getScriptInitFile(scName)); //$NON-NLS-1$
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                throw new MossWorldLoadException(
+                        Messages.getString("MossGame.FILE_NOT_FOUND") + scName); //$NON-NLS-1$
+            }
+    }
 
-	/** The base dir. */
-	private File baseDir;
+    /**
+     * The base dir.
+     */
+    private File baseDir;
 
-	/** The game cfg. */
-	private XMLConfiguration gameCfg;
+    /**
+     * The game cfg.
+     */
+    private XMLConfiguration gameCfg;
 
 	/** The cfg file. */
 	private File cfgFile;

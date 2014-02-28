@@ -31,3 +31,8 @@ src/git.properties
 /stacktraces
 /*.log
 *.log
+.idea
+/.idea
+/out
+/.idea/*
+/out/*
