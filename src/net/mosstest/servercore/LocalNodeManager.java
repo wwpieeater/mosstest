@@ -20,6 +20,7 @@ public class LocalNodeManager extends AbstractNodeManager {
      * The node db.
      */
     private DB nodeDb;
+    private ItemManager itemManager;
 
     /* (non-Javadoc)
      * @see net.mosstest.servercore.INodeManager#getNode(short)
@@ -39,6 +40,7 @@ public class LocalNodeManager extends AbstractNodeManager {
             this.definedNodes.set(this.pending.inverse().get(node.nodeName),
                     node);
             this.defNodeByName.put(node.nodeName, node);
+            node.setDropItem(this.itemManager.getForNode(node));
         } else {
             if (this.definedNodes.size() > NODE_ID_MAX)
                 throw new MossWorldLoadException("Too many nodedefs"); //$NON-NLS-1$
@@ -88,8 +90,9 @@ public class LocalNodeManager extends AbstractNodeManager {
      *
      * @param nodedb the nodedb
      */
-    public LocalNodeManager(DB nodedb) {
+    public LocalNodeManager(DB nodedb, ItemManager mgr) {
         this.nodeDb = nodedb;
+        this.itemManager = mgr;
         this.init();
     }
 

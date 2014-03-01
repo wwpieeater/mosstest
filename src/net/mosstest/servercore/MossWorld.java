@@ -38,24 +38,25 @@ public class MossWorld {
 	private INodeManager nm;
 	private IRenderPreparator rp;
 	private RenderProcessor rend;
+    private ItemManager im;
 
-	/**
-	 * Initializes a server world. This will start the server once the world is
-	 * initialized, loaded, and passes basic consistency checks. This
-	 * constructor will not initialize load-balancing.
-	 * 
-	 * @param name
-	 *            A string that names the world.
-	 * @param port
-	 *            The port number on which to run the server. If negative a
-	 *            singleplayer stack is created.
-	 * @throws MossWorldLoadException
-	 *             Thrown if the world cannot be loaded, due to inconsistency,
-	 *             missing files, or lack of system resources.
-	 * @throws MapDatabaseException
-	 * @throws IOException
-	 * @throws ConfigurationException
-	 */
+    /**
+     * Initializes a server world. This will start the server once the world is
+     * initialized, loaded, and passes basic consistency checks. This
+     * constructor will not initialize load-balancing.
+     *
+     * @param name
+     *            A string that names the world.
+     * @param port
+     *            The port number on which to run the server. If negative a
+     *            singleplayer stack is created.
+     * @throws MossWorldLoadException
+     *             Thrown if the world cannot be loaded, due to inconsistency,
+     *             missing files, or lack of system resources.
+     * @throws MapDatabaseException
+     * @throws IOException
+     * @throws ConfigurationException
+     */
 	@SuppressWarnings("nls")
 	public MossWorld(String name, int port) throws MossWorldLoadException,
 			MapDatabaseException, IOException, ConfigurationException {
@@ -92,8 +93,9 @@ public class MossWorld {
 		}
 
 		this.nc = new NodeCache(this.db);
-		this.nm = new LocalNodeManager(this.db.nodes);
-		// this.db = new MapDatabase(this.baseDir);
+        this.im = new ItemManager();
+        this.nm = new LocalNodeManager(this.db.nodes, im);
+        // this.db = new MapDatabase(this.baseDir);
 		try {
 			MapGenerators.setDefaultMapGenerator(
 					new MapGenerators.SimplexMapGenerator(), this.nm, 8448);
