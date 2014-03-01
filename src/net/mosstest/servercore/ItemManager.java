@@ -3,6 +3,7 @@ package net.mosstest.servercore;
 import com.google.common.collect.HashBiMap;
 import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.MossItem;
+import net.mosstest.scripting.MossItemBuilder;
 import org.iq80.leveldb.DB;
 
 import java.util.ArrayList;
@@ -44,9 +45,7 @@ public class ItemManager {
     /**
      * The unknown fallback item.
      */
-    private final MossItem unknownFallbackItem = new MossItem(
-            "item_unknown.png", "sys_hand.png", 1, true,
-            "An unidentifiable item", "sys:unknown");
+    private final MossItem unknownFallbackItem = new MossItemBuilder().setInvTex("item_unknown.png").setWieldTex("sys_hand.png").setInvWeight(1).setMayStack(true).setDisplayName("An unidentifiable item").setTechnicalName("sys:unknown").createMossItem();
 
     /**
      * Gets the node.
