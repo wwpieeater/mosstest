@@ -22,6 +22,9 @@ import java.util.List;
 public class LocalFileManager implements IFileManager {
 
     public static final LocalFileManager scriptsInstance;
+    public static final int HASHING_BUFFER_SIZE = 8192;
+    public static final int BYTE_CAST_MASK = 0xFF;
+    @SuppressWarnings("StaticCollection")
     private static HashMap<String, LocalFileManager> managers = new HashMap<>();
 
     static {
@@ -89,7 +92,7 @@ public class LocalFileManager implements IFileManager {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         FileInputStream fis = new FileInputStream(f);
         FileChannel fc = fis.getChannel();
-        ByteBuffer bbf = ByteBuffer.allocateDirect(8192);
+        ByteBuffer bbf = ByteBuffer.allocateDirect(HASHING_BUFFER_SIZE);
 
         int bytesRead;
 
@@ -114,7 +117,7 @@ public class LocalFileManager implements IFileManager {
         StringBuilder hexString = new StringBuilder();
 
         for (byte b : mdBytes) {
-            hexString.append(Integer.toHexString((0xFF & b)));
+            hexString.append(Integer.toHexString((BYTE_CAST_MASK & b)));
         }
 
         return hexString.toString();

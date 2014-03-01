@@ -1,18 +1,17 @@
 package net.mosstest.servercore;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
 import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
 import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
-
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 public class MossWorld {
 	static {
@@ -134,7 +133,7 @@ public class MossWorld {
 
 	public static void main(String[] args) throws MossWorldLoadException,
 			MapDatabaseException, ConfigurationException, IOException {
-		MossWorld m = new MossWorld("test", -1); //$NON-NLS-1$
+        new MossWorld("test", -1); //$NON-NLS-1$
 
-	}
+    }
 }

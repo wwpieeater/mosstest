@@ -1,14 +1,12 @@
 package net.mosstest.scripting;
 
-import java.util.ArrayList;
-import java.util.Random;
-
-import org.apache.log4j.Logger;
-
 import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
-import net.mosstest.servercore.MossDebugUtils;
+import org.apache.log4j.Logger;
 import toxi.math.noise.SimplexNoise;
+
+import java.util.ArrayList;
+import java.util.Random;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -251,10 +249,10 @@ public class SimplexMapGenerator implements IMapGenerator {
 		 */
 		public Ore(MapNode node, int seed, double minDepth, double rarity) {
 			Random random = new Random(seed);
-			this.simplexSeedPosition = 10 * Integer.MAX_VALUE
-					* random.nextDouble();
-			this.oreSeed = seed;
-			this.node = node;
+            this.simplexSeedPosition = (Integer.MAX_VALUE
+                    * random.nextDouble());
+            this.oreSeed = seed;
+            this.node = node;
 			this.noise = new SimplexNoise();
 			this.minDepth = minDepth;
 			this.cutoff = 1.0 / rarity;

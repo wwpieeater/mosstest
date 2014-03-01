@@ -1,10 +1,10 @@
 package net.mosstest.servercore;
 
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
-
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Position;
+
+import java.lang.ref.SoftReference;
+import java.util.HashMap;
 
 
 // TODO: Auto-generated Javadoc
@@ -14,10 +14,12 @@ import net.mosstest.scripting.Position;
 public class NodeCache {
 
 	/** The chunks. */
-	private HashMap<Position, SoftReference<MapChunk>> chunks = new HashMap<>();
-	
-	/** The db. */
-	private MapDatabase db ;
+    private final HashMap<Position, SoftReference<MapChunk>> chunks = new HashMap<>();
+
+    /**
+     * The db.
+     */
+    private MapDatabase db ;
 	
 	/**
 	 * Gets the chunk.
@@ -29,11 +31,11 @@ public class NodeCache {
 	public MapChunk getChunk(Position pos) throws MapGeneratorException {
 		synchronized (this.chunks) {
 			synchronized (MapDatabase.class) {
-				MapChunk ourChunk = null;
-				SoftReference<MapChunk> ref = this.chunks.get(pos);
-				ourChunk = ref==null?null:ref.get();
-				if (ourChunk == null) {
-					ourChunk = this.db.getChunk(pos);
+
+                SoftReference<MapChunk> ref = this.chunks.get(pos);
+                MapChunk ourChunk = (ref == null) ? null : ref.get();
+                if (ourChunk == null) {
+                    ourChunk = this.db.getChunk(pos);
 					this.chunks.put(pos, new SoftReference<>(ourChunk));
 				}
 				return ourChunk;
