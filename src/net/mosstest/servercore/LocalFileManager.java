@@ -1,13 +1,19 @@
 package net.mosstest.servercore;
 
+import com.google.common.collect.ImmutableList;
 import com.jme3.asset.AssetLocator;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -24,6 +30,7 @@ public class LocalFileManager implements IFileManager {
     }
 
     private HashMap<String, LocalFile> files = new HashMap<>();
+    public static final IOFileFilter CVS_FILTER = FileFilterUtils.makeCVSAware(null);
 
     public static LocalFileManager getFileManager(String key) {
         return managers.get(key);
@@ -44,15 +51,19 @@ public class LocalFileManager implements IFileManager {
         }
         File f = new File(this.basedir, normalized);
         logger.info("Got local file " + name + " as " + f.getAbsolutePath());
-        LocalFile lf = new LocalFile(f);
-        this.files.put(name, lf);
-        return lf;
+
+        return new LocalFile(name, f);
     }
 
     @Override
     public void registerFile(String name, String sha256, int size, long version)
             throws NotImplementedException {
         throw new NotImplementedException();
+
+    }
+
+    public void registerFile(String name, LocalFile lf) {
+        this.files.put(name, lf);
 
     }
 
@@ -111,23 +122,25 @@ public class LocalFileManager implements IFileManager {
     }
 
     @Override
-    public List<IMossFile> getFiles() {
-        // TODO Auto-generated method stub
-        return null;
+    public List<? extends IMossFile> getFiles() {
+        return ImmutableList.copyOf(files.values());
     }
 
     public IMossFile getScriptInitFile(String scName) throws IOException {
         String normalized = FilenameUtils.normalize(scName);
         if (normalized == null) {
-            System.out.println("FOO");
             logger.warn("Failed to normalize game resource filename: " + scName);
 
             throw new FileNotFoundException("The filename " + scName
                     + " could not be normalized.");
         }
-        LocalFile scriptFile = getFile(normalized + "/init.js");
+        final String scriptName = normalized + "/init.js";
+        LocalFile scriptFile = getFile(scriptName);
+        registerFile(scriptName, scriptFile);
         try {
-            LocalFile fileIndex = getFile(normalized + "/ignore");
+            final String indexName = normalized + "/index";
+            LocalFile fileIndex = getFile(indexName);
+            registerFile(indexName, scriptFile);
             BufferedReader idxR = new BufferedReader(fileIndex.getReader());
             String line;
             while ((line = idxR.readLine()) != null) {
@@ -138,14 +151,33 @@ public class LocalFileManager implements IFileManager {
 
                     continue;
                 }
+                try {
 
-                // side effect of registering the file in the map
-                getFile(normalized + normalizedLine);
+                    final String filename = normalized + normalizedLine;
+                    final LocalFile file = getFile(filename);
+                    this.registerFile(filename, file);
+                } catch (FileNotFoundException e) {
+                    logger.warn("File was in index but not on disk: "
+                            + line);
 
+                }
             }
         } catch (FileNotFoundException e) {
             logger.warn("No index file found; no files will be served to the client.");
-            // TODO use directory listing in this case
+            File base = new File(basedir, normalized);
+            Path basePath = Paths.get(basedir.getAbsolutePath());
+            for (File f : FileUtils.listFiles(base, CVS_FILTER, CVS_FILTER)) {
+                try {
+                    Path path = Paths.get(f.getAbsolutePath());
+                    final String resolvedName = basePath.relativize(path).toFile().getPath();
+                    LocalFile file = this.getFile(resolvedName);
+                    logger.debug("Got file via recursive directory listing: " + resolvedName);
+                    this.registerFile(resolvedName, file);
+                } catch (FileNotFoundException fnfe2) {
+                    // should not happen
+                    logger.warn("Could not find file from recursive directory listing. This should never happen.");
+                }
+            }
         }
         return scriptFile;
     }

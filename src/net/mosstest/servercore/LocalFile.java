@@ -1,18 +1,9 @@
 package net.mosstest.servercore;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.RandomAccessFile;
-import java.io.Reader;
-import java.nio.ByteBuffer;
-import java.nio.ReadOnlyBufferException;
-import java.security.NoSuchAlgorithmException;
-
 import org.apache.log4j.Logger;
+
+import java.io.*;
+import java.security.NoSuchAlgorithmException;
 
 public class LocalFile implements IMossFile {
 
@@ -25,11 +16,19 @@ public class LocalFile implements IMossFile {
 	private final RandomAccessFile rFile;
 	private final int numChunks;
 	private final long length;
-	private final String sha256;
+    private final String name;
 
-	public LocalFile(File f) throws IOException {
-		if (!f.canRead())
-			throw new FileNotFoundException(
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    private final String sha256;
+
+    public LocalFile(String name, File f) throws IOException {
+        this.name = name;
+        if (!f.canRead())
+            throw new FileNotFoundException(
 					"File not existent or cannot be read");
 		this.f = f;
 		this.rFile = new RandomAccessFile(f, "r");
