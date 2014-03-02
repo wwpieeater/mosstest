@@ -7,19 +7,10 @@ package net.mosstest.scripting;
  */
 public class MossTool extends MossItem {
 
-	/**
-	 * Instantiates a new moss tool.
-	 *
-	 * @param invTex the inv tex
-	 * @param wieldTex the wield tex
-	 * @param invWeight the inv weight
-	 * @param mayStack the may stack
-	 * @param displayName the display name
-	 * @param technicalName the technical name
-	 */
+
 	public MossTool(String invTex, String wieldTex, double invWeight,
-			boolean mayStack, String displayName, String technicalName) {
-		super(invTex, wieldTex, invWeight, mayStack, displayName, technicalName);
+			StackMode stackMode, String displayName, String technicalName) {
+		super(invTex, wieldTex, invWeight, stackMode, displayName, technicalName);
 	}
 
 

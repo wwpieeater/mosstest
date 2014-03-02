@@ -4,9 +4,9 @@ public class MossItemBuilder {
     private String invTex;
     private String wieldTex;
     private double invWeight;
-    private boolean mayStack = true;
+    private MossItem.StackMode mayStack = MossItem.StackMode.STACK_UNIT;
     private String displayName;
-    private String technicalName;
+    private String internalName;
 
     public MossItemBuilder setInvTex(String invTex) {
         this.invTex = invTex;
@@ -23,9 +23,33 @@ public class MossItemBuilder {
         return this;
     }
 
-    public MossItemBuilder setMayStack(boolean mayStack) {
+    public String getInvTex() {
+        return invTex;
+    }
+
+    public String getWieldTex() {
+        return wieldTex;
+    }
+
+    public double getInvWeight() {
+        return invWeight;
+    }
+
+    public MossItem.StackMode getStackMode() {
+        return mayStack;
+    }
+
+    public MossItemBuilder setStackMode(MossItem.StackMode mayStack) {
         this.mayStack = mayStack;
         return this;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public String getInternalName() {
+        return internalName;
     }
 
     public MossItemBuilder setDisplayName(String displayName) {
@@ -33,12 +57,12 @@ public class MossItemBuilder {
         return this;
     }
 
-    public MossItemBuilder setTechnicalName(String technicalName) {
-        this.technicalName = technicalName;
+    public MossItemBuilder setInternalName(String internalName) {
+        this.internalName = internalName;
         return this;
     }
 
     public MossItem createMossItem() {
-        return new MossItem(invTex, wieldTex, invWeight, mayStack, displayName, technicalName);
+        return new MossItem(invTex, wieldTex, invWeight, mayStack, displayName, internalName);
     }
 }

@@ -26,7 +26,7 @@ public class ItemManager {
     /**
      * The unknown fallback item.
      */
-    private final MossItem unknownFallbackItem = new MossItemBuilder().setInvTex("item_unknown.png").setWieldTex("sys_hand.png").setInvWeight(1).setMayStack(true).setDisplayName("An unidentifiable item").setTechnicalName("sys:unknown").createMossItem();
+    private final MossItem unknownFallbackItem = new MossItemBuilder().setInvTex("item_unknown.png").setWieldTex("sys_hand.png").setInvWeight(1).setStackMode(MossItem.StackMode.STACK_UNIT).setDisplayName("An unidentifiable item").setInternalName("sys:unknown").createMossItem();
 
 
     public MossItem getItem(short itemId) {
