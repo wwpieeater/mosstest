@@ -46,9 +46,10 @@ public class MossDebugUtils {
         try {
             new File("stacktraces").mkdirs();
             write.createNewFile();
-            FileWriter writer = new FileWriter(write);
-            writer.write(getDebugInformation(e));
-            writer.close();
+            try (FileWriter writer = new FileWriter(write)) {
+                writer.write(getDebugInformation(e));
+                writer.close();
+            }
         } catch (Exception e1) {
             logger.fatal(e1.getClass().getName() + " caught trying to write stacktrace of an existing exception. Message: " + e1.getMessage());
         }

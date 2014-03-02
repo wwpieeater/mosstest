@@ -90,38 +90,40 @@ public class LocalFileManager implements IFileManager {
 
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
-        FileInputStream fis = new FileInputStream(f);
-        FileChannel fc = fis.getChannel();
-        ByteBuffer bbf = ByteBuffer.allocateDirect(HASHING_BUFFER_SIZE);
 
-        int bytesRead;
+        try (FileInputStream fis = new FileInputStream(f)) {
+            try (FileChannel fc = fis.getChannel()) {
+                ByteBuffer bbf = ByteBuffer.allocateDirect(HASHING_BUFFER_SIZE);
 
-        bytesRead = fc.read(bbf);
+                int bytesRead;
 
-        while ((bytesRead != -1) && (bytesRead != 0)) {
-            bbf.flip();
+                bytesRead = fc.read(bbf);
 
-            byte[] bytes = new byte[bytesRead];
-            bbf.get(bytes);
+                while ((bytesRead != -1) && (bytesRead != 0)) {
+                    bbf.flip();
 
-            md.update(bbf);
+                    byte[] bytes = new byte[bytesRead];
+                    bbf.get(bytes);
 
-            bbf.clear();
-            bytesRead = fc.read(bbf);
+                    md.update(bbf);
+
+                    bbf.clear();
+                    bytesRead = fc.read(bbf);
+                }
+
+                fis.close();
+
+                byte[] mdBytes = md.digest();
+
+                StringBuilder hexString = new StringBuilder();
+
+                for (byte b : mdBytes) {
+                    hexString.append(Integer.toHexString((BYTE_CAST_MASK & b)));
+                }
+
+                return hexString.toString();
+            }
         }
-
-        fis.close();
-
-        byte[] mdBytes = md.digest();
-
-        StringBuilder hexString = new StringBuilder();
-
-        for (byte b : mdBytes) {
-            hexString.append(Integer.toHexString((BYTE_CAST_MASK & b)));
-        }
-
-        return hexString.toString();
-
     }
 
     @Override

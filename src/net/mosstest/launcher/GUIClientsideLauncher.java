@@ -323,7 +323,7 @@ public class GUIClientsideLauncher {
                 + "* jmonkeyengine/jme3\r\n"
                 + "* niftygui\r\n"
                 + "* Google Guava Collections\r\n"
-                + "* Apache Commons CLI (currently unused)\r\n"
+                + "* Apache Commons CLI\r\n"
                 + "* Apache Commons Configuration\r\n"
                 + "* Mozilla Rhino\r\n"
                 + "* leveldbjni\r\n"
