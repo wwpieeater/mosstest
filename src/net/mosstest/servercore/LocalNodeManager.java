@@ -1,109 +1,110 @@
 package net.mosstest.servercore;
 
-import java.util.ArrayList;
+import net.mosstest.scripting.MapNode;
+import org.iq80.leveldb.DB;
+
+import java.util.Map.Entry;
 
 import static org.fusesource.leveldbjni.JniDBFactory.asString;
 import static org.fusesource.leveldbjni.JniDBFactory.bytes;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
-
-import net.mosstest.scripting.MapNode;
-
-import org.iq80.leveldb.DB;
-
-import com.google.common.collect.HashBiMap;
-
 // TODO: Auto-generated Javadoc
+
 /**
  * The Class LocalNodeManager.
  */
 public class LocalNodeManager extends AbstractNodeManager {
-	
-	/** The node db. */
-	private DB nodeDb;
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.servercore.INodeManager#getNode(short)
-	 */
-	@Override
-	public MapNode getNode(short nodeId) {
-		return this.definedNodes.get(nodeId);
-	}
+    public static final int NODE_ID_MAX = 16384;
+    /**
+     * The node db.
+     */
+    private DB nodeDb;
+    private ItemManager itemManager;
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.servercore.INodeManager#putNode(net.mosstest.scripting.MapNode)
-	 */
-	@Override
-	public short putNode(MapNode node) throws MossWorldLoadException {
-		if (this.pending.containsValue(node.nodeName)) {
-			node.setNodeId(this.pending.inverse().get(node.nodeName));
-			this.definedNodes.set(this.pending.inverse().get(node.nodeName),
-					node);
-			this.defNodeByName.put(node.nodeName, node);
-		} else {
-			if (this.definedNodes.size() > 16384)
-				throw new MossWorldLoadException("Too many nodedefs"); //$NON-NLS-1$
+    /* (non-Javadoc)
+     * @see net.mosstest.servercore.INodeManager#getNode(short)
+     */
+    @Override
+    public MapNode getNode(short nodeId) {
+        return this.definedNodes.get(nodeId);
+    }
 
-			node.setNodeId((short) this.definedNodes.size());
+    /* (non-Javadoc)
+     * @see net.mosstest.servercore.INodeManager#putNode(net.mosstest.scripting.MapNode)
+     */
+    @Override
+    public short putNode(MapNode node) throws MossWorldLoadException {
+        if (this.pending.containsValue(node.nodeName)) {
+            node.setNodeId(this.pending.inverse().get(node.nodeName));
+            this.definedNodes.set(this.pending.inverse().get(node.nodeName),
+                    node);
+            this.defNodeByName.put(node.nodeName, node);
+            node.setDropItem(this.itemManager.getForNode(node));
+        } else {
+            if (this.definedNodes.size() > NODE_ID_MAX)
+                throw new MossWorldLoadException("Too many nodedefs"); //$NON-NLS-1$
 
-			this.definedNodes.add(node);
-			this.defNodeByName.put(node.nodeName, node);
-			this.nodeDb.put(new byte[] { (byte) (node.getNodeId() >>> 8),
-					(byte) (node.getNodeId() & 0xFF) }, bytes(node.nodeName));
-		}
-		
+            node.setNodeId((short) this.definedNodes.size());
 
-		return node.getNodeId();
-	}
+            this.definedNodes.add(node);
+            this.defNodeByName.put(node.nodeName, node);
+            this.nodeDb.put(new byte[]{(byte) (node.getNodeId() >>> 8),
+                    (byte) (node.getNodeId() & 0xFF)}, bytes(node.nodeName));
+        }
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.servercore.INodeManager#putNodeAlias(java.lang.String, java.lang.String)
-	 */
-	@Override
-	public void putNodeAlias(String alias, String dst) {
-		MapNode dstNode = this.defNodeByName.get(dst);
-		this.defNodeByName.put(alias, dstNode);
-	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.servercore.INodeManager#getNode(java.lang.String, boolean)
-	 */
-	@Override
-	public MapNode getNode(String string, boolean isModified) {
-		MapNode r = this.defNodeByName.get(string);
-		return (r==null)?AbstractNodeManager.MAPNODE_UNKNOWN:r;
-	}
+        return node.getNodeId();
+    }
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.servercore.INodeManager#getNode(java.lang.String)
-	 */
-	@Override
-	public MapNode getNode(String string) {
+    /* (non-Javadoc)
+     * @see net.mosstest.servercore.INodeManager#putNodeAlias(java.lang.String, java.lang.String)
+     */
+    @Override
+    public void putNodeAlias(String alias, String dst) {
+        MapNode dstNode = this.defNodeByName.get(dst);
+        this.defNodeByName.put(alias, dstNode);
+    }
 
-		MapNode r = this.defNodeByName.get(string);
-		return (r==null)?AbstractNodeManager.MAPNODE_UNKNOWN:r;
-	}
+    /* (non-Javadoc)
+     * @see net.mosstest.servercore.INodeManager#getNode(java.lang.String, boolean)
+     */
+    @Override
+    public MapNode getNode(String string, boolean isModified) {
+        MapNode r = this.defNodeByName.get(string);
+        return (r == null) ? AbstractNodeManager.MAPNODE_UNKNOWN : r;
+    }
 
-	/**
-	 * Instantiates a new local node manager.
-	 *
-	 * @param nodedb the nodedb
-	 */
-	public LocalNodeManager(DB nodedb) {
-		this.nodeDb = nodedb;
-		this.init();
-	}
+    /* (non-Javadoc)
+     * @see net.mosstest.servercore.INodeManager#getNode(java.lang.String)
+     */
+    @Override
+    public MapNode getNode(String string) {
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.servercore.INodeManager#init()
-	 */
-	@Override
-	public void init() {
-		for (Entry<byte[], byte[]> entry : this.nodeDb) {
-			short parsedId = (short) (entry.getKey()[0] * 256 + entry.getKey()[1]);
-			String parsedString = asString(entry.getValue());
-			this.pending.put(parsedId, parsedString);
-		}
-	}
+        MapNode r = this.defNodeByName.get(string);
+        return (r == null) ? AbstractNodeManager.MAPNODE_UNKNOWN : r;
+    }
+
+    /**
+     * Instantiates a new local node manager.
+     *
+     * @param nodedb the nodedb
+     */
+    public LocalNodeManager(DB nodedb, ItemManager mgr) {
+        this.nodeDb = nodedb;
+        this.itemManager = mgr;
+        this.init();
+    }
+
+    /* (non-Javadoc)
+     * @see net.mosstest.servercore.INodeManager#init()
+     */
+    @Override
+    public void init() {
+        for (Entry<byte[], byte[]> entry : this.nodeDb) {
+            short parsedId = (short) (entry.getKey()[0] * 256 + entry.getKey()[1]);
+            String parsedString = asString(entry.getValue());
+            this.pending.put(parsedId, parsedString);
+        }
+    }
 }

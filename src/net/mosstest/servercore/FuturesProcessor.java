@@ -1,11 +1,7 @@
 package net.mosstest.servercore;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Random;
-import java.util.TreeMap;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -34,9 +30,9 @@ public class FuturesProcessor {
 	public synchronized void runOnce(long delayMillis, Runnable runnable) {
 		Job tJob = new Job(System.currentTimeMillis() + delayMillis, 0, 0, 1.0,
 				false, runnable);
-		this.nextWakeup = (long) Math.min(this.nextWakeup,
-				System.currentTimeMillis() + delayMillis);
-		this.jobs.put(System.currentTimeMillis() + delayMillis, tJob);
+        this.nextWakeup = Math.min(this.nextWakeup,
+                System.currentTimeMillis() + delayMillis);
+        this.jobs.put(System.currentTimeMillis() + delayMillis, tJob);
 		this.futuresThread.interrupt();
 	}
 
@@ -109,10 +105,10 @@ public class FuturesProcessor {
 
 					for (Job job : requeues) {
 						job.nextInvocation = System.currentTimeMillis()
-								+ job.delay + (long) Math.random()
-								* job.delayJitter;
-						FuturesProcessor.this.jobs.put(job.nextInvocation, job);
-					}
+                                + job.delay + (long) (Math.random()
+                                * job.delayJitter);
+                        FuturesProcessor.this.jobs.put(job.nextInvocation, job);
+                    }
 				}
 			}
 
@@ -165,8 +161,8 @@ public class FuturesProcessor {
 			this.renew = renew;
 			this.r = r;
 			this.nextInvocation = firstInvocation + delay
-					+ (long) Math.random() * delayJitter;
-		}
+                    + (int) (Math.random() * delayJitter);
+        }
 
-	}
+    }
 }

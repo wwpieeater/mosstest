@@ -1,14 +1,5 @@
 package net.mosstest.servercore;
 
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.HashMap;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.logging.Level;
-
-import jme3tools.optimize.GeometryBatchFactory;
-
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -20,27 +11,24 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
-import com.jme3.math.FastMath;
-import com.jme3.math.Matrix3f;
-import com.jme3.math.Quaternion;
-import com.jme3.math.Vector2f;
-import com.jme3.math.Vector3f;
+import com.jme3.math.*;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.system.AppSettings;
-import com.jme3.math.ColorRGBA;
-
-import java.util.Arrays;
-
-import org.apache.log4j.Logger;
-
-import net.mosstest.scripting.INodeParams;
+import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.MapChunk;
-import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
+import org.apache.log4j.Logger;
+
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.HashMap;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
 
 
 public class RenderProcessor extends SimpleApplication {
@@ -136,7 +124,7 @@ public class RenderProcessor extends SimpleApplication {
 			GeometryBatchFactory.optimize(worldNode);
 		}
 	}
-	
+
 	public void getChunk (Position pos) {
 		MapChunk maybe = null;
 		try {maybe = rPreparator.requestChunk(pos);} 
@@ -144,7 +132,7 @@ public class RenderProcessor extends SimpleApplication {
 		catch (InterruptedException e) {e.printStackTrace();}
 		if (maybe != null) {renderChunk(maybe, pos);}
 	}
-
+	
 	public void renderChunk(MapChunk chk, Position pos) {
 		int vertexIndexCounter = 0;
 		

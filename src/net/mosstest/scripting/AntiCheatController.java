@@ -1,42 +1,34 @@
 package net.mosstest.scripting;
 
+import net.mosstest.servercore.SessionManager;
+
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import net.mosstest.servercore.SessionManager;
 
 // TODO: Auto-generated Javadoc
 /**
  * The Class AntiCheatController.
  */
 public class AntiCheatController {
-	
-	/** The checks. */
-	protected ArrayList<AntiCheatCheck> checks = new ArrayList<>();
-	
-	/** The handlers. */
-	protected ArrayList<AntiCheatHandler> handlers = new ArrayList<>();
-	
-	/** The env. */
-	protected MossScriptEnv env;
-	
-	/** The sess. */
-	protected SessionManager sess;
-	
-	/** The run. */
-	protected volatile boolean run = false;
-	
-	/** The need deaths from. */
-	protected AtomicInteger needDeathsFrom = new AtomicInteger(0);
 
-	/**
-	 * Instantiates a new anti cheat controller.
-	 *
-	 * @param env the env
-	 * @param sess the sess
-	 */
-	public AntiCheatController(MossScriptEnv env, SessionManager sess) {
+    protected final List<AntiCheatCheck> checks = new ArrayList<>();
+
+    protected final List<AntiCheatHandler> handlers = new ArrayList<>();
+
+    protected MossScriptEnv env;
+
+    protected SessionManager sess;
+
+    protected volatile boolean run = false;
+
+    protected AtomicInteger needDeathsFrom = new AtomicInteger(0);
+
+    /**
+     * Instantiates a new anticheat controller.
+     */
+    public AntiCheatController(MossScriptEnv env, SessionManager sess) {
 		this.env = env;
 		this.sess = sess;
 	}
@@ -64,10 +56,10 @@ public class AntiCheatController {
 	}
 
 	/** The threads. */
-	private ArrayList<Thread> threads = new ArrayList<>();
+    private List<Thread> threads = new ArrayList<>();
 
-	/**
-	 * Start threads.
+    /**
+     * Start threads.
 	 *
 	 * @param threads the threads
 	 * @param priority the priority

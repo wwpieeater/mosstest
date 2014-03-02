@@ -1,7 +1,5 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.ItemManager;
-
 // TODO: Auto-generated Javadoc
 /**
  * The Class MapNode.
@@ -60,7 +58,6 @@ public class MapNode {
 
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;
-		this.dropItem = ItemManager.getForNode(this);
 
 	}
 
@@ -120,11 +117,18 @@ public class MapNode {
 		this.nodeName = nodeName;
 		this.userFacingName = userFacingName;
 		this.lightEmission = lightEmission;
-		this.dropItem = ItemManager.getForNode(this);
 	}
 
-	/**
-	 * Gets the node id.
+    public MossItem getDropItem() {
+        return dropItem;
+    }
+
+    public void setDropItem(MossItem dropItem) {
+        this.dropItem = dropItem;
+    }
+
+    /**
+     * Gets the node id.
 	 *
 	 * @return the node id
 	 */
