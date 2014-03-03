@@ -85,7 +85,7 @@ public class ScriptEnv {
         } catch (RhinoException e) {
             logger.error("A script error has occured: " + e.getMessage());
             throw new MossWorldLoadException(
-                    Messages.getString("ScriptEnv.ERR_SCRIPT_ERR") + e.getMessage() + "\r\n" + e.getScriptStackTrace()); //$NON-NLS-1$ //$NON-NLS-2$
+                    Messages.getString("ScriptEnv.ERR_SCRIPT_ERR") + e.getMessage() + "\r\n" + e.getScriptStackTrace(), e); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (Error e) {
             // We are really screwed with classloading if we reach this block
             logger.fatal("Caught error of type " + e.getClass().getName() + " with toString() of: " + e.toString() + ". This should not happen and implies a severe classloading error.");

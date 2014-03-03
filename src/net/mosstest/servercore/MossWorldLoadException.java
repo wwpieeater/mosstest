@@ -10,4 +10,8 @@ public class MossWorldLoadException extends Exception {
     public MossWorldLoadException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    public MossWorldLoadException(String message) {
+        super(message);
+    }
 }

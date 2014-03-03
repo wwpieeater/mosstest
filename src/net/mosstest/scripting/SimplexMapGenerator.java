@@ -138,8 +138,8 @@ public class SimplexMapGenerator implements IMapGenerator {
 			} // y
 		} // x
 
-		return new MapChunk(pos, lightNodes, null);
-	}
+        return new MapChunk(pos, lightNodes);
+    }
 
 	/* (non-Javadoc)
 	 * @see net.mosstest.scripting.IMapGenerator#fillInChunk(int[][][], net.mosstest.scripting.Position)
