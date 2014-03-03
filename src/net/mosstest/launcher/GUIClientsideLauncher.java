@@ -1,7 +1,7 @@
 package net.mosstest.launcher;
 
-import net.mosstest.servercore.MossDebugUtils;
-import net.mosstest.servercore.MosstestSecurityManager;
+import net.mosstest.servercore.*;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import javax.swing.*;
@@ -10,6 +10,7 @@ import java.awt.*;
 import java.awt.Dialog.ModalityType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
@@ -99,20 +100,12 @@ public class GUIClientsideLauncher {
 
         EventQueue.invokeAndWait(new Runnable() {
             public void run() {
-                try {
                     ArrayList<SingleplayerListEntry> entries = new ArrayList<>();
-                    entries.add(new SingleplayerListEntry("name1", "desc1", //$NON-NLS-1$ //$NON-NLS-2$
-                            "game1")); //$NON-NLS-1$
-                    entries.add(new SingleplayerListEntry(
-                            "name2", //$NON-NLS-1$
-                            "desc2", //$NON-NLS-1$
-                            "game2aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")); //$NON-NLS-1$
-                    GUIClientsideLauncher window = new GUIClientsideLauncher(
-                            entries);
+
+                GUIClientsideLauncher window = new GUIClientsideLauncher(
+                        entries);
                     window.frmMosstestClientLauncher.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+
             }
         });
     }
@@ -186,11 +179,9 @@ public class GUIClientsideLauncher {
                 // start a world and block. This should be in a try-catch block
                 // for the bug reporter to snatch up.
                 try {
-                    throw new Exception();
-                    // MossWorld w=new
-                    // MossWorld((String)GUIClientsideLauncher.this.table.getModel().getValueAt(row,
-                    // 0), -16511);
-                } catch (Exception e) {
+
+                    MossWorld w = new MossWorld((String) GUIClientsideLauncher.this.table.getModel().getValueAt(row, 0), -16511);
+                } catch (MossWorldLoadException | MapDatabaseException | IOException | ConfigurationException e) {
                     logger.error("Uncaught exception in game code, opening bug reporter.");
 
                     String fname = MossDebugUtils.writeStracktrace(e);
@@ -245,7 +236,6 @@ public class GUIClientsideLauncher {
                             Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED_TITLE"), //$NON-NLS-1$
                             JOptionPane.WARNING_MESSAGE);
 
-                    return;
                 }
 
             }

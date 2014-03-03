@@ -62,87 +62,6 @@ public class EventProcessor {
 
     protected final AtomicInteger currentThreads = new AtomicInteger(0);
 
-    private Thread manager = new Thread(this.eventProcessorGroup,
-            new Runnable() {
-                /**
-                 *
-                 * The manager. Controls the thread number.
-                 */
-                @SuppressWarnings("nls")
-                @Override
-                public void run() {
-
-                    logger.info("The manager thread has been started."); //$NON-NLS-1$
-                    int ticks = 0;
-                    int ticksBusy = 0;
-                    int lSampleInterval = EventProcessor.this.sampleInterval;
-                    int lUpshift = EventProcessor.this.upshift;
-                    int lDownshift = EventProcessor.this.downshift;
-                    int lSamples = EventProcessor.this.samples;
-                    Thread[] threads = new Thread[EventProcessor.this.maxEventThreads];
-
-                    for (int i = 0; i < EventProcessor.this.initialEventThreads; i++) {
-                        int c = EventProcessor.this.currentThreads.get();
-                        threads[c] = new Thread(
-                                EventProcessor.this.eventProcessorGroup,
-                                new Runnable() {
-
-                                    @Override
-                                    public void run() {
-                                        logger.debug(Messages
-                                                .getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
-                                        processEvents();
-                                    }
-
-                                });
-                        threads[c].start();
-
-                        EventProcessor.this.currentThreads.incrementAndGet();
-
-                    }
-                    while (EventProcessor.this.runManager.get()) {
-                        ticks++;
-                        if (!EventProcessor.this.eventQueue.isEmpty()) {
-                            ticksBusy++;
-                        }
-                        if (ticks >= lSamples) {
-                            if ((EventProcessor.this.currentThreads.get() < EventProcessor.this.maxEventThreads)
-                                    && (((float) ticksBusy / (float) ticks) > ((float) lUpshift / (float) lSamples))) {
-                                new Thread(
-                                        EventProcessor.this.eventProcessorGroup,
-                                        new Runnable() {
-
-                                            @Override
-                                            public void run() {
-                                                System.out.println(Messages
-                                                        .getString("EventProcessor.MSG_ADD_DYNAMIC")); //$NON-NLS-1$
-                                                processEvents();
-                                            }
-
-                                        }).run();
-                                EventProcessor.this.currentThreads
-                                        .incrementAndGet();
-
-                            }
-                            if (((float) ticksBusy / (float) ticks) < ((float) lDownshift / (float) lSamples)) {
-                                logger.info((Messages
-                                        .getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
-                                EventProcessor.this.eventQueue
-                                        .add(new ThreadStopEvent());
-
-                            }
-                            ticks = 0;
-                            ticksBusy = 0;
-                        }
-                        try {
-                            Thread.sleep(lSampleInterval);
-                        } catch (InterruptedException e) {
-                            // manager awoke, no problem
-                        }
-                    }
-                }
-            }, Messages.getString("EventProcessor.THREAD_NAME_MGR")); //$NON-NLS-1$
-
     private final MossScriptEnv ev;
 
     private final ThreadContext tc;
@@ -180,7 +99,7 @@ public class EventProcessor {
         try {
             for (MossEventHandler ourHandler : evtHandlerList) {
                 if (dispatchEventInner(ourHandler, evt)) {
-                    continue;
+                    return;
                 }
             }
             DefaultEventHandlers.processEvent(evt, this.ev);
@@ -204,7 +123,7 @@ public class EventProcessor {
 
         } catch (ClassCastException e) {
             throw new IllegalArgumentException(
-                    "The event handler did not match in type with the event.");
+                    "The event handler did not match in type with the event.", e);
         }
     }
 
@@ -217,7 +136,86 @@ public class EventProcessor {
     public EventProcessor(MossScriptEnv ev, ThreadContext tc) {
         this.ev = ev;
         this.tc = tc;
-        this.manager.start();
+        Thread manager = new Thread(this.eventProcessorGroup,
+                new Runnable() {
+                    /**
+                     * The manager. Controls the thread number.
+                     */
+                    @SuppressWarnings("nls")
+                    @Override
+                    public void run() {
+
+                        logger.info("The manager thread has been started."); //$NON-NLS-1$
+                        int ticks = 0;
+                        int ticksBusy = 0;
+                        int lSampleInterval = EventProcessor.this.sampleInterval;
+                        int lUpshift = EventProcessor.this.upshift;
+                        int lDownshift = EventProcessor.this.downshift;
+                        int lSamples = EventProcessor.this.samples;
+                        Thread[] threads = new Thread[EventProcessor.this.maxEventThreads];
+
+                        for (int i = 0; i < EventProcessor.this.initialEventThreads; i++) {
+                            int c = EventProcessor.this.currentThreads.get();
+                            threads[c] = new Thread(
+                                    EventProcessor.this.eventProcessorGroup,
+                                    new Runnable() {
+
+                                        @Override
+                                        public void run() {
+                                            logger.debug(Messages
+                                                    .getString("EventProcessor.MSG_THREAD_START")); //$NON-NLS-1$
+                                            processEvents();
+                                        }
+
+                                    });
+                            threads[c].start();
+
+                            EventProcessor.this.currentThreads.incrementAndGet();
+
+                        }
+                        while (EventProcessor.this.runManager.get()) {
+                            ticks++;
+                            if (!EventProcessor.this.eventQueue.isEmpty()) {
+                                ticksBusy++;
+                            }
+                            if (ticks >= lSamples) {
+                                if ((EventProcessor.this.currentThreads.get() < EventProcessor.this.maxEventThreads)
+                                        && (((float) ticksBusy / (float) ticks) > ((float) lUpshift / (float) lSamples))) {
+                                    new Thread(
+                                            EventProcessor.this.eventProcessorGroup,
+                                            new Runnable() {
+
+                                                @Override
+                                                public void run() {
+                                                    System.out.println(Messages
+                                                            .getString("EventProcessor.MSG_ADD_DYNAMIC")); //$NON-NLS-1$
+                                                    processEvents();
+                                                }
+
+                                            }).run();
+                                    EventProcessor.this.currentThreads
+                                            .incrementAndGet();
+
+                                }
+                                if (((float) ticksBusy / (float) ticks) < ((float) lDownshift / (float) lSamples)) {
+                                    logger.info((Messages
+                                            .getString("EventProcessor.MSG_STOP_ONE_THREAD"))); //$NON-NLS-1$
+                                    EventProcessor.this.eventQueue
+                                            .add(new ThreadStopEvent());
+
+                                }
+                                ticks = 0;
+                                ticksBusy = 0;
+                            }
+                            try {
+                                Thread.sleep(lSampleInterval);
+                            } catch (InterruptedException e) {
+                                // manager awoke, no problem
+                            }
+                        }
+                    }
+                }, Messages.getString("EventProcessor.THREAD_NAME_MGR"));
+        manager.start();
 
     }
 

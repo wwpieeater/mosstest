@@ -3,6 +3,7 @@ package net.mosstest.servercore;
 import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.ScriptableDatabase;
+import net.mosstest.scripting.SimplexMapGenerator;
 import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 import org.apache.commons.configuration.ConfigurationException;
@@ -98,9 +99,9 @@ public class MossWorld {
         // this.db = new MapDatabase(this.baseDir);
 		try {
 			MapGenerators.setDefaultMapGenerator(
-					new MapGenerators.SimplexMapGenerator(), this.nm, 8448);
-		} catch (MapGeneratorException e) {
-			System.err.println(Messages
+                    new SimplexMapGenerator(), this.nm, 8448);
+        } catch (MapGeneratorException e) {
+            System.err.println(Messages
 					.getString("MossWorld.MG_SELECT_FAILURE")); //$NON-NLS-1$
 			System.exit(4);
 		}

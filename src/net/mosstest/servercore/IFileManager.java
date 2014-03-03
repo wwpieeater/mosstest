@@ -9,11 +9,11 @@ import java.util.List;
 public interface IFileManager {
     public IMossFile getFile(String name) throws IOException;
 
-    public void registerFile(String name, String sha256, int size, long version);
-	
-	public void receiveFileChunk(String sha512, int chunkId, ByteBuffer buf);
-	
-	public Class<? extends AssetLocator> getAssetLocatorClass();
+    public void registerFile(String name, String sha256, long size);
+
+    public void receiveFileChunk(String sha512, int chunkId, ByteBuffer buf) throws IOException;
+
+    public Class<? extends AssetLocator> getAssetLocatorClass();
 
     public List<? extends IMossFile> getFiles();
 }

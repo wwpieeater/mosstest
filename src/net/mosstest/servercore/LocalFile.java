@@ -14,8 +14,18 @@ public class LocalFile implements IMossFile {
 	static Logger logger = Logger.getLogger(LocalFile.class);
 	private final File f;
 	private final RandomAccessFile rFile;
-	private final int numChunks;
-	private final long length;
+
+    public LocalFile(File f, int numChunks, long length, String name, String sha256) throws FileNotFoundException {
+        this.f = f;
+        this.rFile = new RandomAccessFile(f, "r");
+        this.numChunks = numChunks;
+        this.length = length;
+        this.name = name;
+        this.sha256 = sha256;
+    }
+
+    private final int numChunks;
+    private final long length;
     private final String name;
 
     @Override
@@ -25,7 +35,7 @@ public class LocalFile implements IMossFile {
 
     private final String sha256;
 
-    public LocalFile(String name, File f) throws IOException {
+    public LocalFile(String name, File f) throws IOException, FileNotFoundException {
         this.name = name;
         if (!f.canRead())
             throw new FileNotFoundException(
@@ -40,9 +50,9 @@ public class LocalFile implements IMossFile {
 			logger.info("Hashed " + f.getAbsolutePath() + " as " + this.sha256);
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("Could not find algorithm SHA-256 while hashing " + f.getAbsolutePath());
-			throw new IOException("Hashing failed while preparing file");
-		}
-	}
+            throw new IOException("Hashing failed while preparing file", e);
+        }
+    }
 
 	@Override
 	public Reader getReader() throws FileNotFoundException {

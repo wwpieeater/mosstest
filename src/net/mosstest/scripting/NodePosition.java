@@ -93,10 +93,7 @@ public class NodePosition {
         if (this.yl != other.yl) {
             return false;
         }
-        if (this.zl != other.zl) {
-            return false;
-        }
-        return true;
+        return this.zl == other.zl;
     }
 
 

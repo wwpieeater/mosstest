@@ -1,14 +1,10 @@
 package net.mosstest.servercore;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -236,9 +232,9 @@ public class ServerNetworkingManager {
 		private void sendPacketUdp(int commandId, byte[] payload,
 				boolean needsAck) throws IOException {
 			if (this.sess.dgramSocket == null)
-				throw new NullPointerException("Null datagram socket!"); //$NON-NLS-1$
-			ByteArrayOutputStream bos = new ByteArrayOutputStream();
-			DataOutputStream dos = new DataOutputStream(bos);
+                throw new SocketException("Null datagram socket!"); //$NON-NLS-1$
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            DataOutputStream dos = new DataOutputStream(bos);
 			dos.writeInt(CommonNetworking.magicNoAck);
 			dos.writeByte(commandId);
 			dos.writeByte(payload.length);

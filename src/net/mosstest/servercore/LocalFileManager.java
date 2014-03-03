@@ -6,7 +6,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
-import org.apache.commons.lang.NotImplementedException;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -44,7 +43,7 @@ public class LocalFileManager implements IFileManager {
     static Logger logger = Logger.getLogger(LocalFileManager.class);
 
     @Override
-    public LocalFile getFile(String name) throws IOException {
+    public LocalFile getFile(String name) throws IOException, FileNotFoundException {
         String normalized = FilenameUtils.normalize(name);
         if (normalized == null) {
             logger.warn("Failed to normalize game resource filename: " + name);
@@ -59,9 +58,12 @@ public class LocalFileManager implements IFileManager {
     }
 
     @Override
-    public void registerFile(String name, String sha256, int size, long version)
-            throws NotImplementedException {
-        throw new NotImplementedException();
+    public void registerFile(String name, String sha256, long size) {
+        try {
+            this.files.put(name, new LocalFile(new File(basedir, name), (int) Math.ceil(size / (double) LocalFile.CHUNK_SIZE), size, name, sha256));
+        } catch (IOException ignored) {
+        }
+
 
     }
 
@@ -71,8 +73,8 @@ public class LocalFileManager implements IFileManager {
     }
 
     @Override
-    public void receiveFileChunk(String sha512, int chunkId, ByteBuffer buf) {
-        throw new NotImplementedException();
+    public void receiveFileChunk(String sha512, int chunkId, ByteBuffer buf) throws IOException {
+        throw new IOException("This file is read-only due to its being in a non-cache directory.");
     }
 
     @Override
@@ -86,7 +88,7 @@ public class LocalFileManager implements IFileManager {
     }
 
     public static String getHash(File f) throws IOException,
-            NoSuchAlgorithmException {
+            NoSuchAlgorithmException, FileNotFoundException {
 
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
@@ -131,7 +133,7 @@ public class LocalFileManager implements IFileManager {
         return ImmutableList.copyOf(files.values());
     }
 
-    public IMossFile getScriptInitFile(String scName) throws IOException {
+    public IMossFile getScriptInitFile(String scName) throws IOException, FileNotFoundException {
         String normalized = FilenameUtils.normalize(scName);
         if (normalized == null) {
             logger.warn("Failed to normalize game resource filename: " + scName);
