@@ -26,22 +26,25 @@ public class MapDatabaseException extends Exception{
 	
 	/** The Constant SEVERITY_UNKNOWN. */
 	public static final int SEVERITY_UNKNOWN = 16;
-	
-	/** The desc. */
-	public String desc;
+
 	
 	/** The severity. */
-	public int severity;
-	
-	/**
-	 * Instantiates a new map database exception.
-	 *
+    public final int severity;
+
+    public MapDatabaseException(String message, Throwable cause, int severity) {
+        super(message, cause);
+        this.severity = severity;
+    }
+
+    /**
+     * Instantiates a new map database exception.
+     *
 	 * @param severity the severity
-	 * @param desc the desc
 	 */
-	public MapDatabaseException(int severity, String desc) {
-		super();
-		this.desc = desc;
-		this.severity = severity;
-	}
+
+    public MapDatabaseException(int severity) {
+        super();
+
+        this.severity = severity;
+    }
 }

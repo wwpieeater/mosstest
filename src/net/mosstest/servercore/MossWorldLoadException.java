@@ -5,17 +5,13 @@ package net.mosstest.servercore;
  * The Class MossWorldLoadException.
  */
 public class MossWorldLoadException extends Exception {
-	
-	/** The reason. */
-	String reason;
 
-	/**
-	 * Instantiates a new moss world load exception.
-	 *
-	 * @param string the string
-	 */
-	public MossWorldLoadException(String string) {
-		reason = string;
-	}
 
+    public MossWorldLoadException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MossWorldLoadException(String message) {
+        super(message);
+    }
 }

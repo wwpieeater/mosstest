@@ -2,6 +2,7 @@ package net.mosstest.scripting;
 
 import net.mosstest.servercore.*;
 import net.mosstest.servercore.Messages;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import java.util.Arrays;
  * The Class MapChunk.
  */
 public class MapChunk {
-
+    public static final Logger logger = Logger.getLogger(MapChunk.class);
     public static final int CHUNK_DIMENSION = 16;
     public static final int IS_CHANGED_MASK = 16384;
     public static final int UNSIGNED_IDENTITY_MASK = 0b0011111111111111;
@@ -61,34 +62,13 @@ public class MapChunk {
      */
     int[][][] lightNodes = new int[CHUNK_DIMENSION][CHUNK_DIMENSION][CHUNK_DIMENSION];
 
-    /**
-     * The modified.
-     */
-    boolean[][][] modified = new boolean[CHUNK_DIMENSION][CHUNK_DIMENSION][CHUNK_DIMENSION];
 
-    /**
-     * The compressed.
-     */
     boolean compressed;
 
-    /**
-     * The db.
-     */
     transient MapDatabase db;
 
-    /**
-     * The Constant MAPCHUNK_SERIALIZATION_VERSION.
-     */
-    static final int MAPCHUNK_SERIALIZATION_VERSION = 1;
+    static final int MAPCHUNK_SERIALIZATION_VERSION = 2;
 
-	/*
-     * Compressed format: Short values act as follows: val&32768: 0 means take
-	 * this node literally, 1 means is repeating
-	 * 
-	 * val&16384: 0: This is repeating an unchanged node. Next short shall be
-	 * the start of a new node/run 1: This is repeating a *changed* node. Next
-	 * short value identifies node type
-	 */
 
     /**
      * Instantiates a new map chunk.
@@ -103,77 +83,74 @@ public class MapChunk {
         this.db = db;
         this.pos = pos;
         Arrays.copyOf(light, light.length);
-        DataInputStream lightStreamIn = new DataInputStream(
-                new ByteArrayInputStream(light));
-        int flags = lightStreamIn.readUnsignedShort();
-        int version = lightStreamIn.readUnsignedShort();
-        if (version > MAPCHUNK_SERIALIZATION_VERSION)
-            ExceptionHandler.registerException(new MossWorldLoadException(
-                    Messages.getString("MapChunk.BAD_SER_VER"))); //$NON-NLS-1$
+        try (DataInputStream lightStreamIn = new DataInputStream(
+                new ByteArrayInputStream(light))) {
+            int flags = lightStreamIn.readUnsignedShort();
+            int version = lightStreamIn.readUnsignedShort();
+
+            if (version > MAPCHUNK_SERIALIZATION_VERSION)
+                ExceptionHandler.registerException(new MossWorldLoadException(
+                        Messages.getString("MapChunk.BAD_SER_VER"))); //$NON-NLS-1$
         /*
-		 * flags short: 1=has heavies 2=none yet 4=run-length diff compression
+         * flags short: 1=has heavies 2=none yet 4=run-length diff compression
 		 * (not implemented yet) 8...=reserved
 		 */
-        if (((flags & 0x01)) != 0) {
-            db.getHeavy(pos);
-            loadHeavies();
-        }
-        this.compressed = (((flags & 0x04)) != 0);
-        if (this.compressed) {
-            int cursor = 0;
-            int[] lightTmp = new int[CHUNK_DIMENSION * CHUNK_DIMENSION * CHUNK_DIMENSION];
-            while (lightStreamIn.available() > 0) {
-                int curShort = lightStreamIn.readUnsignedShort();
-                if ((curShort & IS_CHANGED_MASK) != 0) {
-                    lightTmp[cursor] = curShort;
-                    cursor++;
-                } else {
+            if (((flags & 0x01)) != 0) {
+                this.loadHeavy(db.getHeavy(pos));
+            }
+            this.compressed = (((flags & 0x04)) != 0);
+            if (this.compressed) {
+                int cursor = 0;
+                int[] lightTmp = new int[CHUNK_DIMENSION * CHUNK_DIMENSION * CHUNK_DIMENSION];
+                while (lightStreamIn.available() > 0) {
+                    int curShort = lightStreamIn.readUnsignedShort();
                     if ((curShort & IS_CHANGED_MASK) != 0) {
-                        for (int i = 0; i < (curShort & UNSIGNED_IDENTITY_MASK); i++) {
-                            lightTmp[cursor] = 0;
-                            cursor++;
+                        lightTmp[cursor] = curShort;
+                        cursor++;
+                    } else {
+                        if ((curShort & IS_CHANGED_MASK) != 0) {
+                            for (int i = 0; i < (curShort & UNSIGNED_IDENTITY_MASK); i++) {
+                                lightTmp[cursor] = 0;
+                                cursor++;
+                            }
+                        }
+                    }
+                }
+                try {
+                    MapGenerators.getDefaultMapgen().fillInChunk(this.lightNodes,
+                            pos);
+                } catch (MapGeneratorException e) {
+                    // pass, we'll deal with a bad chunk later in the pipeline
+                }
+                // throw new NotImplementedException();
+            } else {
+                for (int x = 0; x < CHUNK_DIMENSION; x++) {
+                    for (int y = 0; y < CHUNK_DIMENSION; y++) {
+                        for (int z = 0; z < CHUNK_DIMENSION; z++) {
+                            this.lightNodes[x][y][z] = lightStreamIn.readShort();
                         }
                     }
                 }
             }
-            try {
-                MapGenerators.getDefaultMapgen().fillInChunk(this.lightNodes,
-                        pos);
-            } catch (MapGeneratorException e) {
-                // pass, we'll deal with a bad chunk later in the pipeline
-            }
-            // throw new NotImplementedException();
-        } else {
-            for (int x = 0; x < CHUNK_DIMENSION; x++) {
-                for (int y = 0; y < CHUNK_DIMENSION; y++) {
-                    for (int z = 0; z < CHUNK_DIMENSION; z++) {
-                        this.lightNodes[x][y][z] = lightStreamIn.readShort();
-                    }
-                }
-            }
         }
 
     }
 
-    /**
-     * Load heavies.
-     */
-    private void loadHeavies() {
-        // TODO Heavies not here yet
+    private void loadHeavy(byte[] heavy) {
 
     }
+
 
     /**
      * Instantiates a new map chunk.
      *
-     * @param pos2     the pos2
-     * @param nodes    the nodes
-     * @param modified the modified
+     * @param pos2  the pos2
+     * @param nodes the nodes
      */
-    public MapChunk(Position pos2, int[][][] nodes, boolean[][][] modified) {
+    public MapChunk(Position pos2, int[][][] nodes) {
         this.pos = pos2;
         this.lightNodes = Arrays.copyOf(nodes, nodes.length);
-        this.modified = modified == null ? new boolean[CHUNK_DIMENSION][CHUNK_DIMENSION][CHUNK_DIMENSION] : Arrays.copyOf(modified, modified.length);
+
     }
 
     /**
@@ -209,7 +186,7 @@ public class MapChunk {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
 
-        try (DataOutputStream dos = new DataOutputStream(bos);) {
+        try (DataOutputStream dos = new DataOutputStream(bos)) {
             dos.writeShort(0);
             dos.writeShort(MAPCHUNK_SERIALIZATION_VERSION);
             for (int[][] nodelvl : this.lightNodes) {
@@ -222,8 +199,8 @@ public class MapChunk {
             dos.flush();
             bos.flush();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            // should never happen
+            logger.warn("IOException writing light chunk data");
         }
 
         return bos.toByteArray();

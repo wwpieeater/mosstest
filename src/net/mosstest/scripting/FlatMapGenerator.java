@@ -38,25 +38,23 @@ public class FlatMapGenerator implements IMapGenerator {
     public MapChunk generateChunk(Position pos)
             throws MapGeneratorException {
         int[][][] nodes = new int[CHUNK_DIMENSION][CHUNK_DIMENSION][CHUNK_DIMENSION];
-        try {
-            int fillNode = (pos.getZ() >= 0) ? this.nm.getNode(
-                    "mg:air", false).getNodeId() : this.nm.getNode( //$NON-NLS-1$
-                    "mg:ground", false).getNodeId(); //$NON-NLS-1$
 
-            for (int x = 0; x < CHUNK_DIMENSION; x++) {
-                for (int y = 0; y < CHUNK_DIMENSION; y++) {
-                    for (int z = 0; z < CHUNK_DIMENSION; z++) {
-                        nodes[x][y][z] = fillNode;
-                    }
+        int fillNode = (pos.getZ() >= 0) ? this.nm.getNode(
+                "mg:air", false).getNodeId() : this.nm.getNode( //$NON-NLS-1$
+                "mg:ground", false).getNodeId(); //$NON-NLS-1$
+
+        for (int x = 0; x < CHUNK_DIMENSION; x++) {
+            for (int y = 0; y < CHUNK_DIMENSION; y++) {
+                for (int z = 0; z < CHUNK_DIMENSION; z++) {
+                    nodes[x][y][z] = fillNode;
                 }
-
             }
-            return new MapChunk(pos, nodes, new boolean[CHUNK_DIMENSION][CHUNK_DIMENSION][CHUNK_DIMENSION]);
-        } catch (NullPointerException e) {
-            throw new MapGeneratorException();
+
         }
+        return new MapChunk(pos, nodes);
 
     }
+
 
     /* (non-Javadoc)
      * @see net.mosstest.scripting.IMapGenerator#fillInChunk(int[][][], net.mosstest.scripting.Position)

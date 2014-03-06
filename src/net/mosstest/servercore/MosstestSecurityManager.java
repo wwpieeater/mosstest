@@ -226,7 +226,6 @@ public class MosstestSecurityManager extends SecurityManager {
 
         } else {
             super.checkCreateClassLoader();
-            return;
         }
 
     }
@@ -245,7 +244,6 @@ public class MosstestSecurityManager extends SecurityManager {
                     "MosstestSecurityManager stopped an attempt to stop or modify a thread");
 
         } else {
-            return;
         }
     }
 
@@ -263,7 +261,6 @@ public class MosstestSecurityManager extends SecurityManager {
                     "MosstestSecurityManager stopped an attempt to modify a ThreadGroup");
 
         } else {
-            return;
         }
     }
 
