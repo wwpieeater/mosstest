@@ -153,17 +153,17 @@ public class RenderProcessor extends SimpleApplication {
 						
 						else {
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-							float z = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
-							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
+							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
-							vertices.put(x).put(y).put(z); //Front face
-							vertices.put(x).put(y - BLOCK_SIZE).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z); //Top Face
-							vertices.put(x).put(y).put(z + BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z + BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //right face
-							vertices.put(x).put(y - BLOCK_SIZE).put(z + BLOCK_SIZE); //left face
+							vertices.put(x).put(z).put(y); //Front face
+							vertices.put(x).put(z - BLOCK_SIZE).put(y);
+							vertices.put(x + BLOCK_SIZE).put(z).put(y);
+							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y); //Top Face
+							vertices.put(x).put(z).put(y + BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(z).put(y + BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //right face
+							vertices.put(x).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //left face
 							
 							for(int m=0; m<8; m++) {
 								normals.put(0).put(0).put(10);
@@ -211,12 +211,12 @@ public class RenderProcessor extends SimpleApplication {
 		Position p7 = new Position(-1,-1,0,0);
 
 		getChunk(p1);
-		getChunk(p2);
+		//getChunk(p2);
 		getChunk(p3);
-		getChunk(p4);
+		/*getChunk(p4);
 		getChunk(p5);
 		getChunk(p6);
-		getChunk(p7);
+		getChunk(p7);*/
 	}
 	
 	private FloatBuffer getDirectFloatBuffer (int size) {
@@ -270,17 +270,11 @@ public class RenderProcessor extends SimpleApplication {
 	private Material getMaterial(short nVal) {
 		Material mat = null;
 		switch (nVal) {
-		case 1:/*
-			mat = new Material(assetManager,
-					"Common/MatDefs/Light/Lighting.j3md");
-			mat.setBoolean("UseMaterialColors", true);
-			mat.setColor("Ambient", ColorRGBA.Green);
-			mat.setColor("Diffuse", ColorRGBA.Green);
-			*/
-			//mat = new Material(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
+		case 1:
 			mat= new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-			mat.setColor("Diffuse", ColorRGBA.Green);
-			mat.setColor("Specular",ColorRGBA.Green);
+			mat.setBoolean("UseMaterialColors", true);
+			mat.setColor("Diffuse",  ColorRGBA.randomColor());
+			mat.setColor("Specular", ColorRGBA.randomColor());
 			
 		}
 		return mat;
