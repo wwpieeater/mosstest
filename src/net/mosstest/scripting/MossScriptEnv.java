@@ -146,7 +146,7 @@ public class MossScriptEnv {
 	 * @param pos            The position at which to set a node.
 	 * @param node            The node to place at that position.
 	 */
-	public void setNode(NodePosition pos, MapNode node) {
+	public void setNode(NodePosition pos, MapNode node) throws MapGeneratorException {
 		MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
 		if (chk == null)
 			return;
@@ -159,7 +159,7 @@ public class MossScriptEnv {
 	 *
 	 * @param pos            The NodePosition at which to remove the node.
 	 */
-	public void removeNode(NodePosition pos) {
+	public void removeNode(NodePosition pos) throws MapGeneratorException {
 		MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
 		if (chk == null)
 			return;
