@@ -19,37 +19,20 @@ public class MapChunk {
     public static final int UNSIGNED_IDENTITY_MASK = 0b0011111111111111;
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(this.lightNodes);
-        result = prime * result + ((this.pos == null) ? 0 : this.pos.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MapChunk mapChunk = (MapChunk) o;
+
+        if (!pos.equals(mapChunk.pos)) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof MapChunk)) {
-            return false;
-        }
-        MapChunk other = (MapChunk) obj;
-        if (!Arrays.deepEquals(this.lightNodes, other.lightNodes)) {
-            return false;
-        }
-        if (this.pos == null) {
-            if (other.pos != null) {
-                return false;
-            }
-        } else if (!this.pos.equals(other.pos)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return pos.hashCode();
     }
 
     /**

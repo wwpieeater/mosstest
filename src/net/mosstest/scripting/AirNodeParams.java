@@ -61,10 +61,6 @@ public class AirNodeParams implements INodeParams {
 		return false;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.INodeParams#jumpOffHeight(net.mosstest.scripting.Player)
-	 */
-	@Override
 	public double jumpOffHeight(Player player) {
 		return 0;
 	}
@@ -77,18 +73,12 @@ public class AirNodeParams implements INodeParams {
 		return 0;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.INodeParams#calcSinkIn(net.mosstest.scripting.Player, double)
-	 */
-	@Override
+
 	public double calcSinkIn(Player player, double fallheight) {
 		return 1;
 	}
 
-	/* (non-Javadoc)
-	 * @see net.mosstest.scripting.INodeParams#calcSinkEscape(net.mosstest.scripting.Player, double)
-	 */
-	@Override
+
 	public double calcSinkEscape(Player player, double sinkheight) {
 		return 1;
 	}
