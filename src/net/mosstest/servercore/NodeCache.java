@@ -1,10 +1,15 @@
 package net.mosstest.servercore;
 
+import com.google.common.cache.*;
 import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.Position;
+import org.apache.log4j.Logger;
 
-import java.lang.ref.SoftReference;
-import java.util.HashMap;
+
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 
 // TODO: Auto-generated Javadoc
@@ -12,9 +17,19 @@ import java.util.HashMap;
  * The Class NodeCache.
  */
 public class NodeCache {
+    private static final Logger logger = Logger.getLogger(NodeCache.class);
+    private final LoadingCache<Position, MapChunk> chunkCache;
+    private final Map<Position, MapChunk> chunkCacheAsMap;
+    {
+        chunkCache = CacheBuilder.newBuilder()
+                .concurrencyLevel(4)
+                .softValues()
+                .expireAfterAccess(EngineSettings.getInt("chunkCacheTTL", 240), TimeUnit.SECONDS)
+                .removalListener(new RemovalListener())
+                .build(new PositionMapChunkCacheLoader());
+        chunkCacheAsMap = chunkCache.asMap();
+    }
 
-	/** The chunks. */
-    private final HashMap<Position, SoftReference<MapChunk>> chunks = new HashMap<>();
 
     /**
      * The db.
@@ -29,18 +44,25 @@ public class NodeCache {
 	 * @throws MapGeneratorException the map generator exception
 	 */
 	public MapChunk getChunk(Position pos) throws MapGeneratorException {
-		synchronized (this.chunks) {
-			synchronized (MapDatabase.class) {
+        // we want loading implicitly (which will generate it)
+        MapChunk chk = null;
+        try {
+            chk = chunkCache.get(pos);
+        } catch (ExecutionException e) {
+           logger.error("ExecutionException getting a chunk: "+e.getCause() + "/" + e.getMessage());
+        }
+        if(chk == null){
+            // loading from DB is still done if no chunk exists after an async load
+            chk = db.getChunk(pos);
+            // fill in, in case it was stored as compressed
+            MapGenerators.getDefaultMapgen().fillInChunk(chk.getNodes(), pos);
+            if(chk == null){
+                // if still not loaded, generate
+                chk = MapGenerators.getDefaultMapgen().generateChunk(pos);
+            }
+        }
+        return chk;
 
-                SoftReference<MapChunk> ref = this.chunks.get(pos);
-                MapChunk ourChunk = (ref == null) ? null : ref.get();
-                if (ourChunk == null) {
-                    ourChunk = this.db.getChunk(pos);
-					this.chunks.put(pos, new SoftReference<>(ourChunk));
-				}
-				return ourChunk;
-			}
-		}
 	}
 	
 	
@@ -51,54 +73,22 @@ public class NodeCache {
 	 * @return the chunk fail fast
 	 */
 	public MapChunk getChunkFailFast(Position pos) {
-		SoftReference<MapChunk> ref = this.chunks.get(pos);
-		return (ref==null?null:ref.get());
+        // we don't want loading from DB or generating
+        return chunkCacheAsMap.get(pos);
 	}
-	//public void requestMapChunk
-	
-	//public MapChunk getChunkClient(Position pos) {
-	//	synchronized (this.chunks) {
-	//
-	//		MapChunk ourChunk = null;
-	//		ourChunk = this.chunks.get(pos).get();
-	//		if (ourChunk == null)
-	//			ClientManager.getApplicationLevelNetworkingManager().sendChunkRequest(pos);
-	//		return ourChunk;
-	//	}
-	//}
 
-	/**
-	 * Sets the chunk client.
+
+    /**
+	 * Sets the chunk, updating cache and database.
 	 *
-	 * @param pos the pos
-	 * @param chunk the chunk
-	 */
-	public void setChunkClient(Position pos, MapChunk chunk) {
-		synchronized (this.chunks) {
-			synchronized (MapDatabase.class) {
-				this.chunks.put(pos, new SoftReference<>(chunk));
-			}
-		}
-
-	}
-	
-	
-	
-
-	/**
-	 * Sets the chunk.
-	 *
-	 * @param pos the pos
-	 * @param chunk the chunk
+	 * @param pos The position in question
+     * @param chunk the chunk to be stored
 	 */
 	public void setChunk(Position pos, MapChunk chunk) {
-		synchronized (this.chunks) {
-			synchronized (MapDatabase.class) {
-				this.chunks.put(pos, new SoftReference<>(chunk));
-				this.db.addMapChunk(pos, chunk);
-			}
-		}
-
+        // plain and simple, we just store it
+        chunk.compact();
+		db.addMapChunk(pos, chunk);
+        chunkCache.put(pos, chunk);
 	}
 	
 	/**
@@ -107,19 +97,54 @@ public class NodeCache {
 	 * @param db the db
 	 */
 	public NodeCache(MapDatabase db) {
-		this.db =db;
+		this.db = db;
 	}
 
 	/**
-	 * Gets the chunk no generate.
+	 * Gets the chunk, or null if it is not generated.
 	 *
-	 * @param chunk the chunk
-	 * @return the chunk no generate
+	 * @param pos The position in question
+	 * @return the chunk, or null if it does not exist on disk.
 	 */
-	public MapChunk getChunkNoGenerate(Position chunk) {
-		synchronized (this.chunks) {
-			 return this.chunks.get(chunk).get();
-		}
+	public MapChunk getChunkNoGenerate(Position pos) throws MapGeneratorException{
+        // we don't want loading implicitly (which will generate it)
+		MapChunk chk = chunkCacheAsMap.get(pos);
+        if(chk == null){
+            // loading from DB is still done
+            chk = db.getChunk(pos);
+            // fill in, in case it was stored as compressed. This still requires mapgen use as chunks are not guaranteed to be stored fully.
+            MapGenerators.getDefaultMapgen().fillInChunk(chk.getNodes(), pos);
+        }
+        return chk;
 	}
 
+    private class RemovalListener implements com.google.common.cache.RemovalListener<Position, MapChunk> {
+
+        @Override
+        public void onRemoval(RemovalNotification<Position, MapChunk> notification) {
+            switch(notification.getCause()){
+                case COLLECTED:
+                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to GC. Memory may be low.");
+                    break;
+                case EXPIRED:
+                    logger.info("Un-cacahing " + notification.getKey().toString() + " as it expired");
+                case SIZE:
+                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to a size constraint");
+            }
+
+        }
+    }
+
+    private class PositionMapChunkCacheLoader extends CacheLoader<Position, MapChunk> {
+        @Override
+        public MapChunk load(Position position) throws Exception {
+            logger.info("Re-loading " + position.toString() + " into cache.");
+            MapChunk chk = NodeCache.this.db.getChunk(position);
+            if(chk == null) {
+                chk = MapGenerators.getDefaultMapgen().generateChunk(position);
+                NodeCache.this.db.addMapChunk(position, chk);
+            }
+            return chk;
+        }
+    }
 }

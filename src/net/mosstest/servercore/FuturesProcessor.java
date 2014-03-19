@@ -2,6 +2,7 @@ package net.mosstest.servercore;
 
 import org.apache.log4j.Logger;
 
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.DelayQueue;
 import java.util.concurrent.Delayed;
 import java.util.concurrent.TimeUnit;
@@ -9,8 +10,26 @@ import java.util.concurrent.TimeUnit;
 // TODO: Auto-generated Javadoc
 
 public class FuturesProcessor {
+    // tasks for running
     private DelayQueue<Task> queue = new DelayQueue<>();
     private static final Logger logger = Logger.getLogger(FuturesProcessor.class);
+    // tasks for addition and removal.
+    private final ConcurrentHashMap<Object, Task> tasks = new ConcurrentHashMap<>();
+
+    /**
+     * Adds a future for immediate potential execution. If this task already exists, nothing will occur.
+     * @param task The future task to add. Its RequeuePolicy will be used to determine when to requeue it.
+     * @param key Any object to associate with this task (such as a higher-level ABM object), to be used when removing this task
+     */
+    public synchronized void addFuture(Task task, Object key){
+        if(this.tasks.containsValue(task)) return;
+        this.tasks.put(key, task);
+        this.queue.put(task);
+    }
+
+    public synchronized void removeFuture(Object key){
+        this.tasks.remove(key);
+    }
 
     protected void runLoop() {
         rLoop:
@@ -30,15 +49,27 @@ public class FuturesProcessor {
                     task.requeue();
                     continue rLoop;
                 }
+                if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ON_FAILURE) {
+                   task.removeSelf();
+
+                }
             } catch (Exception e) {
                 if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ON_FAILURE) {
                     task.requeue();
                     continue rLoop;
                 }
+                if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ON_SUCCESS) {
+                    task.removeSelf();
+
+                }
             }
             if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ALWAYS) {
                 task.requeue();
                 continue rLoop;
+            }
+            if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_NONE) {
+                task.removeSelf();
+
             }
 
         }
@@ -63,12 +94,14 @@ public class FuturesProcessor {
 
         private RequeuePolicy requeuePolicy;
         private volatile long jitterThisTime;
+        private final Object key;
 
-        public Task(long delayMsec, long jitterMsec, ExceptableRunnable callback, RequeuePolicy requeuePolicy) {
+        public Task(long delayMsec, long jitterMsec, ExceptableRunnable callback, RequeuePolicy requeuePolicy, Object key) {
             this.delayMsec = delayMsec;
             this.jitterMsec = jitterMsec;
             this.callback = callback;
             this.requeuePolicy = requeuePolicy;
+            this.key = key;
         }
 
         public long getDelayMsec() {
@@ -112,6 +145,10 @@ public class FuturesProcessor {
         public void requeue() {
             this.jitterThisTime = (long) (this.delayMsec + ((2.0 * Math.random()) - 1) * this.jitterMsec);
             FuturesProcessor.this.queue.put(this);
+        }
+
+        public void removeSelf() {
+            FuturesProcessor.this.removeFuture(this.key);
         }
     }
 

@@ -12,9 +12,8 @@ import java.util.Arrays;
 /**
  * The Class MapChunk.
  */
-public class MapChunk {
+public class MapChunk implements IMapChunk {
     public static final Logger logger = Logger.getLogger(MapChunk.class);
-    public static final int CHUNK_DIMENSION = 16;
     public static final int IS_CHANGED_MASK = 16384;
     public static final int UNSIGNED_IDENTITY_MASK = 0b0011111111111111;
 
@@ -144,6 +143,7 @@ public class MapChunk {
      * @param z the z
      * @return the node id
      */
+    @Override
     public int getNodeId(byte x, byte y, byte z) {
         return this.lightNodes[x][y][z];
     }
@@ -157,14 +157,17 @@ public class MapChunk {
      * @param z    the z
      * @param node the node
      */
+    @Override
     public void setNode(byte x, byte y, byte z, short node) {
         this.lightNodes[x][y][z] = node;
     }
 
+    @Override
     public int[][][] getNodes() {
         return this.lightNodes;
     }
 
+    @Override
     public byte[] writeLight(boolean compressed) {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -189,4 +192,8 @@ public class MapChunk {
         return bos.toByteArray();
     }
 
+    @Override
+    public void compact() {
+        // noop in this version. Later versions may compact.
+    }
 }
