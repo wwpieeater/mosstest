@@ -1,168 +1,135 @@
 package net.mosstest.servercore;
 
-import java.util.*;
-import java.util.Map.Entry;
+import org.apache.log4j.Logger;
+
+import java.util.concurrent.DelayQueue;
+import java.util.concurrent.Delayed;
+import java.util.concurrent.TimeUnit;
 
 // TODO: Auto-generated Javadoc
-/**
- * The Class FuturesProcessor.
- */
+
 public class FuturesProcessor {
-	
-	/** The r. */
-	Random r = new Random();
-	
-	/** The jobs. */
-	TreeMap<Long, Job> jobs = new TreeMap<>();
-	
-	/** The next wakeup. */
-	volatile long nextWakeup = System.currentTimeMillis();
+    private DelayQueue<Task> queue = new DelayQueue<>();
+    private static final Logger logger = Logger.getLogger(FuturesProcessor.class);
 
-	/** The futures thread. */
-	public Thread futuresThread = new Thread(new FuturesRunnable(), Messages.getString("FuturesProcessor.FUTURES_THREAD")); //$NON-NLS-1$
+    protected void runLoop() {
+        rLoop:
+        while (true) {
+            Task task;
+            try {
+                task = queue.take();
+            } catch (InterruptedException e) {
+                logger.error("InterruptedException in futures processor trying to take from queue.");
+                Thread.currentThread().interrupt(); // in case caller requires detecting interrupts
+                continue rLoop;
+            }
+            try {
 
-	/**
-	 * Run once.
-	 *
-	 * @param delayMillis the delay millis
-	 * @param runnable the runnable
-	 */
-	public synchronized void runOnce(long delayMillis, Runnable runnable) {
-		Job tJob = new Job(System.currentTimeMillis() + delayMillis, 0, 0, 1.0,
-				false, runnable);
-        this.nextWakeup = Math.min(this.nextWakeup,
-                System.currentTimeMillis() + delayMillis);
-        this.jobs.put(System.currentTimeMillis() + delayMillis, tJob);
-		this.futuresThread.interrupt();
-	}
+                task.getCallback().run();
+                if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ON_SUCCESS) {
+                    task.requeue();
+                    continue rLoop;
+                }
+            } catch (Exception e) {
+                if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ON_FAILURE) {
+                    task.requeue();
+                    continue rLoop;
+                }
+            }
+            if (task.getRequeuePolicy() == RequeuePolicy.REQUEUE_ALWAYS) {
+                task.requeue();
+                continue rLoop;
+            }
 
-	/**
-	 * Register abm.
-	 *
-	 * @param delayMillis the delay millis
-	 * @param delayJitterMillis the delay jitter millis
-	 * @param probability the probability
-	 * @param runnable the runnable
-	 */
-	public synchronized void registerAbm(long delayMillis,
-			long delayJitterMillis, double probability, Runnable runnable) {
-		Job tJob = new Job(System.currentTimeMillis(), delayMillis,
-				delayJitterMillis, probability, true, runnable);
-		this.nextWakeup = (long) Math.min(this.nextWakeup,
-				System.currentTimeMillis() + delayMillis + Math.random()
-						* delayJitterMillis);
-		this.jobs.put(System.currentTimeMillis(), tJob);
-		this.futuresThread.interrupt(); // interrupt, and step back to release
-										// the lock
-	}
+        }
+    }
 
-	/**
-	 * Start.
-	 */
-	public void start() {
-		this.futuresThread.start();
-	}
-
-	/** The run. */
-	private volatile boolean run = true;
-
-	/**
-	 * The Class FuturesRunnable.
-	 */
-	public class FuturesRunnable implements Runnable {
-
-		/* (non-Javadoc)
-		 * @see java.lang.Runnable#run()
-		 */
-		@Override
-		public void run() {
-			while (FuturesProcessor.this.run) {
-				try {
-					Thread.sleep(FuturesProcessor.this.nextWakeup
-							- System.currentTimeMillis());
-				} catch (InterruptedException | IllegalArgumentException e) {
-					// pass, got a new job.
-				}
-
-				synchronized (FuturesProcessor.this) {
-					ArrayList<Job> requeues = new ArrayList<>();
-					iterLoop: for (Iterator<Entry<Long, Job>> iterator = FuturesProcessor.this.jobs
-							.entrySet().iterator(); iterator.hasNext();) {
-						Map.Entry<Long, FuturesProcessor.Job> e = iterator
-								.next();
-
-						// ascending key order
-						if (e.getKey() <= System.currentTimeMillis()) {
-							e.getValue().r.run();
-							if (e.getValue().renew) {
-								requeues.add(e.getValue());
-							}
-							iterator.remove();
-
-						} else
-							break iterLoop;
-					}
-
-					for (Job job : requeues) {
-						job.nextInvocation = System.currentTimeMillis()
-                                + job.delay + (long) (Math.random()
-                                * job.delayJitter);
-                        FuturesProcessor.this.jobs.put(job.nextInvocation, job);
-                    }
-				}
-			}
-
-		}
-
-	}
-
-	/**
-	 * The Class Job.
-	 */
-	public class Job {
-		
-		/** The first invocation. */
-		long firstInvocation;
-		
-		/** The delay. */
-		long delay;
-		
-		/** The delay jitter. */
-		long delayJitter;
-		
-		/** The probability. */
-		double probability;
-		
-		/** The renew. */
-		boolean renew;
-		
-		/** The r. */
-		Runnable r;
-		
-		/** The next invocation. */
-		volatile long nextInvocation;
-
-		/**
-		 * Instantiates a new job.
-		 *
-		 * @param firstInvocation the first invocation
-		 * @param delay the delay
-		 * @param delayJitter the delay jitter
-		 * @param probability the probability
-		 * @param renew the renew
-		 * @param r the r
-		 */
-		public Job(long firstInvocation, long delay, long delayJitter,
-				double probability, boolean renew, Runnable r) {
-			this.firstInvocation = firstInvocation;
-			this.delay = delay;
-			this.delayJitter = delayJitter;
-			this.probability = probability;
-			this.renew = renew;
-			this.r = r;
-			this.nextInvocation = firstInvocation + delay
-                    + (int) (Math.random() * delayJitter);
+    public FuturesProcessor(int threads) {
+        for (int i = 0; i < threads; i++) {
+            Thread th = new Thread(new QueueRunnable(), "FuturesProcessorThread" + i);
+            th.start();
         }
 
+
+    }
+
+    public class Task implements Delayed {
+
+        private final long delayMsec;
+
+        private final long jitterMsec;
+
+        private ExceptableRunnable callback;
+
+        private RequeuePolicy requeuePolicy;
+        private volatile long jitterThisTime;
+
+        public Task(long delayMsec, long jitterMsec, ExceptableRunnable callback, RequeuePolicy requeuePolicy) {
+            this.delayMsec = delayMsec;
+            this.jitterMsec = jitterMsec;
+            this.callback = callback;
+            this.requeuePolicy = requeuePolicy;
+        }
+
+        public long getDelayMsec() {
+            return delayMsec;
+        }
+
+
+        public long getJitterMsec() {
+            return jitterMsec;
+        }
+
+
+        public ExceptableRunnable getCallback() {
+            return callback;
+        }
+
+        public void setCallback(ExceptableRunnable callback) {
+            this.callback = callback;
+        }
+
+        public RequeuePolicy getRequeuePolicy() {
+            return requeuePolicy;
+        }
+
+        public void setRequeuePolicy(RequeuePolicy requeuePolicy) {
+            this.requeuePolicy = requeuePolicy;
+        }
+
+        @Override
+        public long getDelay(TimeUnit unit) {
+
+            return unit.convert(delayMsec + jitterThisTime, TimeUnit.MILLISECONDS);
+        }
+
+        @Override
+        public int compareTo(Delayed o) {
+            return Long.compare(this.delayMsec, o.getDelay(TimeUnit.MILLISECONDS));
+        }
+
+
+        public void requeue() {
+            this.jitterThisTime = (long) (this.delayMsec + ((2.0 * Math.random()) - 1) * this.jitterMsec);
+            FuturesProcessor.this.queue.put(this);
+        }
+    }
+
+    public enum RequeuePolicy {
+        REQUEUE_NONE,
+        REQUEUE_ON_SUCCESS,
+        REQUEUE_ON_FAILURE,
+        REQUEUE_ALWAYS
+    }
+
+    public interface ExceptableRunnable {
+        public void run() throws Exception;
+    }
+
+    private class QueueRunnable implements Runnable {
+        @Override
+        public void run() {
+            FuturesProcessor.this.runLoop();
+        }
     }
 }

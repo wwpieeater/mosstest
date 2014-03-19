@@ -106,7 +106,7 @@ public class MossWorld {
 			System.exit(4);
 		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
-		this.fp = new FuturesProcessor();
+		this.fp = new FuturesProcessor(0);
 		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp, this.nm);
 		this.sEnv = new ScriptEnv(this.mossEnv);
 		List<IMossFile> scripts = this.game.getScripts();
