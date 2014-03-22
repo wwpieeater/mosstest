@@ -8,7 +8,7 @@ package net.mosstest.scripting;
  * @see NodePosition
  */
 public class Position {
-
+    public static final int SERIALIZED_LENGTH = 16;
 	@Override
 	public String toString() {
 		return "Position [x=" + x + ", y=" + y + ", z=" + z + ", realm="
@@ -118,7 +118,7 @@ public class Position {
 	 */
 	public byte[] toBytes() {
 
-		return new byte[] { (byte) ((long) this.realm >>> 24),
+		byte[] buf = new byte[] { (byte) ((long) this.realm >>> 24),
 				(byte) ((long) this.realm >>> 16),
 				(byte) ((long) this.realm >>> 8), (byte) ((long) this.realm),
 
@@ -132,6 +132,8 @@ public class Position {
 				(byte) ((long) this.z >>> 8),
 
 				(byte) this.x, (byte) this.y, (byte) this.z };
+        assert(buf.length==Position.SERIALIZED_LENGTH);
+        return buf;
 	}
 
 	/**

@@ -12,7 +12,7 @@ import java.util.Arrays;
 /**
  * The Class MapChunk.
  */
-public class MapChunk implements IMapChunk {
+public class MapChunk extends AbstractMapChunk {
     public static final Logger logger = Logger.getLogger(MapChunk.class);
     public static final int IS_CHANGED_MASK = 16384;
     public static final int UNSIGNED_IDENTITY_MASK = 0b0011111111111111;
@@ -47,7 +47,6 @@ public class MapChunk implements IMapChunk {
 
     boolean compressed;
 
-    transient MapDatabase db;
 
     static final int MAPCHUNK_SERIALIZATION_VERSION = 2;
 
@@ -55,15 +54,18 @@ public class MapChunk implements IMapChunk {
     /**
      * Instantiates a new map chunk.
      *
-     * @param pos   the pos
-     * @param light the light
-     * @param db    the db
+     *
+     *
+     * @param light the primary data storage
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public MapChunk(Position pos, byte[] light, MapDatabase db)
+    public MapChunk(byte[] light)
             throws IOException {
-        this.db = db;
-        this.pos = pos;
+        loadBytes_(light);
+
+    }
+
+    public void loadBytes_(byte[] light) throws IOException {
         Arrays.copyOf(light, light.length);
         try (DataInputStream lightStreamIn = new DataInputStream(
                 new ByteArrayInputStream(light))) {
@@ -73,13 +75,17 @@ public class MapChunk implements IMapChunk {
             if (version > MAPCHUNK_SERIALIZATION_VERSION)
                 ExceptionHandler.registerException(new MossWorldLoadException(
                         Messages.getString("MapChunk.BAD_SER_VER"))); //$NON-NLS-1$
+            byte[] posBuf = new byte[Position.SERIALIZED_LENGTH];
+            // side effect of reading into buffer
+            lightStreamIn.read(posBuf);
+
+            this.pos = new Position(posBuf);
         /*
-         * flags short: 1=has heavies 2=none yet 4=run-length diff compression
+         * flags short: 1=TODO
+          * 2=none yet 4=run-length diff compression
 		 * (not implemented yet) 8...=reserved
 		 */
-            if (((flags & 0x01)) != 0) {
-                this.loadHeavy(db.getHeavy(pos));
-            }
+
             this.compressed = (((flags & 0x04)) != 0);
             if (this.compressed) {
                 int cursor = 0;
@@ -115,7 +121,6 @@ public class MapChunk implements IMapChunk {
                 }
             }
         }
-
     }
 
     private void loadHeavy(byte[] heavy) {
@@ -175,6 +180,7 @@ public class MapChunk implements IMapChunk {
         try (DataOutputStream dos = new DataOutputStream(bos)) {
             dos.writeShort(0);
             dos.writeShort(MAPCHUNK_SERIALIZATION_VERSION);
+            dos.write(this.pos.toBytes());
             for (int[][] nodelvl : this.lightNodes) {
                 for (int[] nodelvl2 : nodelvl) {
                     for (int node : nodelvl2) {
@@ -195,5 +201,16 @@ public class MapChunk implements IMapChunk {
     @Override
     public void compact() {
         // noop in this version. Later versions may compact.
+    }
+
+    @Override
+    public byte[] toBytes() {
+        return this.writeLight(true);
+    }
+
+    @Override
+    public void loadBytes(byte[] buf) throws IOException{
+        // delegate to internal implementation
+        this.loadBytes_(buf);
     }
 }

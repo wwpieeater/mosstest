@@ -1,12 +1,10 @@
 package net.mosstest.servercore;
 
 import net.mosstest.scripting.MapChunk;
-import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.Position;
 import org.apache.log4j.Logger;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
-import org.iq80.leveldb.Range;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,7 +106,7 @@ public class MapDatabase {
         byte[] chunk = this.map.get(pos.toBytes());
 
         try {
-            return new MapChunk(pos, chunk, this);
+            return new MapChunk(chunk);
         } catch (IOException e) {
             logger.error("IOException loading a chunk from byte[]");
             ExceptionHandler.registerException(e);
