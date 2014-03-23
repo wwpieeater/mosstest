@@ -65,6 +65,12 @@ public class MapChunk extends AbstractMapChunk {
 
     }
 
+    @Override
+    protected void setManager(Void manager) {
+        // This is a void here, ergo we can just return
+        return;
+    }
+
     public void loadBytes_(byte[] light) throws IOException {
         Arrays.copyOf(light, light.length);
         try (DataInputStream lightStreamIn = new DataInputStream(

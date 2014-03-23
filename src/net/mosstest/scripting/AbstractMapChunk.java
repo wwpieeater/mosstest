@@ -4,7 +4,7 @@ import net.mosstest.servercore.AbstractByteArrayStorable;
 
 import java.io.IOException;
 
-public abstract class AbstractMapChunk extends AbstractByteArrayStorable{
+public abstract class AbstractMapChunk extends AbstractByteArrayStorable<Void> {
     int CHUNK_DIMENSION = 16;
 
     public AbstractMapChunk(byte[] buf) throws IOException{

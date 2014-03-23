@@ -2,6 +2,8 @@ package net.mosstest.servercore;
 
 import org.iq80.leveldb.DB;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 
 /**
@@ -9,41 +11,65 @@ import java.util.*;
  * @param <K>
  * @param <V>
  */
-public class LevelDBBackedMap<K extends AbstractByteArrayStorable, V extends AbstractByteArrayStorable> implements Map<K, V> {
+public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends AbstractByteArrayStorable<M>, M> implements Map<K, V> {
+    private final Class<V> valueClass;
     // TODO a map backed by a levelDB datastore
 
-    HashMap<K,V> memoryBackingMap;
+    HashMap<K,V> memoryBackingMap = new HashMap<>();
 
     DB diskBackingDatastore;
 
     @Override
     public int size() {
-        return 0;
+        return memoryBackingMap.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return memoryBackingMap.isEmpty();
     }
 
     @Override
     public boolean containsKey(Object key) {
-        return false;
+        return memoryBackingMap.containsKey(key);
     }
 
     @Override
     public boolean containsValue(Object value) {
-        return false;
+        return memoryBackingMap.containsValue(value);
     }
 
     @Override
     public V get(Object key) {
-        return null;
+        V v = memoryBackingMap.get(key);
+        if(v == null){
+            byte[] buf = diskBackingDatastore.get(((AbstractByteArrayStorable<?>) key).toBytes());
+            if(buf == null) return null;
+            try {
+                if(manager == null){
+                    v = (V) valueClass.newInstance();
+                } else {
+                    v = (V) valueClass.newInstance();
+                    System.out.println(v.toString());
+                }
+                v.setManager(manager);
+                v.loadBytes(buf);
+
+            } catch (InstantiationException | IllegalAccessException e) {
+                e.printStackTrace();
+                System.err.println(e.getMessage());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return v;
     }
 
     @Override
     public V put(K key, V value) {
-        return null;
+        memoryBackingMap.put(key, value);
+        diskBackingDatastore.put(key.toBytes(), value.toBytes());
+        return value;
     }
 
     @Override
@@ -75,5 +101,16 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable, V extends Abs
     public Set<Entry<K, V>> entrySet() {
         return null;
     }
+    private M manager;
 
+    public LevelDBBackedMap(DB diskBackingDatastore, Class<V> valueClass) {
+        this.diskBackingDatastore = diskBackingDatastore;
+        this.valueClass = valueClass;
+    }
+
+    public LevelDBBackedMap(M manager, DB diskBackingDatastore,  Class<V> valueClass) {
+        this.manager = manager;
+        this.diskBackingDatastore = diskBackingDatastore;
+        this.valueClass = valueClass;
+    }
 }

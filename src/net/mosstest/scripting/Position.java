@@ -1,5 +1,9 @@
 package net.mosstest.scripting;
 
+import net.mosstest.servercore.AbstractByteArrayStorable;
+
+import java.io.IOException;
+
 /**
  * A class representing a position that refers to a chunk. Each increment of 1
  * for x, y, or z, represents an increment of a chunk (or 16 nodes in the
@@ -7,7 +11,7 @@ package net.mosstest.scripting;
  * 
  * @see NodePosition
  */
-public class Position {
+public class Position extends AbstractByteArrayStorable<Void>{
     public static final int SERIALIZED_LENGTH = 16;
 	@Override
 	public String toString() {
@@ -15,14 +19,14 @@ public class Position {
 				+ realm + ", hashCode()=" + hashCode() + "]";
 	}
 
-	public final int x;
+	public int x;
 
-	public final int y;
+	public int y;
 
-	public final int z;
+	public int z;
 
 	/** The realm. */
-	public final int realm;
+	public int realm;
 
 	transient boolean isValid = true;
 
@@ -56,24 +60,36 @@ public class Position {
 	public Position(byte[] bytes) throws IllegalArgumentException {
 		// ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 		// DataInputStream dis = new DataInputStream(bis);
-		if (bytes.length != 16)
-			throw new IllegalArgumentException(
-					"Input array is not 16 elements long.");
-
-		this.realm = ((0xFF & (0xFF & bytes[0])) << 24)
-				+ ((0xFF & bytes[1]) << 16) + ((0xFF & bytes[2]) << 8)
-				+ (0xFF & bytes[3]);
-		this.x = ((0xFF & bytes[4]) << 24) + ((0xFF & bytes[5]) << 16)
-				+ ((0xFF & bytes[6]) << 8) + ((0xFF & bytes[13]));
-		this.y = ((0xFF & bytes[7]) << 24) + ((0xFF & bytes[8]) << 16)
-				+ ((0xFF & bytes[9]) << 8) + (0xFF & bytes[14]);
-		this.z = ((0xFF & bytes[10]) << 24) + ((0xFF & bytes[11]) << 16)
-				+ ((0xFF & bytes[12]) << 8) + (0xFF & bytes[15]);
-
-		this.isValid = true;
+        loadBytes(bytes);
 	}
 
-	@Override
+    @Override
+    public void loadBytes(byte[] bytes) {
+        if (bytes.length != 16)
+            throw new IllegalArgumentException(
+                    "Input array is not 16 elements long.");
+
+        this.realm = ((0xFF & (0xFF & bytes[0])) << 24)
+                + ((0xFF & bytes[1]) << 16) + ((0xFF & bytes[2]) << 8)
+                + (0xFF & bytes[3]);
+        this.x = ((0xFF & bytes[4]) << 24) + ((0xFF & bytes[5]) << 16)
+                + ((0xFF & bytes[6]) << 8) + ((0xFF & bytes[13]));
+        this.y = ((0xFF & bytes[7]) << 24) + ((0xFF & bytes[8]) << 16)
+                + ((0xFF & bytes[9]) << 8) + (0xFF & bytes[14]);
+        this.z = ((0xFF & bytes[10]) << 24) + ((0xFF & bytes[11]) << 16)
+                + ((0xFF & bytes[12]) << 8) + (0xFF & bytes[15]);
+
+        this.isValid = true;
+    }
+
+    @Override
+    protected void setManager(Void manager) {
+        // no-op with Void
+        return;
+    }
+
+
+    @Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
