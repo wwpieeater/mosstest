@@ -14,8 +14,7 @@ public class AirNodeParams implements INodeParams {
 	 */
 	@Override
 	public void onPunch(Player player, MossItem tool,
-			NodePosition target, Face punchedFace)
-			throws EventProcessingCompletedSignal {
+			NodePosition target, Face punchedFace){
 		// pass
 
 	}
@@ -25,7 +24,7 @@ public class AirNodeParams implements INodeParams {
 	 */
 	@Override
 	public void onDig(Player player, MossItem tool, NodePosition target,
-			Face punchedFace) throws EventProcessingCompletedSignal {
+			Face punchedFace){
 		// pass
 
 	}
@@ -35,7 +34,7 @@ public class AirNodeParams implements INodeParams {
 	 */
 	@Override
 	public void onPlaceNextTo(Player player, NodePosition target,
-			NodePosition placed) throws EventProcessingCompletedSignal {
+			NodePosition placed) {
 		// pass
 
 	}
@@ -45,8 +44,7 @@ public class AirNodeParams implements INodeParams {
 	 */
 	@Override
 	public void onRightClick(Player player, MossItem tool,
-			NodePosition target, Face clickedFace)
-			throws EventProcessingCompletedSignal {
+			NodePosition target, Face clickedFace){
 		// pass
 
 	}
@@ -55,8 +53,7 @@ public class AirNodeParams implements INodeParams {
 	 * @see net.mosstest.scripting.INodeParams#onStepOn(net.mosstest.scripting.Player, net.mosstest.scripting.NodePosition)
 	 */
 	@Override
-	public boolean onStepOn(Player player, NodePosition pos)
-			throws EventProcessingCompletedSignal {
+	public boolean onStepOn(Player player, NodePosition pos){
 		// pass
 		return false;
 	}

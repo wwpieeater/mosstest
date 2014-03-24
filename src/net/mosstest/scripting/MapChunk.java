@@ -95,6 +95,8 @@ public class MapChunk extends AbstractMapChunk {
             this.compressed = (((flags & 0x04)) != 0);
             if (this.compressed) {
                 int cursor = 0;
+                // Below comment for IntelliJ Idea. This is the primary side effect of this method
+                //noinspection MismatchedReadAndWriteOfArray
                 int[] lightTmp = new int[CHUNK_DIMENSION * CHUNK_DIMENSION * CHUNK_DIMENSION];
                 while (lightStreamIn.available() > 0) {
                     int curShort = lightStreamIn.readUnsignedShort();

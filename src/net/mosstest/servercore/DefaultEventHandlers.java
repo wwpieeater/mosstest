@@ -1,10 +1,7 @@
 package net.mosstest.servercore;
 
-import net.mosstest.scripting.MossEvent;
-import net.mosstest.scripting.MossItem;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
-import net.mosstest.scripting.Player;
 import net.mosstest.scripting.events.IMossEvent;
 
 // TODO: Auto-generated Javadoc

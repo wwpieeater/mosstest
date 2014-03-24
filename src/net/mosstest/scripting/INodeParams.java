@@ -4,9 +4,7 @@ package net.mosstest.scripting;
 /**
  * Interface to specify handlers to be called when various actions are taken by
  * players directed at a node. These handlers are called after the ones defined
- * in {@link MossScriptEnv} but before the default handlers. Handlers have a
- * chance to throw {@link EventProcessingCompletedSignal} to bypass the default
- * handler.
+ * in {@link MossScriptEnv} but before the default handlers.
  * 
  * @author rarkenin
  * 
@@ -25,12 +23,9 @@ public interface INodeParams {
 	 *            The position of the targeted node.
 	 * @param punchedFace
 	 *            The face being punched.
-	 * @throws EventProcessingCompletedSignal
-	 *             the event processing completed signal
 	 */
 	public abstract void onPunch(Player player, MossItem tool,
-			NodePosition target, Face punchedFace)
-			throws EventProcessingCompletedSignal;
+			NodePosition target, Face punchedFace);
 
 	/**
 	 * Determines if a fall should continue.
@@ -58,12 +53,9 @@ public interface INodeParams {
 	 *            complete. Note that if a dig begins on one face but the player
 	 *            moves the aim to another face the onPunch handler may receive
 	 *            a different face than this handler.
-	 * @throws EventProcessingCompletedSignal
-	 *             the event processing completed signal
 	 */
 	public abstract void onDig(Player player, MossItem tool,
-			NodePosition target, Face punchedFace)
-			throws EventProcessingCompletedSignal;
+			NodePosition target, Face punchedFace);
 
 	/**
 	 * Called when a node is placed directly above, below, left, right, in front
@@ -75,11 +67,9 @@ public interface INodeParams {
 	 *            the target
 	 * @param placed
 	 *            the placed
-	 * @throws EventProcessingCompletedSignal
-	 *             the event processing completed signal
 	 */
 	public abstract void onPlaceNextTo(Player player, NodePosition target,
-			NodePosition placed) throws EventProcessingCompletedSignal;
+			NodePosition placed);
 
 	/**
 	 * Called when a right-click is done on a node. Note that this is called
@@ -94,12 +84,9 @@ public interface INodeParams {
 	 *            Position of targeted node
 	 * @param clickedFace
 	 *            Face which was right-clicked.
-	 * @throws EventProcessingCompletedSignal
-	 *             the event processing completed signal
 	 */
 	public abstract void onRightClick(Player player, MossItem tool,
-			NodePosition target, Face clickedFace)
-			throws EventProcessingCompletedSignal;
+			NodePosition target, Face clickedFace);
 
 	/**
 	 * Called when a player steps on a node either from jumping, falling, or
@@ -110,11 +97,8 @@ public interface INodeParams {
 	 * @param pos
 	 *            Position of node that is stepped on.
 	 * @return Currently unused.
-	 * @throws EventProcessingCompletedSignal
-	 *             the event processing completed signal
 	 */
-	public abstract boolean onStepOn(Player player, NodePosition pos)
-			throws EventProcessingCompletedSignal;
+	public abstract boolean onStepOn(Player player, NodePosition pos);
 
 	/**
 	 * Calculates the height a player will bounce when landing on this node.
@@ -180,8 +164,6 @@ public interface INodeParams {
 	 * 
 	 * @param player
 	 *            The player for which the walk rate is being calculated.
-	 * @param depth
-	 *            The depth to which the player has sunk, 0 for surface.
 	 * @return The rate in nodes/second at which the player should walk.
 	 */
 	public abstract double calcWalkSpeed(Player player);
