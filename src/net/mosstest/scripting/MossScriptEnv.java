@@ -10,7 +10,7 @@ import net.mosstest.servercore.FuturesProcessor;
 import net.mosstest.servercore.INodeManager;
 import net.mosstest.servercore.MapGeneratorException;
 import net.mosstest.servercore.MossWorldLoadException;
-import net.mosstest.servercore.NodeCache;
+import net.mosstest.servercore.MapCache;
 import net.mosstest.servercore.ScriptSandboxBorderToken;
 
 /**
@@ -50,7 +50,7 @@ public class MossScriptEnv {
 
     private ScriptableDatabase db;
 
-    private NodeCache nc;
+    private MapCache nc;
 
     private FuturesProcessor fp;
 
@@ -369,7 +369,7 @@ public class MossScriptEnv {
      * @param fp the fp
      * @param nm the nm
      */
-    public MossScriptEnv(ScriptableDatabase db, NodeCache nc,
+    public MossScriptEnv(ScriptableDatabase db, MapCache nc,
                          FuturesProcessor fp, INodeManager nm) {
         this.db = db;
         this.nc = nc;

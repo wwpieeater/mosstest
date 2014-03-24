@@ -14,10 +14,10 @@ import java.util.concurrent.TimeUnit;
 
 // TODO: Auto-generated Javadoc
 /**
- * The Class NodeCache.
+ * The Class MapCache.
  */
-public class NodeCache {
-    private static final Logger logger = Logger.getLogger(NodeCache.class);
+public class MapCache {
+    private static final Logger logger = Logger.getLogger(MapCache.class);
     private final LoadingCache<Position, MapChunk> chunkCache;
     private final Map<Position, MapChunk> chunkCacheAsMap;
     {
@@ -96,7 +96,7 @@ public class NodeCache {
 	 *
 	 * @param db the db
 	 */
-	public NodeCache(MapDatabase db) {
+	public MapCache(MapDatabase db) {
 		this.db = db;
 	}
 
@@ -139,10 +139,10 @@ public class NodeCache {
         @Override
         public MapChunk load(Position position) throws Exception {
             logger.info("Re-loading " + position.toString() + " into cache.");
-            MapChunk chk = NodeCache.this.db.getChunk(position);
+            MapChunk chk = MapCache.this.db.getChunk(position);
             if(chk == null) {
                 chk = MapGenerators.getDefaultMapgen().generateChunk(position);
-                NodeCache.this.db.addMapChunk(position, chk);
+                MapCache.this.db.addMapChunk(position, chk);
             }
             return chk;
         }
