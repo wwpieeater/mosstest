@@ -25,7 +25,7 @@ public class LiquidNode extends MapNode {
 	 * @param userFacingName the user facing name
 	 * @param lightEmission the light emission
 	 */
-	public LiquidNode(LiquidNodeParams nodeparams, String texture,
+	public LiquidNode(LiquidNodeParams nodeparams, CubeTextureSet texture,
 			String nodeName, String userFacingName, int lightEmission) {
 		super(nodeparams, texture, nodeName, userFacingName, lightEmission);
 		this.nodeParams = nodeparams;

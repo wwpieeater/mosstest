@@ -3,6 +3,7 @@ package net.mosstest.servercore;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import net.mosstest.scripting.CubeTextureSet;
 import net.mosstest.scripting.MapNode;
 
 import org.iq80.leveldb.DB;
@@ -25,9 +26,12 @@ public abstract class AbstractNodeManager implements INodeManager {
 	protected HashBiMap<Short, String> pending = HashBiMap.create();
 
 	/** The Constant MAPNODE_UNKNOWN. */
-	public static final MapNode MAPNODE_UNKNOWN = new MapNode("unknown.png", //$NON-NLS-1$
-			"sys:unknown", Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), 1); //$NON-NLS-1$ //$NON-NLS-2$
+	public static final MapNode MAPNODE_UNKNOWN;
 	static {
+        CubeTextureSet cts = new CubeTextureSet();
+        cts.setAll("builtin/unknown.png");
+        MAPNODE_UNKNOWN = new MapNode(cts,
+                "sys:unknown", Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), 1); //$NON-NLS-1$ //$NON-NLS-2$
 		MAPNODE_UNKNOWN.setNodeId((short) -1);
 	}
 	

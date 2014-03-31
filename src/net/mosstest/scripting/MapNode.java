@@ -20,7 +20,7 @@ public class MapNode {
     /**
      * The texture.
      */
-    public final transient String texture;
+    public final transient CubeTextureSet texture;
 
     /**
      * The node name.
@@ -71,7 +71,7 @@ public class MapNode {
      * @param userFacingName the user facing name
      * @param lightEmission  the light emission
      */
-    public MapNode(INodeParams nodeparams, String texture, String nodeName,
+    public MapNode(INodeParams nodeparams, CubeTextureSet texture, String nodeName,
                    String userFacingName, int lightEmission) {
         this.nodeparams = nodeparams;
         this.texture = texture;
@@ -130,7 +130,7 @@ public class MapNode {
      * @param userFacingName the user facing name
      * @param lightEmission  the light emission
      */
-    public MapNode(String textures, String nodeName, String userFacingName,
+    public MapNode(CubeTextureSet textures, String nodeName, String userFacingName,
                    int lightEmission) {
         this.nodeparams = new DefaultNodeParams();
         this.texture = textures;

@@ -32,8 +32,7 @@ import net.mosstest.servercore.ScriptSandboxBorderToken;
  * same types within the same script are guaranteed to be called in order.
  * <p/>
  * An event handler may interrupt handling of the event so that no further event
- * handlers nor the default are ever called, by throwing an instance of
- * {@link EventProcessingCompletedSignal}.
+ * handlers nor the default are ever called, by returning the proper boolean value
  *
  * @author rarkenin
  * @version 0.0
@@ -195,7 +194,7 @@ public class MossScriptEnv {
      *                                registering.
      */
     public MapNode registerNode(String sysname, String userFacingName,
-                                INodeParams params, String textures, boolean isLiquid, int light)
+                                INodeParams params, CubeTextureSet textures, boolean isLiquid, int light)
             throws MossWorldLoadException {
         MapNode nd = new MapNode(params, textures, sysname, userFacingName,
                 light);
@@ -224,7 +223,7 @@ public class MossScriptEnv {
      */
     public LiquidNode registerLiquid(String sysname, String userFacingName,
                                      LiquidNodeParams params, LiquidNodeParams sourceParams,
-                                     String textures, int light) throws MossWorldLoadException {
+                                     CubeTextureSet textures, int light) throws MossWorldLoadException {
         LiquidNode nd = new LiquidNode(sourceParams, textures, sysname,
                 userFacingName, light);
         this.nm.putNode(nd);
@@ -270,7 +269,7 @@ public class MossScriptEnv {
      * @throws MossWorldLoadException If an exception occurs during node registration.
      */
     public MapNode registerNodeDefParams(String sysname, String userFacingName,
-                                         String textures, int light) throws MossWorldLoadException {
+                                         CubeTextureSet textures, int light) throws MossWorldLoadException {
         MapNode nd = new MapNode(new DefaultNodeParams(), textures, sysname,
                 userFacingName, light);
         this.nm.putNode(nd);
@@ -291,7 +290,7 @@ public class MossScriptEnv {
      * @throws MossWorldLoadException If an exception occurs during node registration.
      */
     public LiquidNode registerLiquidDefParams(String sysname,
-                                              String userFacingName, String textures, int light)
+                                              String userFacingName, CubeTextureSet textures, int light)
             throws MossWorldLoadException {
         LiquidNode nd = new LiquidNode(new LiquidSourceNodeParams(), textures,
                 sysname, userFacingName, light);
