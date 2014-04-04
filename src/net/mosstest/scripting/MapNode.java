@@ -2,6 +2,8 @@ package net.mosstest.scripting;
 
 // TODO: Auto-generated Javadoc
 
+import java.util.Arrays;
+
 /**
  * The Class MapNode.
  */
@@ -20,7 +22,7 @@ public class MapNode {
     /**
      * The texture.
      */
-    public final transient CubeTextureSet texture;
+    public final transient String[] texture;
 
     /**
      * The node name.
@@ -66,15 +68,36 @@ public class MapNode {
      * Instantiates a new map node.
      *
      * @param nodeparams     the nodeparams
-     * @param texture        the texture
+     * @param textures       the textures, in the order of top, front, right, back, left, bottom
      * @param nodeName       the node name
      * @param userFacingName the user facing name
      * @param lightEmission  the light emission
      */
-    public MapNode(INodeParams nodeparams, CubeTextureSet texture, String nodeName,
+    public MapNode(INodeParams nodeparams, String[] textures, String nodeName,
                    String userFacingName, int lightEmission) {
         this.nodeparams = nodeparams;
-        this.texture = texture;
+        this.texture = textures;
+        this.nodeName = nodeName;
+
+        this.userFacingName = userFacingName;
+        this.lightEmission = lightEmission;
+
+    }
+
+    /**
+     * Instantiates a new map node. This is an overload for nodes with the same texture on all sides
+     *
+     * @param nodeparams     the nodeparams
+     * @param texture        the texture to use for all sides
+     * @param nodeName       the node name
+     * @param userFacingName the user facing name
+     * @param lightEmission  the light emission
+     */
+    public MapNode(INodeParams nodeparams, String texture, String nodeName,
+                   String userFacingName, int lightEmission) {
+        this.nodeparams = nodeparams;
+        this.texture = new String[6];
+        Arrays.fill(this.texture, texture);
         this.nodeName = nodeName;
 
         this.userFacingName = userFacingName;
@@ -123,17 +146,38 @@ public class MapNode {
     }
 
     /**
-     * Instantiates a new map node.
+     * Instantiates a new map node, but does not add it to a node manager.
      *
-     * @param textures       the textures
+     * @param textures       the textures, in the order of top, front, right, back, left, bottom
      * @param nodeName       the node name
-     * @param userFacingName the user facing name
+     * @param userFacingName the name shown in user interfaces
      * @param lightEmission  the light emission
      */
-    public MapNode(CubeTextureSet textures, String nodeName, String userFacingName,
+    public MapNode(String[] textures, String nodeName, String userFacingName,
                    int lightEmission) {
+        if (textures.length != 6) throw new IllegalArgumentException("The number of texture given was not 6.");
         this.nodeparams = new DefaultNodeParams();
         this.texture = textures;
+
+        this.nodeName = nodeName;
+        this.userFacingName = userFacingName;
+        this.lightEmission = lightEmission;
+    }
+
+    /**
+     * Instantiates a new map node with the same texture used for all sides, but does not add it to a node manager.
+     *
+     * @param texture        the texture to use for each side
+     * @param nodeName       the node name
+     * @param userFacingName the name shown in user interfaces
+     * @param lightEmission  the light emission
+     */
+    public MapNode(String texture, String nodeName, String userFacingName,
+                   int lightEmission) {
+        this.nodeparams = new DefaultNodeParams();
+
+        // 6 times
+        this.texture = new String[]{texture, texture, texture, texture, texture, texture};
 
         this.nodeName = nodeName;
         this.userFacingName = userFacingName;

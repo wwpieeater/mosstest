@@ -1,7 +1,6 @@
 package net.mosstest.servercore;
 
 import com.google.common.collect.HashBiMap;
-import net.mosstest.scripting.CubeTextureSet;
 import net.mosstest.scripting.MapNode;
 import org.iq80.leveldb.DB;
 
@@ -47,9 +46,8 @@ public class NodeManager {
 
 
     static {
-        CubeTextureSet cts = new CubeTextureSet();
-        cts.setAll("builtin/unknown.png");
-        unknownFallbackNode = new MapNode(cts, "sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), 1);
+
+        unknownFallbackNode = new MapNode("builtin/unknown.png", "sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), 1);
         unknownFallbackNode.setNodeId((short) -1);
     }
 

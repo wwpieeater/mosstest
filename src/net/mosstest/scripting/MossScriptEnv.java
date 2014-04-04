@@ -1,17 +1,12 @@
 package net.mosstest.scripting;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.scripting.handlers.MossEventHandler;
 import net.mosstest.scripting.handlers.MossNodeChangeHandler;
-import net.mosstest.servercore.FuturesProcessor;
-import net.mosstest.servercore.INodeManager;
-import net.mosstest.servercore.MapGeneratorException;
-import net.mosstest.servercore.MossWorldLoadException;
-import net.mosstest.servercore.MapCache;
-import net.mosstest.servercore.ScriptSandboxBorderToken;
+import net.mosstest.servercore.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * This class is used by scripts and script-facing portions of Mosstest. Methods
@@ -143,6 +138,9 @@ public class MossScriptEnv {
         MapChunk chk = this.nc.getChunkNoGenerate(pos.chunk);
         if (chk == null)
             return;
+        if (!(this.nm.containsNode(node) || node instanceof IDynamicNode))
+            throw new IllegalArgumentException("The mapnode passed is not contained in the world node manager");
+
         chk.setNode(pos.xl, pos.yl, pos.zl, node.getNodeId());
     }
 
@@ -175,45 +173,26 @@ public class MossScriptEnv {
     }
 
     /**
-     * Register a new MapNode in the node manager.
-     *
-     * @param sysname        The name such as default:dirt to set. The prefix mg: is used
-     *                       for mapgen-specific nodes, and should be done by creating a
-     *                       node with a different prefix and aliasing mg:foo to it.
-     * @param userFacingName The name to display in the UI, such as Dirt or Iron Ore
-     * @param params         An implementation of the {@link LiquidNodeParams} interface
-     *                       detailing the action of the node.
-     *                       {@link LiquidSourceNodeParams} is a default that is
-     *                       applicable to most liquids with near-water viscosity.
-     * @param textures       A string stating the filename of the textures image.
-     * @param isLiquid       the is liquid
-     * @param light          The amount of light from 0 to 255 to be emitted.
-     * @return The MapNode object that has been created and added to the
-     * manager.
-     * @throws MossWorldLoadException If an exception occurs during the execution of the
-     *                                registering.
+     * Registers a mapnode in the world, allowing it to be placed.
+     * @param nd
+     * @throws MossWorldLoadException
      */
-    public MapNode registerNode(String sysname, String userFacingName,
-                                INodeParams params, CubeTextureSet textures, boolean isLiquid, int light)
-            throws MossWorldLoadException {
-        MapNode nd = new MapNode(params, textures, sysname, userFacingName,
-                light);
+    public void registerMapNode(MapNode nd) throws MossWorldLoadException {
         this.nm.putNode(nd);
-        return nd;
     }
 
     /**
-     * Register a new MapNode in the node manager.
+     * Register a new liquid in the node manager, generating intermediates as needed.
      *
      * @param sysname        The name such as default:lava to set. The prefix mg: is used
      *                       for mapgen-specific nodes, and should be done by creating a
      *                       node with a different prefix and aliasing mg:foo to it.
      * @param userFacingName The name to display in the UI, such as Lava or Iron Ore
-     * @param params         An implementation of the {@link INodeParams} interface
-     *                       detailing the action of the node. {@link AirNodeParams} and
-     *                       {@link DefaultNodeParams} are valid for air-like(display only)
-     *                       and standard solid blocks, respectively.
-     * @param sourceParams   the source params
+     * @param params         An implementation of the {@link LiquidNodeParams} interface
+     *                       detailing the action of the node. {@link LiquidSourceNodeParams} and
+     *                       {@link LiquidFlowingNodeParams} are valid for liquid sources and flowing liquid nodes,
+     *                       respectively.
+     * @param flowParams   the source params
      * @param textures       A string stating the filename of the textures image.
      * @param light          The amount of light from 0 to 255 to be emitted.
      * @return The MapNode object that has been created and added to the
@@ -222,14 +201,14 @@ public class MossScriptEnv {
      *                                registering.
      */
     public LiquidNode registerLiquid(String sysname, String userFacingName,
-                                     LiquidNodeParams params, LiquidNodeParams sourceParams,
-                                     CubeTextureSet textures, int light) throws MossWorldLoadException {
-        LiquidNode nd = new LiquidNode(sourceParams, textures, sysname,
+                                     LiquidNodeParams params, LiquidNodeParams flowParams,
+                                     String textures, int light) throws MossWorldLoadException {
+        LiquidNode nd = new LiquidNode(params, textures, sysname,
                 userFacingName, light);
         this.nm.putNode(nd);
         nd.level = 0;
         for (int i = 1; i < 8; i++) {
-            LiquidNode innerNd = new LiquidNode(params, textures, sysname
+            LiquidNode innerNd = new LiquidNode(flowParams, textures, sysname
                     + "$LEVEL$" + i, userFacingName, light); //$NON-NLS-1$
             innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i / 8f) - 0.5f);
             nd.liquidLevels[i] = innerNd;
@@ -255,59 +234,6 @@ public class MossScriptEnv {
         this.nm.putNodeAlias(alias, dst);
     }
 
-    /**
-     * Register a new MapNode in the node manager.
-     *
-     * @param sysname        The name such as default:dirt to set. The prefix mg: is used
-     *                       for mapgen-specific nodes, and should be done by creating a
-     *                       node with a different prefix and aliasing mg:foo to it.
-     * @param userFacingName The name to display in the UI, such as Dirt or Iron Ore
-     * @param textures       A string stating the filename of the textures image.
-     * @param light          The amount of light from 0 to 255 to be emitted.
-     * @return The MapNode object that has been created and added to the
-     * manager.
-     * @throws MossWorldLoadException If an exception occurs during node registration.
-     */
-    public MapNode registerNodeDefParams(String sysname, String userFacingName,
-                                         CubeTextureSet textures, int light) throws MossWorldLoadException {
-        MapNode nd = new MapNode(new DefaultNodeParams(), textures, sysname,
-                userFacingName, light);
-        this.nm.putNode(nd);
-        return nd;
-    }
-
-    /**
-     * Register a new liquid in the node manager.
-     *
-     * @param sysname        The name such as default:lava to set. The prefix mg: is used
-     *                       for mapgen-specific nodes, and should be done by creating a
-     *                       node with a different prefix and aliasing mg:foo to it.
-     * @param userFacingName The name to display in the UI, such as Dirt or Iron Ore
-     * @param textures       A string stating the filename of the textures image.
-     * @param light          The amount of light from 0 to 255 to be emitted.
-     * @return The LiquidNode object that has been created and added to the
-     * manager.
-     * @throws MossWorldLoadException If an exception occurs during node registration.
-     */
-    public LiquidNode registerLiquidDefParams(String sysname,
-                                              String userFacingName, CubeTextureSet textures, int light)
-            throws MossWorldLoadException {
-        LiquidNode nd = new LiquidNode(new LiquidSourceNodeParams(), textures,
-                sysname, userFacingName, light);
-        this.nm.putNode(nd);
-        nd.level = 0;
-        for (int i = 1; i < 8; i++) {
-            LiquidNode innerNd = new LiquidNode(new LiquidFlowingNodeParams(),
-                    textures, sysname + "$LEVEL$" + i, userFacingName, light); //$NON-NLS-1$
-            innerNd.setByBounds(-.5f, .5f, -.5f, .5f, -.5f, (i / 8f) - 0.5f);
-            nd.liquidLevels[i] = innerNd;
-            innerNd.liquidLevels = nd.liquidLevels;
-            innerNd.level = i;
-            this.nm.putNode(innerNd);
-        }
-        nd.liquidLevels[0] = nd;
-        return nd;
-    }
 
     /**
      * Gets the inv by name.
