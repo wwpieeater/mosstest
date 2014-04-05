@@ -18,9 +18,9 @@ public class NodePositionTest {
         for (int i = 0; i < coords.length; i++) {
             for (int j = 0; j < coords.length; j++) {
                 for (int k = 0; k < coords.length; k++) {
-                    for (byte x = 0; x < CHUNK_DIMENSION; x += 2) {
-                        for (byte y = 0; y < CHUNK_DIMENSION; y += 2) {
-                            for (byte z = 0; z < CHUNK_DIMENSION; z += 2) {
+                    for (byte x = 0; x < CHUNK_DIMENSION; x += 8) {
+                        for (byte y = 0; y < CHUNK_DIMENSION; y += 8) {
+                            for (byte z = 0; z < CHUNK_DIMENSION; z += 8) {
                                 NodePosition pos1 = new NodePosition(coords[i],
                                         coords[j], coords[k], 0, x, y, z);
                                 NodePosition pos2 = new NodePosition(coords[i],
@@ -41,9 +41,9 @@ public class NodePositionTest {
         for (int i = 0; i < coords.length; i++) {
             for (int j = 0; i < coords.length; i++) {
                 for (int k = 0; i < coords.length; i++) {
-                    for (byte x = 0; x < CHUNK_DIMENSION; x++) {
-                        for (byte y = 0; y < CHUNK_DIMENSION; y++) {
-                            for (byte z = 0; z < CHUNK_DIMENSION; z++) {
+                    for (byte x = 0; x < CHUNK_DIMENSION; x+=8) {
+                        for (byte y = 0; y < CHUNK_DIMENSION; y+=8) {
+                            for (byte z = 0; z < CHUNK_DIMENSION; z+=4) {
                                 NodePosition pos1 = new NodePosition(coords[i],
                                         coords[j], coords[k], 0, x, y, z);
                                 byte[] bytes = pos1.toBytes();
@@ -70,9 +70,9 @@ public class NodePositionTest {
         for (int i = 0; i < coords.length; i++) {
             for (int j = 0; j < coords.length; j++) {
                 for (int k = 0; k < coords.length; k++) {
-                    for (byte x = 0; x < CHUNK_DIMENSION; x++) {
-                        for (byte y = 0; y < CHUNK_DIMENSION; y++) {
-                            for (byte z = 0; z < CHUNK_DIMENSION; z++) {
+                    for (byte x = 0; x < CHUNK_DIMENSION; x+=8) {
+                        for (byte y = 0; y < CHUNK_DIMENSION; y+=8) {
+                            for (byte z = 0; z < CHUNK_DIMENSION; z+=4) {
                                 NodePosition pos1 = new NodePosition(coords[i],
                                         coords[j], coords[k], 0, x, y, z);
                                 NodePosition pos2 = new NodePosition(coords[i],
@@ -127,16 +127,16 @@ public class NodePositionTest {
         for (int i = 0; i < coords.length; i++) {
             for (int j = 0; j < coords.length; j++) {
                 for (int k = 0; k < coords.length; k++) {
-                    for (byte x = 0; x < CHUNK_DIMENSION; x++) {
-                        for (byte y = 0; y < CHUNK_DIMENSION; y++) {
-                            for (byte z = 0; z < CHUNK_DIMENSION; z++) {
+                    for (byte x = 0; x < CHUNK_DIMENSION; x+=4) {
+                        for (byte y = 0; y < CHUNK_DIMENSION; y+=8) {
+
                                 NodePosition pos1 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                        coords[j], coords[k], 0, x, y, (byte)0);
                                 NodePosition pos2 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                        coords[j], coords[k], 0, x, y, (byte)0);
                                 org.junit.Assert.assertArrayEquals(
                                         pos1.toBytes(), pos2.toBytes());
-                            }
+
                         }
                     }
                 }

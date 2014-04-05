@@ -67,7 +67,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
     /**
      * The nc.
      */
-    private NodeCache nc;
+    private MapCache nc;
 
     /**
      * The run.
@@ -117,7 +117,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
      * @param rp the rp
      * @param nc the nc
      */
-    public LocalRenderPreparator(RenderProcessor rp, NodeCache nc) {
+    public LocalRenderPreparator(RenderProcessor rp, MapCache nc) {
         this.rend = rp;
         this.nc = nc;
     }

@@ -12,44 +12,26 @@ import java.util.Arrays;
 /**
  * The Class MapChunk.
  */
-public class MapChunk {
+public class MapChunk extends AbstractMapChunk {
     public static final Logger logger = Logger.getLogger(MapChunk.class);
-    public static final int CHUNK_DIMENSION = 16;
     public static final int IS_CHANGED_MASK = 16384;
     public static final int UNSIGNED_IDENTITY_MASK = 0b0011111111111111;
 
     @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Arrays.hashCode(this.lightNodes);
-        result = prime * result + ((this.pos == null) ? 0 : this.pos.hashCode());
-        return result;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MapChunk mapChunk = (MapChunk) o;
+
+        if (!pos.equals(mapChunk.pos)) return false;
+
+        return true;
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof MapChunk)) {
-            return false;
-        }
-        MapChunk other = (MapChunk) obj;
-        if (!Arrays.deepEquals(this.lightNodes, other.lightNodes)) {
-            return false;
-        }
-        if (this.pos == null) {
-            if (other.pos != null) {
-                return false;
-            }
-        } else if (!this.pos.equals(other.pos)) {
-            return false;
-        }
-        return true;
+    public int hashCode() {
+        return pos.hashCode();
     }
 
     /**
@@ -65,7 +47,6 @@ public class MapChunk {
 
     boolean compressed;
 
-    transient MapDatabase db;
 
     static final int MAPCHUNK_SERIALIZATION_VERSION = 2;
 
@@ -73,15 +54,24 @@ public class MapChunk {
     /**
      * Instantiates a new map chunk.
      *
-     * @param pos   the pos
-     * @param light the light
-     * @param db    the db
+     *
+     *
+     * @param light the primary data storage
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public MapChunk(Position pos, byte[] light, MapDatabase db)
+    public MapChunk(byte[] light)
             throws IOException {
-        this.db = db;
-        this.pos = pos;
+        loadBytes_(light);
+
+    }
+
+    @Override
+    protected void setManager(Void manager) {
+        // This is a void here, ergo we can just return
+        return;
+    }
+
+    public void loadBytes_(byte[] light) throws IOException {
         Arrays.copyOf(light, light.length);
         try (DataInputStream lightStreamIn = new DataInputStream(
                 new ByteArrayInputStream(light))) {
@@ -91,16 +81,22 @@ public class MapChunk {
             if (version > MAPCHUNK_SERIALIZATION_VERSION)
                 ExceptionHandler.registerException(new MossWorldLoadException(
                         Messages.getString("MapChunk.BAD_SER_VER"))); //$NON-NLS-1$
+            byte[] posBuf = new byte[Position.SERIALIZED_LENGTH];
+            // side effect of reading into buffer
+            lightStreamIn.read(posBuf);
+
+            this.pos = new Position(posBuf);
         /*
-         * flags short: 1=has heavies 2=none yet 4=run-length diff compression
+         * flags short: 1=TODO
+          * 2=none yet 4=run-length diff compression
 		 * (not implemented yet) 8...=reserved
 		 */
-            if (((flags & 0x01)) != 0) {
-                this.loadHeavy(db.getHeavy(pos));
-            }
+
             this.compressed = (((flags & 0x04)) != 0);
             if (this.compressed) {
                 int cursor = 0;
+                // Below comment for IntelliJ Idea. This is the primary side effect of this method
+                //noinspection MismatchedReadAndWriteOfArray
                 int[] lightTmp = new int[CHUNK_DIMENSION * CHUNK_DIMENSION * CHUNK_DIMENSION];
                 while (lightStreamIn.available() > 0) {
                     int curShort = lightStreamIn.readUnsignedShort();
@@ -133,7 +129,6 @@ public class MapChunk {
                 }
             }
         }
-
     }
 
     private void loadHeavy(byte[] heavy) {
@@ -161,6 +156,7 @@ public class MapChunk {
      * @param z the z
      * @return the node id
      */
+    @Override
     public int getNodeId(byte x, byte y, byte z) {
         return this.lightNodes[x][y][z];
     }
@@ -174,14 +170,17 @@ public class MapChunk {
      * @param z    the z
      * @param node the node
      */
+    @Override
     public void setNode(byte x, byte y, byte z, short node) {
         this.lightNodes[x][y][z] = node;
     }
 
+    @Override
     public int[][][] getNodes() {
         return this.lightNodes;
     }
 
+    @Override
     public byte[] writeLight(boolean compressed) {
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -189,6 +188,7 @@ public class MapChunk {
         try (DataOutputStream dos = new DataOutputStream(bos)) {
             dos.writeShort(0);
             dos.writeShort(MAPCHUNK_SERIALIZATION_VERSION);
+            dos.write(this.pos.toBytes());
             for (int[][] nodelvl : this.lightNodes) {
                 for (int[] nodelvl2 : nodelvl) {
                     for (int node : nodelvl2) {
@@ -205,5 +205,19 @@ public class MapChunk {
 
         return bos.toByteArray();
     }
+    @Override
+    public void compact() {
+        // noop in this version. Later versions may compact.
+    }
 
+    @Override
+    public byte[] toBytes() {
+        return this.writeLight(true);
+    }
+
+    @Override
+    public void loadBytes(byte[] buf) throws IOException{
+        // delegate to internal implementation
+        this.loadBytes_(buf);
+    }
 }

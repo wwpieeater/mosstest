@@ -42,9 +42,12 @@ public class NodeManager {
     /**
      * The Constant unknownFallbackNode.
      */
-    private static final MapNode unknownFallbackNode = new MapNode("unknown.png", "sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), 1); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    private static final MapNode unknownFallbackNode; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
 
     static {
+
+        unknownFallbackNode = new MapNode("builtin/unknown.png", "sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), 1);
         unknownFallbackNode.setNodeId((short) -1);
     }
 

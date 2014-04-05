@@ -154,7 +154,7 @@ public class RenderProcessor extends SimpleApplication {
 						else {
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
 							float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
-							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER  + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
 							vertices.put(x).put(z).put(y); //Front face
 							vertices.put(x).put(z - BLOCK_SIZE).put(y);
@@ -219,15 +219,17 @@ public class RenderProcessor extends SimpleApplication {
 		getChunk(p7);*/
 	}
 	
+	
 	private FloatBuffer getDirectFloatBuffer (int size) {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
 		return temp.asFloatBuffer();
-	}
-	
+	}	
+
 	private IntBuffer getDirectIntBuffer (int size) {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
 		return temp.asIntBuffer();
 	}
+	
 
 	private void setupFlashlight () {
 		spot = new SpotLight();
@@ -240,12 +242,14 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(spot);
 	}
 	
+	
 	private void setupSunlight () {
 		sun = new DirectionalLight();
 		sun.setColor(ColorRGBA.White);
 		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
 		rootNode.addLight(sun);
 	}
+	
 	
 	private void setupLamplight () {
 		lamp = new PointLight();
@@ -255,10 +259,12 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(lamp);
 	}
 	
+	
 	private void setupWorldNode () {
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
 	}
+	
 
 	private void setupPlayer () {
 		player = new Player ("Test Guy");
@@ -266,6 +272,7 @@ public class RenderProcessor extends SimpleApplication {
 		player.setChunkPosition(0,0,0);
 		cam.setLocation(new Vector3f(0,0,0));
 	}
+	
 	
 	private Material getMaterial(short nVal) {
 		Material mat = null;
@@ -279,6 +286,7 @@ public class RenderProcessor extends SimpleApplication {
 		}
 		return mat;
 	}
+	
 	
 	private void move(float cx, float cy, float cz) {
 
@@ -308,6 +316,7 @@ public class RenderProcessor extends SimpleApplication {
 			player.setPositionOffsets (xoffset, yoffset, zoffset);
 		}
 	}
+	
 
 	private void rotateCamera(float value, Vector3f axis) {
 
@@ -330,6 +339,7 @@ public class RenderProcessor extends SimpleApplication {
 		
 		spot.setDirection(cam.getDirection());
 	}
+	
 
 	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
 		if (i == 0 || j == 0 || k == 0 || i == chunk.length-1 || j == chunk[0].length-1 || k == chunk[0][0].length-1) {
@@ -338,14 +348,17 @@ public class RenderProcessor extends SimpleApplication {
 		return (chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
 			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
 	}
+	
 
 	private void acquireLock () {
 		MosstestSecurityManager.instance.lock(renderKey, null);
 	}
 	
+	
 	private void releaseLock () {
 		MosstestSecurityManager.instance.unlock(renderKey);
 	}
+	
 	
 	private void initKeyBindings() {
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
@@ -380,6 +393,7 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addListener(analogListener, "CAM_Down");
 		inputManager.addListener(actionListener, "TestFeature");
 	}
+	
 
 	private AnalogListener analogListener = new AnalogListener() {
 
@@ -395,6 +409,7 @@ public class RenderProcessor extends SimpleApplication {
 			}
 		}
 	};
+	
 	
 	/** The action listener. */
 	private ActionListener actionListener = new ActionListener() {

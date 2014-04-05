@@ -28,7 +28,7 @@ public class MapChunkTest {
 		for(Position p : positions) {
 			MapChunk mc1 = MapGenerators.getDefaultMapgen().generateChunk(p);
 			byte[] bytes = mc1.writeLight(false);
-			MapChunk mc2 = new MapChunk(p, bytes, null);
+			MapChunk mc2 = new MapChunk(bytes);
 			assertTrue(mc1.equals(mc2));
 		}
 	}

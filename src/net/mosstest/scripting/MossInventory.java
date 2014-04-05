@@ -1,6 +1,8 @@
 package net.mosstest.scripting;
 
+import net.mosstest.servercore.AbstractByteArrayStorable;
 import net.mosstest.servercore.ItemManager;
+import org.apache.log4j.Logger;
 
 import java.io.*;
 
@@ -9,17 +11,24 @@ import java.io.*;
 /**
  * The Class MossInventory.
  */
-public class MossInventory {
+public class MossInventory extends AbstractByteArrayStorable<ItemManager> {
+
+    private ItemManager im;
+
+    public void loadBytes(byte[] buf){
+
+    }
 
     /**
      * The max stack size.
      */
-    final int maxStackSize;
+    private int maxStackSize;
 
     /**
      * The stacks.
      */
-    final MossItem.Stack[][] stacks;
+    private MossItem.Stack[][] stacks;
+    private static final Logger logger = Logger.getLogger(MossInventory.class);
 
     /**
      * Instantiates a new moss inventory.
@@ -36,13 +45,14 @@ public class MossInventory {
     /**
      * To bytes.
      *
-     * @return the byte[]
-     * @throws IOException Signals that an I/O exception has occurred.
+     * @return the byte[] array that can be deserialized to this inventory
      */
-    public final byte[] toBytes() throws IOException {
+    public final byte[] toBytes() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);
-        dos.writeInt(this.maxStackSize);
+        try {
+            dos.writeInt(this.maxStackSize);
+
         dos.writeInt(this.stacks.length);
         dos.writeInt(this.stacks[0].length);
         for (MossItem.Stack[] sa : this.stacks) {
@@ -53,11 +63,19 @@ public class MossInventory {
         }
         dos.flush();
         bos.flush();
+        } catch (IOException e) {
+            // This should never happen in real life
+            logger.error("IOException serializing an inventory. This should not happen, if it does a bug should be filed");
+        }
         return bos.toByteArray();
     }
 
 
     public MossInventory(byte[] buf, ItemManager im) throws IOException {
+        loadBytes(buf, im);
+    }
+
+    public void loadBytes(byte[] buf, ItemManager im) throws IOException {
         try (ByteArrayInputStream bais = new ByteArrayInputStream(buf)) {
             try (DataInputStream dis = new DataInputStream(bais)) {
                 this.maxStackSize = dis.readInt();
@@ -73,6 +91,11 @@ public class MossInventory {
                 }
             }
         }
+    }
+
+    @Override
+    protected void setManager(ItemManager manager) {
+        this.im = manager;
     }
 
 

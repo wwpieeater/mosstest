@@ -49,6 +49,7 @@ public class LocalNodeManager extends AbstractNodeManager {
 
             this.definedNodes.add(node);
             this.defNodeByName.put(node.nodeName, node);
+            this.containedNodes.add(node);
             this.nodeDb.put(new byte[]{(byte) (node.getNodeId() >>> 8),
                     (byte) (node.getNodeId() & 0xFF)}, bytes(node.nodeName));
         }
@@ -105,6 +106,12 @@ public class LocalNodeManager extends AbstractNodeManager {
             short parsedId = (short) (entry.getKey()[0] * 256 + entry.getKey()[1]);
             String parsedString = asString(entry.getValue());
             this.pending.put(parsedId, parsedString);
+
         }
+    }
+
+    @Override
+    public boolean containsNode(MapNode node) {
+        return this.containedNodes.contains(node);
     }
 }

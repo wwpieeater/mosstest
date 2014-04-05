@@ -25,7 +25,7 @@ public class MossWorld {
 	private XMLConfiguration worldCfg;
 	private File cfgFile;
 	private MapDatabase db;
-	private NodeCache nc;
+	private MapCache nc;
 	private MossScriptEnv mossEnv;
 	private ScriptEnv sEnv;
 	private ScriptableDatabase sdb;
@@ -93,7 +93,7 @@ public class MossWorld {
 					Messages.getString("MossWorld.ERR_DB")); //$NON-NLS-1$
 		}
 
-		this.nc = new NodeCache(this.db);
+		this.nc = new MapCache(this.db);
         this.im = new ItemManager();
         this.nm = new LocalNodeManager(this.db.nodes, im);
         // this.db = new MapDatabase(this.baseDir);
@@ -106,7 +106,7 @@ public class MossWorld {
 			System.exit(4);
 		}
 		this.sdb = new ScriptableDatabase(this.baseDir);
-		this.fp = new FuturesProcessor();
+		this.fp = new FuturesProcessor(0);
 		this.mossEnv = new MossScriptEnv(this.sdb, this.nc, this.fp, this.nm);
 		this.sEnv = new ScriptEnv(this.mossEnv);
 		List<IMossFile> scripts = this.game.getScripts();

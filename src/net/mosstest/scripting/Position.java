@@ -1,30 +1,29 @@
 package net.mosstest.scripting;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import net.mosstest.servercore.AbstractByteArrayStorable;
+
 import java.io.IOException;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class Position.
  */
-public class Position {
+public class Position extends AbstractByteArrayStorable<Void>{
+    public static final int SERIALIZED_LENGTH = 16;
+	@Override
+	public String toString() {
+		return "Position [x=" + x + ", y=" + y + ", z=" + z + ", realm="
+				+ realm + ", hashCode()=" + hashCode() + "]";
+	}
 
-	/** The x. */
-	public final int x;
-	
-	/** The y. */
-	public final int y;
-	
-	/** The z. */
-	public final int z;
-	
+	public int x;
+
+	public int y;
+
+	public int z;
+
 	/** The realm. */
-	public final int realm;
-	
-	/** The is valid. */
+	public int realm;
+
 	transient boolean isValid = true;
 
 	/**
@@ -49,25 +48,39 @@ public class Position {
 	 * @param bytes the bytes
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public Position(byte[] bytes) throws IOException {
-		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-		DataInputStream dis = new DataInputStream(bis);
-		this.x = dis.readInt();
-		this.y = dis.readInt();
-		this.z = dis.readInt();
-		this.realm = dis.readInt();
-		this.isValid = true;
+	public Position(byte[] bytes) throws IllegalArgumentException {
+		// ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+		// DataInputStream dis = new DataInputStream(bis);
+        loadBytes(bytes);
 	}
 
+    @Override
+    public void loadBytes(byte[] bytes) {
+        if (bytes.length != 16)
+            throw new IllegalArgumentException(
+                    "Input array is not 16 elements long.");
+
+        this.realm = ((0xFF & (0xFF & bytes[0])) << 24)
+                + ((0xFF & bytes[1]) << 16) + ((0xFF & bytes[2]) << 8)
+                + (0xFF & bytes[3]);
+        this.x = ((0xFF & bytes[4]) << 24) + ((0xFF & bytes[5]) << 16)
+                + ((0xFF & bytes[6]) << 8) + ((0xFF & bytes[13]));
+        this.y = ((0xFF & bytes[7]) << 24) + ((0xFF & bytes[8]) << 16)
+                + ((0xFF & bytes[9]) << 8) + (0xFF & bytes[14]);
+        this.z = ((0xFF & bytes[10]) << 24) + ((0xFF & bytes[11]) << 16)
+                + ((0xFF & bytes[12]) << 8) + (0xFF & bytes[15]);
+
+        this.isValid = true;
+    }
+
+    @Override
+    protected void setManager(Void manager) {
+        // no-op with Void
+        return;
+    }
 
 
-	/** The Constant serialVersionUID. */
-	static final long serialVersionUID = 1128980133700001337L;
-
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
+    @Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
 			return true;
@@ -114,21 +127,22 @@ public class Position {
 	 * @return the byte[]
 	 */
 	public byte[] toBytes() {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		DataOutputStream dos = new DataOutputStream(bos);
-		try {
-			dos.writeInt(this.x);
-			dos.writeInt(this.y);
-			dos.writeInt(this.z);
-			dos.writeInt(this.realm);
-			dos.flush();
-			bos.flush();
-			return bos.toByteArray();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			this.isValid = false;
-		}
-		return new byte[] {};
+		byte[] buf = new byte[] { (byte) ((long) this.realm >>> 24),
+				(byte) ((long) this.realm >>> 16),
+				(byte) ((long) this.realm >>> 8), (byte) ((long) this.realm),
+
+				(byte) ((long) this.x >>> 24), (byte) ((long) this.x >>> 16),
+				(byte) ((long) this.x >>> 8),
+
+				(byte) ((long) this.y >>> 24), (byte) ((long) this.y >>> 16),
+				(byte) ((long) this.y >>> 8),
+
+				(byte) ((long) this.z >>> 24), (byte) ((long) this.z >>> 16),
+				(byte) ((long) this.z >>> 8),
+
+				(byte) this.x, (byte) this.y, (byte) this.z };
+        assert(buf.length==Position.SERIALIZED_LENGTH);
+        return buf;
 	}
 
 	/**

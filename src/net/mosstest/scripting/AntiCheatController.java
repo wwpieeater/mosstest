@@ -71,7 +71,7 @@ public class AntiCheatController {
         this.run = true;
         for (int i = 0; i < threads; i++) {
             Thread cThread = new Thread(new AntiCheatRunnable(), "anticheat-" //$NON-NLS-1$
-                    + new Random().nextInt());
+                    + i);
             this.threads.add(cThread);
             cThread.start();
             cThread.setPriority(priority);

@@ -279,8 +279,9 @@ public class SimplexMapGenerator implements IMapGenerator {
 			} else
 				preProb = 1;
 
+            // mismatched x,y,z intended
 			return (r.nextDouble() < preProb)
-					&& (this.noise.noise(this.simplexSeedPosition, x, y, z) < this.cutoff);
+                    && (this.noise.noise(this.simplexSeedPosition, x, y, z) < this.cutoff);
 
 		}
 	}

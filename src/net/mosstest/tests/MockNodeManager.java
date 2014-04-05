@@ -16,7 +16,7 @@ public class MockNodeManager implements INodeManager {
      * The Constant MOCK_SOLID_MAPNODE.
      */
     private static final MapNode MOCK_SOLID_MAPNODE = new MapNode(
-            new DefaultNodeParams(), "mock", "!mock:mock", "Mock node", 1);
+            new DefaultNodeParams(), "mock.png", "!mock:mock", "Mock node", 1);
 
     /* (non-Javadoc)
      * @see net.mosstest.servercore.INodeManager#getNode(short)
@@ -63,6 +63,12 @@ public class MockNodeManager implements INodeManager {
      */
     @Override
     public void init() {
+    }
+
+    @Override
+    public boolean containsNode(MapNode node) {
+        //for testing reasons
+        return true;
     }
 
 }

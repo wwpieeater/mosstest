@@ -1,7 +1,6 @@
 package net.mosstest.servercore;
 
 import net.mosstest.scripting.MapChunk;
-import net.mosstest.scripting.MapGenerators;
 import net.mosstest.scripting.Position;
 import org.apache.log4j.Logger;
 import org.iq80.leveldb.DB;
@@ -71,6 +70,8 @@ public class MapDatabase {
             throw new MossWorldLoadException(Messages.getString("MapDatabase.ERR_DB_FAIL"), e); //$NON-NLS-1$
         }
 
+        logger.info("Database loaded normally.");
+
     }
 
 	/**
@@ -79,6 +80,8 @@ public class MapDatabase {
 	 * @throws MapDatabaseException the map database exception
 	 */
 	public void close() throws MapDatabaseException {
+
+        logger.info("Database shutting down (normally)");
 		try {
 			this.map.close();
 			this.entities.close();
@@ -90,29 +93,27 @@ public class MapDatabase {
         }
     }
 
-	/**
-	 * Gets the chunk.
-	 *
-	 * @param pos the pos
-	 * @return the chunk
-	 * @throws MapGeneratorException the map generator exception
-	 */
-	public MapChunk getChunk(final Position pos) throws MapGeneratorException {
 
-		byte[] chunk = this.map.get(pos.toBytes());
-		if (chunk == null) {
-			MapChunk gen = MapGenerators.getDefaultMapgen().generateChunk(pos);
-            this.map.put(pos.toBytes(), gen.writeLight(true));
-            return gen;
+    /**
+     * Gets the chunk, but does not generate it if it does not exist.
+     *
+     * @param pos the position
+     * @return the chunk
+     * @throws MapGeneratorException the map generator exception
+     */
+    public MapChunk getChunk(final Position pos) throws MapGeneratorException {
+
+        byte[] chunk = this.map.get(pos.toBytes());
+
+        try {
+            return new MapChunk(chunk);
+        } catch (IOException e) {
+            logger.error("IOException loading a chunk from byte[]");
+            ExceptionHandler.registerException(e);
+            return null;
         }
-		try {
-			return new MapChunk(pos, chunk, this);
-		} catch (IOException e) {
-			ExceptionHandler.registerException(e);
-			return null;
-		}
 
-	}
+    }
 
 	/**
 	 * Adds the map chunk.

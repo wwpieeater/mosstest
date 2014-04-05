@@ -55,4 +55,5 @@ public interface INodeManager {
 	 */
 	public abstract void init();
 
+    boolean containsNode(MapNode node);
 }
