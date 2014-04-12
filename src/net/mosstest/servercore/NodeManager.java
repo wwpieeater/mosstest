@@ -47,7 +47,7 @@ public class NodeManager {
 
     static {
 
-        unknownFallbackNode = new MapNode("builtin/unknown.png", "sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), 1);
+        unknownFallbackNode = new MapNode("sys:unknown", Messages.getString("NodeManager.DESC_UNKNWN_NODE"), "builtin/unknown.png", 1);
         unknownFallbackNode.setNodeId((short) -1);
     }
 
