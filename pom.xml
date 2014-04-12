@@ -5,7 +5,7 @@
     <artifactId>mosstest</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>Mosstest</name>
-    <description>Open-source InfiniMiner remake</description>
+    <description>Open-source voxel engine with some extra features</description>
     <repositories>
         <repository>
             <snapshots>
