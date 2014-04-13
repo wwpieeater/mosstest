@@ -4,6 +4,7 @@ import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.scripting.handlers.MossEventHandler;
 import net.mosstest.scripting.handlers.MossNodeChangeHandler;
 import net.mosstest.servercore.*;
+import org.mozilla.javascript.NativeJavaPackage;
 
 import java.util.ArrayList;
 import java.util.HashMap;

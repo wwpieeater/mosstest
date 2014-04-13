@@ -104,8 +104,7 @@ public class LocalFileManager implements IFileManager {
                 while ((bytesRead != -1) && (bytesRead != 0)) {
                     bbf.flip();
 
-                    byte[] bytes = new byte[bytesRead];
-                    bbf.get(bytes);
+
 
                     md.update(bbf);
 
