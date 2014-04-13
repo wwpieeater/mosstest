@@ -104,6 +104,7 @@ public class ScriptEnv {
 
         this.cx = ContextFactory.getGlobal().enterContext();
         this.globalScope = this.cx.initStandardObjects();
+        cx.setOptimizationLevel(9);
         this.globalScope.put("moss", this.globalScope, ev); //$NON-NLS-1$
 
 

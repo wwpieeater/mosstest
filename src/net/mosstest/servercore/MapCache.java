@@ -112,6 +112,7 @@ public class MapCache {
         if(chk == null){
             // loading from DB is still done
             chk = db.getChunk(pos);
+            if(chk == null) return null; // not found in DB
             // fill in, in case it was stored as compressed. This still requires mapgen use as chunks are not guaranteed to be stored fully.
             MapGenerators.getDefaultMapgen().fillInChunk(chk.getNodes(), pos);
         }

@@ -99,12 +99,13 @@ public class MapDatabase {
      *
      * @param pos the position
      * @return the chunk
-     * @throws MapGeneratorException the map generator exception
      */
     public MapChunk getChunk(final Position pos) throws MapGeneratorException {
 
         byte[] chunk = this.map.get(pos.toBytes());
-
+        if(chunk == null){
+            return null;
+        }
         try {
             return new MapChunk(chunk);
         } catch (IOException e) {
