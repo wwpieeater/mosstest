@@ -72,7 +72,7 @@ public class MapChunk extends AbstractMapChunk {
     }
 
     public void loadBytes_(byte[] light) throws IOException {
-        Arrays.copyOf(light, light.length);
+        //Arrays.copyOf(light, light.length);
         try (DataInputStream lightStreamIn = new DataInputStream(
                 new ByteArrayInputStream(light))) {
             int flags = lightStreamIn.readUnsignedShort();
@@ -205,6 +205,7 @@ public class MapChunk extends AbstractMapChunk {
 
         return bos.toByteArray();
     }
+
     @Override
     public void compact() {
         // noop in this version. Later versions may compact.

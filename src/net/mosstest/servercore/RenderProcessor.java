@@ -138,19 +138,19 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(150000);
-		FloatBuffer normals = getDirectFloatBuffer(150000);
-		IntBuffer indices = getDirectIntBuffer(150000);
+		FloatBuffer vertices = getDirectFloatBuffer(450000);
+		FloatBuffer normals = getDirectFloatBuffer(450000);
+		IntBuffer indices = getDirectIntBuffer(450000);
 		RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
 					if (isNodeVisible(chk.getNodes(), i, j, k)) {
-					
+						
 						int nVal = chk.getNodeId(i, j, k);
 						//MapNode node = nManager.getNode((short) nVal);
 						//Material mat = getMaterial((short) nVal);
-						if (nVal == 0) {/*System.out.println("GOT A 0");*/}
+						if (nVal == 0) {}
 						
 						else {
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
@@ -167,7 +167,7 @@ public class RenderProcessor extends SimpleApplication {
 							vertices.put(x).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //left face
 							
 							for(int m=0; m<8; m++) {
-								normals.put(0).put(0).put(10);
+								normals.put(0).put(0).put(2);
 							}
 							
 							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 1).put(vertexIndexCounter + 0);//front
@@ -198,8 +198,8 @@ public class RenderProcessor extends SimpleApplication {
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
 		geom.setMaterial(mat);
 		worldNode.attachChild(geom);
-		RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
-		allChunks.put(pos, currentChunk);
+		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
+		//allChunks.put(pos, currentChunk);
 	}
 
 	private void preparatorChunkTest() {
@@ -213,17 +213,17 @@ public class RenderProcessor extends SimpleApplication {
 
 		getChunk(p1);
 		//getChunk(p2);
-		getChunk(p3);
-		/*getChunk(p4);
-		getChunk(p5);
-		getChunk(p6);
-		getChunk(p7);*/
+		//getChunk(p3);
+		//getChunk(p4);
+		//getChunk(p5);
+		//getChunk(p6);
+		//getChunk(p7);
 	}
 	
 	
 	private void blankChunkTest () {
 		Position p1 = new Position(0, 0, 0, 0);
-		Position p2 = new Position(1, 0, 0, 0);
+		Position p2 = new Position(-1, 2, 1, 0);
 		
 		int[][][] n1 = new int[16][16][16];
 		int[][][] n2 = new int[16][16][16];
@@ -231,7 +231,7 @@ public class RenderProcessor extends SimpleApplication {
 			for (int j = 0; j < n1[i].length; j++) {
 				for (int k = 0; k < n1[i][j].length; k++) {
 					n1[i][j][k] = 1;
-					n2[i][j][k] = 2;
+					n2[i][j][k] = 1;
 				}
 			}
 		}
@@ -239,8 +239,12 @@ public class RenderProcessor extends SimpleApplication {
 		MapChunk c1 = new MapChunk(p1, n1);
 		MapChunk c2 = new MapChunk(p2, n2);
 		
-		renderChunk(c1, p1);
-		renderChunk(c2, p2);
+		MossRenderEvent e1 = new MossRenderChunkEvent(c1);
+		MossRenderEvent e2 = new MossRenderChunkEvent(c2);
+		
+		renderEventQueue.add(e1);
+		renderEventQueue.add(e2);
+		//renderChunk(c2, p2);
 		
 	}
 	
@@ -266,14 +270,12 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(spot);
 	}
 	
-	
 	private void setupSunlight () {
 		sun = new DirectionalLight();
 		sun.setColor(ColorRGBA.White);
 		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
 		rootNode.addLight(sun);
 	}
-	
 	
 	private void setupLamplight () {
 		lamp = new PointLight();
@@ -283,12 +285,10 @@ public class RenderProcessor extends SimpleApplication {
 		rootNode.addLight(lamp);
 	}
 	
-	
 	private void setupWorldNode () {
 		worldNode = new Node("world");
 		rootNode.attachChild(worldNode);
 	}
-	
 
 	private void setupPlayer () {
 		player = new Player ("Test Guy");
@@ -297,20 +297,23 @@ public class RenderProcessor extends SimpleApplication {
 		cam.setLocation(new Vector3f(0,0,0));
 	}
 	
-	
 	private Material getMaterial(short nVal) {
 		Material mat = null;
+		logger.debug("NVAL IS: "+nVal);
 		switch (nVal) {
 		case 1:
-			mat= new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
 			mat.setBoolean("UseMaterialColors", true);
 			mat.setColor("Diffuse",  ColorRGBA.randomColor());
 			mat.setColor("Specular", ColorRGBA.randomColor());
-			
+		case 2:
+			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+			mat.setBoolean("UseMaterialColors", true);
+			mat.setColor("Diffuse",  ColorRGBA.randomColor());
+			mat.setColor("Specular", ColorRGBA.randomColor());
 		}
 		return mat;
 	}
-	
 	
 	private void move(float cx, float cy, float cz) {
 
@@ -340,7 +343,6 @@ public class RenderProcessor extends SimpleApplication {
 			player.setPositionOffsets (xoffset, yoffset, zoffset);
 		}
 	}
-	
 
 	private void rotateCamera(float value, Vector3f axis) {
 
@@ -363,7 +365,6 @@ public class RenderProcessor extends SimpleApplication {
 		
 		spot.setDirection(cam.getDirection());
 	}
-	
 
 	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
 		if (i == 0 || j == 0 || k == 0 || i == chunk.length-1 || j == chunk[0].length-1 || k == chunk[0][0].length-1) {
@@ -373,16 +374,13 @@ public class RenderProcessor extends SimpleApplication {
 			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
 	}
 	
-
 	private void acquireLock () {
 		MosstestSecurityManager.instance.lock(renderKey, null);
 	}
 	
-	
 	private void releaseLock () {
 		MosstestSecurityManager.instance.unlock(renderKey);
 	}
-	
 	
 	private void initKeyBindings() {
 		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
@@ -417,7 +415,6 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addListener(analogListener, "CAM_Down");
 		inputManager.addListener(actionListener, "TestFeature");
 	}
-	
 
 	private AnalogListener analogListener = new AnalogListener() {
 
@@ -434,8 +431,6 @@ public class RenderProcessor extends SimpleApplication {
 		}
 	};
 	
-	
-	/** The action listener. */
 	private ActionListener actionListener = new ActionListener() {
 		public void onAction(String name, boolean keyPressed, float tpf) {
 			if (name.equals("Jump") && keyPressed/* && jumpSPEED == 0 */) {
