@@ -10,7 +10,7 @@ import java.io.IOException;
 // TODO: Auto-generated Javadoc
 
 /**
- * Static environment for executing scripts. Call {@link ScriptEnv.runScript()}
+ * Static environment for executing scripts. Call {@link ScriptEnv#runScript()}
  * to call a script.
  *
  * @author rarkenin
@@ -19,7 +19,7 @@ public class ScriptEnv {
 
     static Logger logger = Logger.getLogger(MossDebugUtils.class);
 
-    ScriptableObject globalScope;
+    ImporterTopLevel globalScope;
 
 
     /**
@@ -52,14 +52,9 @@ public class ScriptEnv {
     /**
      * Executes a script with default permissions. This will allow sandboxed
      * access to the database, and gameplay data, without access to
-     * authentication data. These scripts have access to
-     * <code>Hashmap&lt;String, Object&gt;</code>-style maps used for extended
-     * custom attributes, and may access various API classes via
-     * {@link net.mosstest.scripting.JavaApi JavaApi}(which internally uses
-     * reflection to obtain classes). Via an ACL, certain classes may be blocked
+     * authentication data. Via an ACL, certain classes may be blocked
      * or replaced with limited versions thereof. At the time of writing, this
-     * feature is incomplete and will not allow any access to the Java(tm) SE
-     * API.
+     * feature uses a security manager to disallow anything that tries to access risky data or sockets.
      *
      * @param script A string representing the script to run
      * @return A {@link ScriptEnv.ScriptResult} constant representing the
@@ -101,9 +96,9 @@ public class ScriptEnv {
      * @param ev the ev
      */
     public ScriptEnv(MossScriptEnv ev) {
-
         this.cx = ContextFactory.getGlobal().enterContext();
-        this.globalScope = this.cx.initStandardObjects();
+        this.globalScope = new ImporterTopLevel();
+        this.globalScope.initStandardObjects(cx, false);
         cx.setOptimizationLevel(9);
         this.globalScope.put("moss", this.globalScope, ev); //$NON-NLS-1$
 
