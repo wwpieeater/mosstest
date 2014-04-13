@@ -132,7 +132,6 @@ public class RenderProcessor extends SimpleApplication {
 	
 	public void renderChunk(MapChunk chk, Position pos) {
 		int vertexIndexCounter = 0;
-		
 		Mesh completeMesh = new Mesh ();
 		FloatBuffer vertices = getDirectFloatBuffer(150000);
         FloatBuffer tex = getDirectFloatBuffer(100000);
