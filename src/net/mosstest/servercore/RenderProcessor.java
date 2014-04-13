@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
@@ -99,11 +100,11 @@ public class RenderProcessor extends SimpleApplication {
 		setupLamplight();
 		setupPlayer();
 		
-		preparatorChunkTest();
+		//preparatorChunkTest();
+		blankChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
-		//localChunkTest();
 	}
 
 	@Override
@@ -219,6 +220,29 @@ public class RenderProcessor extends SimpleApplication {
 		getChunk(p7);*/
 	}
 	
+	
+	private void blankChunkTest () {
+		Position p1 = new Position(0, 0, 0, 0);
+		Position p2 = new Position(1, 0, 0, 0);
+		
+		int[][][] n1 = new int[16][16][16];
+		int[][][] n2 = new int[16][16][16];
+		for (int i = 0; i < n1.length; i++) {
+			for (int j = 0; j < n1[i].length; j++) {
+				for (int k = 0; k < n1[i][j].length; k++) {
+					n1[i][j][k] = 1;
+					n2[i][j][k] = 2;
+				}
+			}
+		}
+		
+		MapChunk c1 = new MapChunk(p1, n1);
+		MapChunk c2 = new MapChunk(p2, n2);
+		
+		renderChunk(c1, p1);
+		renderChunk(c2, p2);
+		
+	}
 	
 	private FloatBuffer getDirectFloatBuffer (int size) {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
