@@ -17,6 +17,7 @@ import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.system.AppSettings;
+import com.jme3.util.BufferUtils;
 import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Player;
@@ -134,6 +135,7 @@ public class RenderProcessor extends SimpleApplication {
 		
 		Mesh completeMesh = new Mesh ();
 		FloatBuffer vertices = getDirectFloatBuffer(150000);
+        FloatBuffer tex = getDirectFloatBuffer(100000);
 		FloatBuffer normals = getDirectFloatBuffer(150000);
 		IntBuffer indices = getDirectIntBuffer(150000);
 		//RenderNode[][][] renderNodes = new RenderNode[16][16][16];
@@ -153,13 +155,24 @@ public class RenderProcessor extends SimpleApplication {
 							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
 							vertices.put(x).put(z).put(y); //Front face
+                            tex.put(1).put(0);
 							vertices.put(x).put(z - BLOCK_SIZE).put(y);
+                            tex.put(1).put(1);
 							vertices.put(x + BLOCK_SIZE).put(z).put(y);
-							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y); //Top Face
+                            tex.put(0).put(0);
+							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y);
+                            tex.put(0).put(1);
+                            // top face
 							vertices.put(x).put(z).put(y + BLOCK_SIZE);
+                            tex.put(1).put(1);
 							vertices.put(x + BLOCK_SIZE).put(z).put(y + BLOCK_SIZE);
+                            tex.put(1).put(0);
+
 							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //right face
+                            tex.put(0).put(0);
+
 							vertices.put(x).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //left face
+                            tex.put(1).put(0);
 							
 							for(int m=0; m<8; m++) {
 								normals.put(0).put(0).put(2);
@@ -189,13 +202,14 @@ public class RenderProcessor extends SimpleApplication {
 		completeMesh.setBuffer(Type.Position, 3, vertices);
 		completeMesh.setBuffer(Type.Normal, 3, normals);
 		completeMesh.setBuffer(Type.Index, 3, indices);
+        completeMesh.setBuffer(Type.TexCoord, 2, tex);
 		completeMesh.updateBound();
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
 		geom.setMaterial(mat);
 		worldNode.attachChild(geom);
 		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
 		//allChunks.put(pos, currentChunk);
-	}
+    }
 	
 	private Material getMaterial(short nodeType) {
 		Material mat = null;
@@ -301,7 +315,7 @@ public class RenderProcessor extends SimpleApplication {
 		player = new Player ("Test Guy");
 		player.setPositionOffsets (0,0,0);
 		player.setChunkPosition(0,0,0);
-		cam.setLocation(new Vector3f(0,0,0));
+		cam.setLocation(new Vector3f(0, 0, 0));
 	}
 	
 	private void setupAssetManager () {
