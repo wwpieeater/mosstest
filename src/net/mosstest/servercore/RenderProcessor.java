@@ -100,8 +100,8 @@ public class RenderProcessor extends SimpleApplication {
 		setupLamplight();
 		setupPlayer();
 		
-		//preparatorChunkTest();
-		blankChunkTest();
+		preparatorChunkTest();
+		//blankChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -154,7 +154,8 @@ public class RenderProcessor extends SimpleApplication {
 						
 						else {
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-							float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
+							//float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
+							float y = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
 							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
 							vertices.put(x).put(z).put(y); //Front face
@@ -212,18 +213,18 @@ public class RenderProcessor extends SimpleApplication {
 		Position p7 = new Position(-1,-1,0,0);
 
 		getChunk(p1);
-		//getChunk(p2);
-		//getChunk(p3);
-		//getChunk(p4);
-		//getChunk(p5);
-		//getChunk(p6);
-		//getChunk(p7);
+		getChunk(p2);
+		getChunk(p3);
+		getChunk(p4);
+		getChunk(p5);
+		getChunk(p6);
+		getChunk(p7);
 	}
 	
 	
 	private void blankChunkTest () {
 		Position p1 = new Position(0, 0, 0, 0);
-		Position p2 = new Position(-1, 2, 1, 0);
+		Position p2 = new Position(1, 1, 1, 0);
 		
 		int[][][] n1 = new int[16][16][16];
 		int[][][] n2 = new int[16][16][16];
