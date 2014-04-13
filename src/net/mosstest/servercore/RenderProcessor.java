@@ -240,8 +240,7 @@ public class RenderProcessor extends SimpleApplication {
 		getChunk(p5);
 		getChunk(p6);
 		getChunk(p7);
-	}
-	
+	}	
 	
 	private void blankChunkTest () {
 		Position p1 = new Position(0, 0, 0, 0);
@@ -321,8 +320,6 @@ public class RenderProcessor extends SimpleApplication {
 	private void setupAssetManager () {
 		assetManager.registerLocator("scripts", LocalAssetLocator.class);
 	}
-	
-	
 	
 	private void move(float cx, float cy, float cz) {
 
