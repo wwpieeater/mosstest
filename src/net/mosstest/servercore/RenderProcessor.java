@@ -26,8 +26,6 @@ import org.apache.log4j.Logger;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 
@@ -36,7 +34,6 @@ public class RenderProcessor extends SimpleApplication {
 
 	static Logger logger = Logger.getLogger(RenderProcessor.class);
 	private final float SPEED = 3f;
-	private final float PLAYER_HEIGHT = 25;
 	private final float BLOCK_SIZE = 20f;
 	private final float CHUNK_SIZE = 16*BLOCK_SIZE;
 	private final float ROTATION_SPEED = 1f;
@@ -51,7 +48,7 @@ public class RenderProcessor extends SimpleApplication {
 	private SpotLight spot;
 	private PointLight lamp;
 	private DirectionalLight sun;
-	private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
+	//private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
 	public Player player;
@@ -92,14 +89,13 @@ public class RenderProcessor extends SimpleApplication {
 	@Override
 	public void simpleInitApp() {
 		lastTime = 0;
-		
 		//acquireLock();
 		setupWorldNode ();
 		setupFlashlight();
 		setupSunlight();
 		setupLamplight();
+		setupAssetManager();
 		setupPlayer();
-		
 		preparatorChunkTest();
 		//blankChunkTest();
 		flyCam.setEnabled(false);
@@ -113,7 +109,6 @@ public class RenderProcessor extends SimpleApplication {
 			move(locChanges[0], locChanges[1], locChanges[2]);
 			lastTime = System.currentTimeMillis();
 		}
-
 		inputManager.setCursorVisible(false);
 		MossRenderEvent myEvent = renderEventQueue.poll();
 		if (myEvent instanceof MossRenderStopEvent) {
@@ -138,10 +133,10 @@ public class RenderProcessor extends SimpleApplication {
 		int vertexIndexCounter = 0;
 		
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(450000);
-		FloatBuffer normals = getDirectFloatBuffer(450000);
-		IntBuffer indices = getDirectIntBuffer(450000);
-		RenderNode[][][] renderNodes = new RenderNode[16][16][16];
+		FloatBuffer vertices = getDirectFloatBuffer(150000);
+		FloatBuffer normals = getDirectFloatBuffer(150000);
+		IntBuffer indices = getDirectIntBuffer(150000);
+		//RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
@@ -154,7 +149,6 @@ public class RenderProcessor extends SimpleApplication {
 						
 						else {
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-							//float y = (float) ((pos.y - PLAYER_HEIGHT) - (j * BLOCK_SIZE));
 							float y = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
 							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
@@ -202,7 +196,20 @@ public class RenderProcessor extends SimpleApplication {
 		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
 		//allChunks.put(pos, currentChunk);
 	}
-
+	
+	private Material getMaterial(short nodeType) {
+		Material mat = null;
+		switch (nodeType) {
+		case 1:
+			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+			mat.setTexture("DiffuseMap", assetManager.loadTexture("default/grass.png"));
+			mat.setBoolean("UseMaterialColors", true);
+			mat.setColor("Diffuse",  ColorRGBA.White);
+			mat.setColor("Specular", ColorRGBA.White);
+		}
+		return mat;
+	}
+	
 	private void preparatorChunkTest() {
 		Position p1 = new Position(0, 0, 0, 0);
 		Position p2 = new Position(1, 0, 0, 0);
@@ -258,7 +265,6 @@ public class RenderProcessor extends SimpleApplication {
 		ByteBuffer temp = ByteBuffer.allocateDirect(size);
 		return temp.asIntBuffer();
 	}
-	
 
 	private void setupFlashlight () {
 		spot = new SpotLight();
@@ -298,23 +304,11 @@ public class RenderProcessor extends SimpleApplication {
 		cam.setLocation(new Vector3f(0,0,0));
 	}
 	
-	private Material getMaterial(short nVal) {
-		Material mat = null;
-		logger.debug("NVAL IS: "+nVal);
-		switch (nVal) {
-		case 1:
-			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-			mat.setBoolean("UseMaterialColors", true);
-			mat.setColor("Diffuse",  ColorRGBA.randomColor());
-			mat.setColor("Specular", ColorRGBA.randomColor());
-		case 2:
-			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-			mat.setBoolean("UseMaterialColors", true);
-			mat.setColor("Diffuse",  ColorRGBA.randomColor());
-			mat.setColor("Specular", ColorRGBA.randomColor());
-		}
-		return mat;
+	private void setupAssetManager () {
+		assetManager.registerLocator("scripts", LocalAssetLocator.class);
 	}
+	
+	
 	
 	private void move(float cx, float cy, float cz) {
 
