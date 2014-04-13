@@ -148,12 +148,12 @@ public class MapNode {
     /**
      * Instantiates a new map node, but does not add it to a node manager.
      *
-     * @param textures       the textures, in the order of top, front, right, back, left, bottom
      * @param nodeName       the node name
      * @param userFacingName the name shown in user interfaces
+     * @param textures       the textures, in the order of top, front, right, back, left, bottom
      * @param lightEmission  the light emission
      */
-    public MapNode(String[] textures, String nodeName, String userFacingName,
+    public MapNode(String nodeName, String userFacingName, String[] textures,
                    int lightEmission) {
         if (textures.length != 6) throw new IllegalArgumentException("The number of texture given was not 6.");
         this.nodeparams = new DefaultNodeParams();
@@ -167,12 +167,12 @@ public class MapNode {
     /**
      * Instantiates a new map node with the same texture used for all sides, but does not add it to a node manager.
      *
-     * @param texture        the texture to use for each side
      * @param nodeName       the node name
      * @param userFacingName the name shown in user interfaces
+     * @param texture        the texture to use for each side
      * @param lightEmission  the light emission
      */
-    public MapNode(String texture, String nodeName, String userFacingName,
+    public MapNode(String nodeName, String userFacingName, String texture,
                    int lightEmission) {
         this.nodeparams = new DefaultNodeParams();
 

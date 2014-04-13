@@ -177,7 +177,7 @@ public class MossScriptEnv {
      * @param nd
      * @throws MossWorldLoadException
      */
-    public void registerMapNode(MapNode nd) throws MossWorldLoadException {
+    public void registerNode(MapNode nd) throws MossWorldLoadException {
         this.nm.putNode(nd);
     }
 

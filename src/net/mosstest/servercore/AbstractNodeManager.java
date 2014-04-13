@@ -39,8 +39,8 @@ public abstract class AbstractNodeManager implements INodeManager {
     public static final MapNode MAPNODE_UNKNOWN;
 
     static {
-        MAPNODE_UNKNOWN = new MapNode("builtin/unknown.png",
-                "sys:unknown", Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), 1); //$NON-NLS-1$ //$NON-NLS-2$
+        MAPNODE_UNKNOWN = new MapNode("sys:unknown", Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), "builtin/unknown.png",
+                1); //$NON-NLS-1$ //$NON-NLS-2$
         MAPNODE_UNKNOWN.setNodeId((short) -1);
     }
 
