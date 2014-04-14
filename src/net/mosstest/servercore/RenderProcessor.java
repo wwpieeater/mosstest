@@ -1,5 +1,18 @@
 package net.mosstest.servercore;
 
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.logging.Level;
+
+import jme3tools.optimize.GeometryBatchFactory;
+import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.Player;
+import net.mosstest.scripting.Position;
+
+import org.apache.log4j.Logger;
+
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
@@ -11,24 +24,18 @@ import com.jme3.light.DirectionalLight;
 import com.jme3.light.PointLight;
 import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
-import com.jme3.math.*;
+import com.jme3.math.ColorRGBA;
+import com.jme3.math.FastMath;
+import com.jme3.math.Matrix3f;
+import com.jme3.math.Quaternion;
+import com.jme3.math.Vector2f;
+import com.jme3.math.Vector3f;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.system.AppSettings;
-import com.jme3.util.BufferUtils;
-import jme3tools.optimize.GeometryBatchFactory;
-import net.mosstest.scripting.MapChunk;
-import net.mosstest.scripting.Player;
-import net.mosstest.scripting.Position;
-import org.apache.log4j.Logger;
-
-import java.nio.ByteBuffer;
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.logging.Level;
+import com.jme3.texture.Texture;
 
 
 public class RenderProcessor extends SimpleApplication {
@@ -149,11 +156,12 @@ public class RenderProcessor extends SimpleApplication {
 						if (nVal == 0) {}
 						
 						else {
+							//z and y are switched on purpose.
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-							float y = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
-							float z = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
+							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
-							vertices.put(x).put(z).put(y); //Front face
+							/*vertices.put(x).put(z).put(y);
                             tex.put(1).put(0);
 							vertices.put(x).put(z - BLOCK_SIZE).put(y);
                             tex.put(1).put(1);
@@ -161,37 +169,97 @@ public class RenderProcessor extends SimpleApplication {
                             tex.put(0).put(0);
 							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y);
                             tex.put(0).put(1);
-                            // top face
 							vertices.put(x).put(z).put(y + BLOCK_SIZE);
                             tex.put(1).put(1);
 							vertices.put(x + BLOCK_SIZE).put(z).put(y + BLOCK_SIZE);
                             tex.put(1).put(0);
-
-							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //right face
+							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE);
                             tex.put(0).put(0);
-
-							vertices.put(x).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE); //left face
-                            tex.put(1).put(0);
+							vertices.put(x).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE);
+                            tex.put(1).put(0);*/
+							
+							/**
+							 * Vertices start at the top left corner and go clockwise around the face.
+							 */
+							vertices.put(x).put(y).put(z); //FRONT
+							vertices.put(x + BLOCK_SIZE).put(y).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x).put(y).put(z - BLOCK_SIZE);
+							tex.put(0).put(0);
+							tex.put(0).put(1);
+							tex.put(1).put(1);
+							tex.put(1).put(0);
+							
+							vertices.put(x).put(y + BLOCK_SIZE).put(z); //TOP
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z);
+							vertices.put(x).put(y).put(z);
+							tex.put(0).put(0);
+							tex.put(0).put(1);
+							tex.put(1).put(1);
+							tex.put(1).put(0);
+							
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);//BACK	
+							vertices.put(x).put(y + BLOCK_SIZE).put(z);
+							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							tex.put(0).put(0);
+							tex.put(0).put(1);
+							tex.put(1).put(1);
+							tex.put(1).put(0);
+							
+							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE); //BOTTOM
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x).put(y).put(z - BLOCK_SIZE);
+							tex.put(0).put(0);
+							tex.put(0).put(1);
+							tex.put(1).put(1);
+							tex.put(1).put(0);
+							
+							vertices.put(x).put(y + BLOCK_SIZE).put(z); //LEFT
+							vertices.put(x).put(y).put(z);
+							vertices.put(x).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							tex.put(0).put(0);
+							tex.put(0).put(1);
+							tex.put(1).put(1);
+							tex.put(1).put(0);
+							
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z); //RIGHT
+							vertices.put(x + BLOCK_SIZE).put(y).put(z);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							tex.put(0).put(0);
+							tex.put(0).put(1);
+							tex.put(1).put(1);
+							tex.put(1).put(0);
+							
 							
 							for(int m=0; m<8; m++) {
 								normals.put(0).put(0).put(2);
 							}
 							
-							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 1).put(vertexIndexCounter + 0);//front
-							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 0).put(vertexIndexCounter + 2);
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 2).put(vertexIndexCounter + 0);//top
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 5).put(vertexIndexCounter + 2);
-							indices.put(vertexIndexCounter + 3).put(vertexIndexCounter + 2).put(vertexIndexCounter + 6);//right
-							indices.put(vertexIndexCounter + 2).put(vertexIndexCounter + 5).put(vertexIndexCounter + 6);
-							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 1).put(vertexIndexCounter + 7);//left
-							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 7).put(vertexIndexCounter + 4);
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//back
+							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 2).put(vertexIndexCounter + 1);//front
+							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 3).put(vertexIndexCounter + 2);
+							
+							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//top
 							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
-							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 6).put(vertexIndexCounter + 7);//bottom
-							indices.put(vertexIndexCounter + 1).put(vertexIndexCounter + 3).put(vertexIndexCounter + 6);
+							
+							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 10).put(vertexIndexCounter + 9);//back
+							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 11).put(vertexIndexCounter + 10);
+							
+							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 14).put(vertexIndexCounter + 13);//left
+							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 15).put(vertexIndexCounter + 14);
+							
+							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 18).put(vertexIndexCounter + 17);//back
+							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 19).put(vertexIndexCounter + 18);
+							
+							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//bottom
+							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 23).put(vertexIndexCounter + 22);
 							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
 							//renderNodes[i][j][k] = geom;
-							vertexIndexCounter += 8;
+							vertexIndexCounter += 24;
 						}
 					}
 				}
@@ -215,10 +283,9 @@ public class RenderProcessor extends SimpleApplication {
 		switch (nodeType) {
 		case 1:
 			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-			mat.setTexture("DiffuseMap", assetManager.loadTexture("default/grass.png"));
-			mat.setBoolean("UseMaterialColors", true);
-			mat.setColor("Diffuse",  ColorRGBA.White);
-			mat.setColor("Specular", ColorRGBA.White);
+			Texture tx = assetManager.loadTexture("default/grass.png");
+			tx.setMagFilter(Texture.MagFilter.Nearest);
+			mat.setTexture("DiffuseMap", tx);
 		}
 		return mat;
 	}
