@@ -161,23 +161,6 @@ public class RenderProcessor extends SimpleApplication {
 							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
 							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 							
-							/*vertices.put(x).put(z).put(y);
-                            tex.put(1).put(0);
-							vertices.put(x).put(z - BLOCK_SIZE).put(y);
-                            tex.put(1).put(1);
-							vertices.put(x + BLOCK_SIZE).put(z).put(y);
-                            tex.put(0).put(0);
-							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y);
-                            tex.put(0).put(1);
-							vertices.put(x).put(z).put(y + BLOCK_SIZE);
-                            tex.put(1).put(1);
-							vertices.put(x + BLOCK_SIZE).put(z).put(y + BLOCK_SIZE);
-                            tex.put(1).put(0);
-							vertices.put(x + BLOCK_SIZE).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE);
-                            tex.put(0).put(0);
-							vertices.put(x).put(z - BLOCK_SIZE).put(y + BLOCK_SIZE);
-                            tex.put(1).put(0);*/
-							
 							/**
 							 * Vertices start at the top left corner and go clockwise around the face.
 							 */
@@ -208,10 +191,10 @@ public class RenderProcessor extends SimpleApplication {
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE); //BOTTOM
 							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
 							vertices.put(x).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
@@ -226,18 +209,17 @@ public class RenderProcessor extends SimpleApplication {
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z); //RIGHT
-							vertices.put(x + BLOCK_SIZE).put(y).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z); //RIGHT
+							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
 							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							
 							for(int m=0; m<8; m++) {
-								normals.put(0).put(0).put(2);
+								normals.put(1).put(3).put(2);
 							}
 							
 							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 2).put(vertexIndexCounter + 1);//front
@@ -249,13 +231,13 @@ public class RenderProcessor extends SimpleApplication {
 							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 10).put(vertexIndexCounter + 9);//back
 							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 11).put(vertexIndexCounter + 10);
 							
-							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 14).put(vertexIndexCounter + 13);//left
+							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 14).put(vertexIndexCounter + 13);//bottom
 							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 15).put(vertexIndexCounter + 14);
 							
-							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 18).put(vertexIndexCounter + 17);//back
+							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 18).put(vertexIndexCounter + 17);//left
 							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 19).put(vertexIndexCounter + 18);
 							
-							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//bottom
+							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//right
 							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 23).put(vertexIndexCounter + 22);
 							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
 							//renderNodes[i][j][k] = geom;
