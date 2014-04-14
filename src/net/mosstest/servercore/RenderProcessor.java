@@ -104,8 +104,8 @@ public class RenderProcessor extends SimpleApplication {
 		setupLamplight();
 		setupAssetManager();
 		setupPlayer();
-		preparatorChunkTest();
-		//blankChunkTest();
+		//preparatorChunkTest();
+		blankChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -140,10 +140,10 @@ public class RenderProcessor extends SimpleApplication {
 	public void renderChunk(MapChunk chk, Position pos) {
 		int vertexIndexCounter = 0;
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(150000);
-        FloatBuffer tex = getDirectFloatBuffer(100000);
-		FloatBuffer normals = getDirectFloatBuffer(150000);
-		IntBuffer indices = getDirectIntBuffer(150000);
+		FloatBuffer vertices = getDirectFloatBuffer(950000);
+        FloatBuffer tex = getDirectFloatBuffer(950000);
+		FloatBuffer normals = getDirectFloatBuffer(950000);
+		IntBuffer indices = getDirectIntBuffer(950000);
 		//RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
@@ -219,7 +219,7 @@ public class RenderProcessor extends SimpleApplication {
 							tex.put(1).put(0);
 							
 							for(int m=0; m<8; m++) {
-								normals.put(1).put(3).put(2);
+								normals.put(2).put(3).put(5);
 							}
 							
 							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 2).put(vertexIndexCounter + 1);//front
@@ -360,7 +360,7 @@ public class RenderProcessor extends SimpleApplication {
 
 	private void setupPlayer () {
 		player = new Player ("Test Guy");
-		player.setPositionOffsets (0,0,0);
+		player.setPositionOffsets (0,5,0);
 		player.setChunkPosition(0,0,0);
 		cam.setLocation(new Vector3f(0, 0, 0));
 	}
