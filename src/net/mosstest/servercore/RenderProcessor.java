@@ -30,6 +30,7 @@ import com.jme3.math.Matrix3f;
 import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
+import com.jme3.renderer.queue.RenderQueue;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -104,8 +105,8 @@ public class RenderProcessor extends SimpleApplication {
 		setupLamplight();
 		setupAssetManager();
 		setupPlayer();
-		//preparatorChunkTest();
-		blankChunkTest();
+		preparatorChunkTest();
+		//blankChunkTest();
 		flyCam.setEnabled(false);
 		initialUpVec = cam.getUp().clone();
 		initKeyBindings();
@@ -218,7 +219,7 @@ public class RenderProcessor extends SimpleApplication {
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							for(int m=0; m<8; m++) {
+							for(int m=0; m<24; m++) {
 								normals.put(2).put(3).put(5);
 							}
 							
