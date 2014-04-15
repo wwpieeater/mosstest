@@ -181,7 +181,7 @@ public class GUIClientsideLauncher {
                 try {
 
                     MossWorld w = new MossWorld((String) GUIClientsideLauncher.this.table.getModel().getValueAt(row, 0), -16511);
-                } catch (MossWorldLoadException | MapDatabaseException | IOException | ConfigurationException e) {
+                } catch (MossWorldLoadException | MapDatabaseException | IOException e) {
                     logger.error("Uncaught exception in game code, opening bug reporter.");
 
                     String fname = MossDebugUtils.writeStracktrace(e);

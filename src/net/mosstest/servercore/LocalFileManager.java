@@ -2,6 +2,8 @@ package net.mosstest.servercore;
 
 import com.google.common.collect.ImmutableList;
 import com.jme3.asset.AssetLocator;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -15,11 +17,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class LocalFileManager implements IFileManager {
-
+    private HashSet<String> visitedScripts = new HashSet<>();
+    protected HashSet<AbstractMossScript> executed = new HashSet<>();
     public static final LocalFileManager scriptsInstance;
     public static final int HASHING_BUFFER_SIZE = 8192;
     public static final int BYTE_CAST_MASK = 0xFF;
@@ -105,7 +107,6 @@ public class LocalFileManager implements IFileManager {
                     bbf.flip();
 
 
-
                     md.update(bbf);
 
                     bbf.clear();
@@ -132,21 +133,12 @@ public class LocalFileManager implements IFileManager {
         return ImmutableList.copyOf(files.values());
     }
 
-    public IMossFile getScriptInitFile(String scName) throws IOException, FileNotFoundException {
-        String normalized = FilenameUtils.normalize(scName);
-        if (normalized == null) {
-            logger.warn("Failed to normalize game resource filename: " + scName);
-
-            throw new FileNotFoundException("The filename " + scName
-                    + " could not be normalized.");
-        }
-        final String scriptName = normalized + "/init.js";
-        LocalFile scriptFile = getFile(scriptName);
-        registerFile(scriptName, scriptFile);
+    @Override
+    public AbstractMossScript getScript(final String name) throws IOException, MossWorldLoadException {
+        String normalized = FilenameUtils.normalize(name);
         try {
             final String indexName = normalized + "/index";
             LocalFile fileIndex = getFile(indexName);
-            registerFile(indexName, scriptFile);
             BufferedReader idxR = new BufferedReader(fileIndex.getReader());
             String line;
             while ((line = idxR.readLine()) != null) {
@@ -169,7 +161,7 @@ public class LocalFileManager implements IFileManager {
                 }
             }
         } catch (FileNotFoundException e) {
-            logger.warn("No index file found; no files will be served to the client.");
+            logger.warn("No index file found; all files will be served to the client.");
             File base = new File(basedir, normalized);
             Path basePath = Paths.get(basedir.getAbsolutePath());
             for (File f : FileUtils.listFiles(base, CVS_FILTER, CVS_FILTER)) {
@@ -185,6 +177,77 @@ public class LocalFileManager implements IFileManager {
                 }
             }
         }
+        List<AbstractMossScript> dependencies = new ArrayList<>();
+        try {
+            File scriptXml = new File(this.getFile(normalized + "/script.xml").getFilename());
+
+
+            XMLConfiguration scriptCfg = new XMLConfiguration(scriptXml);
+            String[] scNames = scriptCfg.getStringArray("dependencies.dependency");
+            for (String sc : scNames) {
+                if (sc.equals(name)) continue;
+                if (visitedScripts.contains(sc)) {
+                    logger.fatal("A circular dependency was found. " + name + "depends on " + sc + " but the latter depends directly or indirectly on the former");
+                    throw new MossWorldLoadException("A circular dependency was found. " + name + "depends on " + sc + " but the latter depends directly or indirectly on the former");
+                }
+                try {
+                    dependencies.add(this.getScript(sc));
+                } catch (StackOverflowError e) {
+                    // should never happen
+                    logger.fatal("FIXME The stack overflowed while resolving dependencies. " +
+                            "Either there is an undetected dependency issue, or there is simply an extreme number of dependencies.");
+                    throw new MossWorldLoadException("FIXME The stack overflowed while resolving dependencies. " +
+                            "Either there is an undetected dependency issue, or there is simply an extreme number of dependencies.");
+                }
+            }
+        } catch (ConfigurationException | FileNotFoundException e) {
+            logger.warn("No script.xml has been given, assuming no dependencies and defaults for all other script settings.");
+        }
+
+        return new LocalScript(name, dependencies);
+    }
+
+    public IMossFile getScriptInitFile(String scName) throws IOException, FileNotFoundException {
+        String normalized = FilenameUtils.normalize(scName);
+        if (normalized == null) {
+            logger.warn("Failed to normalize game resource filename: " + scName);
+
+            throw new FileNotFoundException("The filename " + scName
+                    + " could not be normalized.");
+        }
+        final String scriptName = normalized + "/init.js";
+        LocalFile scriptFile = getFile(scriptName);
+        registerFile(scriptName, scriptFile);
+
         return scriptFile;
+    }
+
+    private class LocalScript extends AbstractMossScript {
+
+        private final List<AbstractMossScript> dependencies;
+
+        public LocalScript(String name, List<AbstractMossScript> dependencies) {
+            super(name);
+            this.dependencies = dependencies;
+        }
+
+        @Override
+        public void exec(ScriptEnv sEnv) throws IOException, MossWorldLoadException {
+            LocalFileManager.this.executed.add(this);
+            for(AbstractMossScript sc : dependencies) {
+                sc.exec(sEnv);
+            }
+            sEnv.runScript(this.getInitFile());
+        }
+
+        @Override
+        public IMossFile getInitFile() throws IOException {
+            return LocalFileManager.this.getScriptInitFile(name);
+        }
+
+        @Override
+        public List<AbstractMossScript> getDependencies() {
+            return Collections.unmodifiableList(dependencies);
+        }
     }
 }

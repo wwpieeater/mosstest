@@ -40,11 +40,11 @@ public class MossGame {
 					Messages.getString("MossGame.CFG_LOAD_ERR")); //$NON-NLS-1$
 		}
 		this.scripts = new ArrayList<>();
-		String[] scNames = this.gameCfg.getStringArray("plugin"); //$NON-NLS-1$
+		String[] scNames = this.gameCfg.getStringArray("plugins.plugin"); //$NON-NLS-1$
         for (String scName : scNames)
             try {
                 this.scripts.add(LocalFileManager.scriptsInstance
-                        .getScriptInitFile(scName)); //$NON-NLS-1$
+                        .getScript(scName)); //$NON-NLS-1$
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
                 throw new MossWorldLoadException(
@@ -66,14 +66,14 @@ public class MossGame {
 	private File cfgFile;
 
 	/** The scripts. */
-	private ArrayList<IMossFile> scripts;
+	private ArrayList<AbstractMossScript> scripts;
 
 	/**
 	 * Gets the scripts.
 	 * 
 	 * @return the scripts
 	 */
-	public List<IMossFile> getScripts() {
+	public List<AbstractMossScript> getScripts() {
 		return ImmutableList.copyOf(this.scripts);
 	}
 }

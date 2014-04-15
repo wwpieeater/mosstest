@@ -4,6 +4,7 @@ import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.MossItem;
 import net.mosstest.scripting.NodePosition;
 import net.mosstest.scripting.Player;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -88,4 +89,42 @@ public class MossNodeChangeEvent implements IMossEvent{
 		this.wieldItem = wieldItem;
 	}
 
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this)
+                .append("pl", pl)
+                .append("pos", pos)
+                .append("seqnum", seqnum)
+                .append("type", type)
+                .append("nodeBefore", nodeBefore)
+                .append("wieldItem", wieldItem)
+                .toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        MossNodeChangeEvent that = (MossNodeChangeEvent) o;
+
+        if (seqnum != that.seqnum) return false;
+        if (nodeBefore != null ? !nodeBefore.equals(that.nodeBefore) : that.nodeBefore != null) return false;
+        if (pl != null ? !pl.equals(that.pl) : that.pl != null) return false;
+        if (pos != null ? !pos.equals(that.pos) : that.pos != null) return false;
+        if (type != that.type) return false;
+        if (wieldItem != null ? !wieldItem.equals(that.wieldItem) : that.wieldItem != null) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = pl != null ? pl.hashCode() : 0;
+        result = 31 * result + (pos != null ? pos.hashCode() : 0);
+        result = 31 * result + type.hashCode();
+        result = 31 * result + (nodeBefore != null ? nodeBefore.hashCode() : 0);
+        result = 31 * result + (wieldItem != null ? wieldItem.hashCode() : 0);
+        return result;
+    }
 }
