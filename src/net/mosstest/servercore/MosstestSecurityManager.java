@@ -8,6 +8,8 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.security.Permission;
+import java.util.Arrays;
+import java.util.List;
 
 // TODO: Auto-generated Javadoc
 
@@ -69,17 +71,17 @@ public class MosstestSecurityManager extends SecurityManager {
      * The lock.
      */
     private InheritableThreadLocal<Object> lock = new InheritableThreadLocal<>();
-    private File basedir;
+    private File baseDirectory;
     // Class dir corresponding to "net.mosstest"
-    private final File classDir;
+    private final File classDirectory;
 
     public void setTrustedBasedir(File basedir) throws SecurityException,
             IOException {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            logger.error("The security manager prevented an attempt to set the trusted basedir.");
-            throw new SecurityException("Cannot set basedir.");
+            logger.error("The security manager prevented an attempt to set the trusted base directory.");
+            throw new SecurityException("Cannot set base directory.");
         }
-        this.basedir = basedir.getCanonicalFile();
+        this.baseDirectory = basedir.getCanonicalFile();
     }
 
     /**
@@ -338,6 +340,7 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkRead(String file) {
 
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
+            List<File> safeDirectories = Arrays.asList(this.baseDirectory, this.classDirectory);
             File tested;
             try {
                 ThreadContext oldTc = MosstestSecurityManager.this
@@ -347,16 +350,14 @@ public class MosstestSecurityManager extends SecurityManager {
                 tested = new File(file).getCanonicalFile();
                 MosstestSecurityManager.this.lock(oldLock, oldTc);
             } catch (IOException e1) {
-                throw new SecurityException(
-                        "The basedir resolution failed to resolve!");
+                throw new SecurityException("The base directory failed to resolve!", e1);
             }
 
-            File parentFile = tested;
-            while (parentFile != null) {
-                if (basedir.equals(parentFile) || classDir.equals(parentFile)) {
+            while (tested != null) {
+                if (safeDirectories.contains(tested)) {
                     return;
                 }
-                parentFile = parentFile.getParentFile();
+                tested = tested.getParentFile();
             }
             logger.warn("MosstestSecurityManager stopped an attempt to read a file from non-core code"
                     + file);
@@ -732,12 +733,11 @@ public class MosstestSecurityManager extends SecurityManager {
             classDir = new File(MossScriptEnv.class.getProtectionDomain()
                     .getCodeSource().getLocation().getPath()) // net.mosstest.scripting.MossScriptEnv
                     .getParentFile() // net.mosstest.scripting
-                    .getParentFile() // net.mosstest
                     .getCanonicalFile();
         } catch (IOException e) {
-            logger.warn("Failed to obtain a class directory for the security manager, surious classloading failures may result.");
+            logger.warn("Failed to obtain a class directory for the security manager, spurious classloading failures may result.");
         } finally {
-            this.classDir = classDir;
+            this.classDirectory = classDir;
         }
     }
 
