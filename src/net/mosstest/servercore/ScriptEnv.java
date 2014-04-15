@@ -10,14 +10,14 @@ import java.io.IOException;
 // TODO: Auto-generated Javadoc
 
 /**
- * Static environment for executing scripts. Call {@link ScriptEnv#runScript()}
+ * Static environment for executing scripts. Call {@link ScriptEnv#runScript(IMossFile)}
  * to call a script.
  *
  * @author rarkenin
  */
 public class ScriptEnv {
 
-    static Logger logger = Logger.getLogger(MossDebugUtils.class);
+    static Logger logger = Logger.getLogger(ScriptEnv.class);
 
     ImporterTopLevel globalScope;
 
@@ -71,11 +71,12 @@ public class ScriptEnv {
             Object lock = new Object();
             MosstestSecurityManager.instance.lock(lock,
                     ThreadContext.CONTEXT_SCRIPT);
-
+            logger.fatal("Preexec");
             sc.exec(this.cx, this.globalScope);
-
+            logger.fatal("postexec");
             MosstestSecurityManager.instance.unlock(lock);
         } catch (IOException e) {
+            logger.fatal("An IOException has resulted while running "+script.getName()+": "+e);
             return ScriptResult.RESULT_ERROR;
         } catch (RhinoException e) {
             logger.error("A script error has occured: " + e.getMessage());

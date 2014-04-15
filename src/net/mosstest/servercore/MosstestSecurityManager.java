@@ -1,13 +1,17 @@
 package net.mosstest.servercore;
 
 import net.mosstest.scripting.MossScriptEnv;
+import net.mosstest.scripting.ScriptDebugUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FilePermission;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.security.AccessController;
 import java.security.Permission;
+import java.security.SecureClassLoader;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,6 +31,23 @@ public class MosstestSecurityManager extends SecurityManager {
      * The logger.
      */
     static Logger logger = Logger.getLogger(MosstestSecurityManager.class);
+    private final boolean testMode;
+
+    public MosstestSecurityManager(boolean testMode) {
+        this.testMode = testMode;
+        if (testMode) logger.warn("WARNING! The security manager is running in test mode. Security may be diminished.");
+        File classDir = null;
+        try {
+            classDir = new File(MossScriptEnv.class.getProtectionDomain()
+                    .getCodeSource().getLocation().getPath()) // net.mosstest.scripting.MossScriptEnv
+                    .getParentFile() // net.mosstest.scripting
+                    .getCanonicalFile();
+        } catch (IOException e) {
+            logger.warn("Failed to obtain a class directory for the security manager, spurious classloading failures may result.");
+        } finally {
+            this.classDirectory = classDir;
+        }
+    }
 
 
     @Override
@@ -34,7 +55,9 @@ public class MosstestSecurityManager extends SecurityManager {
 
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
             logger.fatal("Requested permssion " + perm);
+            if (testMode && perm.getName().equals("setIO")) return;
             logger.warn("MosstestSecurityManager prevented the use of arbitrary permissions outside engine contexts.");
+
             throw new SecurityException(
                     "MosstestSecurityManager prevented the use of arbitrary permissions outside engine contexts.");
 
@@ -104,6 +127,7 @@ public class MosstestSecurityManager extends SecurityManager {
 
     private Object forceUnlock() {
         Object key = this.lock.get();
+        this.lock.set(null);
         this.threadContext.set(ThreadContext.CONTEXT_ENGINE);
         return key;
     }
@@ -239,6 +263,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkAccess(Thread t) {
+        if(testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
             logger.warn("MosstestSecurityManager stopped an attempt to stop or modify a thread");
@@ -256,6 +281,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkAccess(ThreadGroup g) {
+        if(testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
             logger.warn("MosstestSecurityManager stopped an attempt to modify a ThreadGroup");
@@ -273,6 +299,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkExit(int status) {
+        if (testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
             logger.warn("MosstestSecurityManager stopped an attempt to exit Mosstest improperly from a script");
@@ -338,33 +365,43 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkRead(String file) {
-
+        if(file.contains("testtest")){
+            System.currentTimeMillis();
+        }
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            List<File> safeDirectories = Arrays.asList(this.baseDirectory, this.classDirectory);
+//            List<File> safeDirectories = Arrays.asList(this.baseDirectory, this.classDirectory);
+            ThreadContext oldTc = MosstestSecurityManager.this
+                    .getThreadContext();
+            Object oldLock = MosstestSecurityManager.this.forceUnlock();
             File tested;
+//            try {
+//
+//
+//                tested = new File(file).getCanonicalFile();
+//                //MosstestSecurityManager.this.lock(oldLock, oldTc);
+//            } catch (IOException e1) {
+//                throw new SecurityException("The base directory failed to resolve!", e1);
+//            }
+//
+//            do {
+//                if (safeDirectories.contains(file)) {
+//                    MosstestSecurityManager.this.lock(oldLock, oldTc);
+//                    return;
+//                }
+//                tested = tested.getParentFile();
+//          } while (tested != null);
             try {
-                ThreadContext oldTc = MosstestSecurityManager.this
-                        .getThreadContext();
-                Object oldLock = MosstestSecurityManager.this.forceUnlock();
-
-                tested = new File(file).getCanonicalFile();
-                MosstestSecurityManager.this.lock(oldLock, oldTc);
-            } catch (IOException e1) {
-                throw new SecurityException("The base directory failed to resolve!", e1);
+                AccessController.checkPermission(new FilePermission(file, "read"));
+            } catch (SecurityException e) {
+                // lock
+                this.lock(oldLock, oldTc);
+                // rethrow to bail to a failure
+                throw e;
             }
 
-            while (tested != null) {
-                if (safeDirectories.contains(tested)) {
-                    return;
-                }
-                tested = tested.getParentFile();
-            }
-            logger.warn("MosstestSecurityManager stopped an attempt to read a file from non-core code"
-                    + file);
+            super.checkRead(file);
 
-            throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to read a file from non-core code");
-
+            this.lock(oldLock, oldTc);
         }
     }
 
@@ -564,6 +601,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPropertiesAccess() {
+        if(testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
             logger.warn("MosstestSecurityManager has denied a thread running outside the engine context the right to access system properties.");
@@ -580,11 +618,12 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPropertyAccess(String key) {
+        if(testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
             logger.warn("MosstestSecurityManager has denied a thread running outside the engine context the right to access system properties.");
             throw new SecurityException(
-                    "Scripts may not access system properties");
+                   "Scripts may not access system properties. Attempt was to access "+key);
 
         }
     }
@@ -722,23 +761,13 @@ public class MosstestSecurityManager extends SecurityManager {
 
             logger.warn("MosstestSecurityManager has prevented a plugin from controlling certain portions of the Mosstest engine.");
             throw new SecurityException(
-                    "Non-engine threads may not set java system factories");
+                    "Non-engine threads may not control Mosstest execution");
         }
         super.checkSetFactory();
     }
 
     public MosstestSecurityManager() {
-        File classDir = null;
-        try {
-            classDir = new File(MossScriptEnv.class.getProtectionDomain()
-                    .getCodeSource().getLocation().getPath()) // net.mosstest.scripting.MossScriptEnv
-                    .getParentFile() // net.mosstest.scripting
-                    .getCanonicalFile();
-        } catch (IOException e) {
-            logger.warn("Failed to obtain a class directory for the security manager, spurious classloading failures may result.");
-        } finally {
-            this.classDirectory = classDir;
-        }
+        this(false);
     }
 
 }
