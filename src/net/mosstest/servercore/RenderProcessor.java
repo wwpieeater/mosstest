@@ -371,10 +371,10 @@ public class RenderProcessor extends SimpleApplication {
 	}
 	
 	private void move(float cx, float cy, float cz) {
-
+		 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
-				cam.getDirection().z);
-
+				cam.getDirection().z).normalizeLocal();
+ 
 		worldNode.setLocalTranslation(worldNode
 				.getLocalTranslation()
 				.addLocal(
@@ -398,25 +398,26 @@ public class RenderProcessor extends SimpleApplication {
 			player.setPositionOffsets (xoffset, yoffset, zoffset);
 		}
 	}
-
+ 
 	private void rotateCamera(float value, Vector3f axis) {
-
+ 
 		Matrix3f mat = new Matrix3f();
 		mat.fromAngleNormalAxis(ROTATION_SPEED * value, axis);
-
+ 
 		Vector3f up = cam.getUp();
 		Vector3f left = cam.getLeft();
 		Vector3f dir = cam.getDirection();
-
+ 
 		mat.mult(up, up);
 		mat.mult(left, left);
 		mat.mult(dir, dir);
-
+ 
 		Quaternion q = new Quaternion();
 		q.fromAxes(left, up, dir);
 		q.normalizeLocal();
-
-		cam.setAxes(q);
+        if (up.angleBetween(Vector3f.UNIT_Y) <= FastMath.HALF_PI) {
+            cam.setAxes(q);
+        }
 		
 		spot.setDirection(cam.getDirection());
 	}
