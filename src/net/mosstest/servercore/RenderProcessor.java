@@ -43,11 +43,11 @@ public class RenderProcessor extends SimpleApplication {
 
 	static Logger logger = Logger.getLogger(RenderProcessor.class);
 	private final float SPEED = 3f;
-	private final float BLOCK_SIZE = 20f;
-	private final float CHUNK_SIZE = 16*BLOCK_SIZE;
+	private final float NODE_SIZE = 20f;
+	private final float CHUNK_SIZE = 16*NODE_SIZE;
 	private final float ROTATION_SPEED = 1f;
-	private final double BLOCK_OFFSET_FROM_CENTER = 8 * BLOCK_SIZE;
-	private final double CHUNK_OFFSET = 8 * BLOCK_SIZE;
+	private final double NODE_OFFSET_FROM_CENTER = 8 * NODE_SIZE;
+	private final double CHUNK_OFFSET = 8 * NODE_SIZE;
 	private float[] locChanges = { 0, 0, 0 };
 	private double lastTime;
 	private boolean invertY = false;
@@ -150,9 +150,9 @@ public class RenderProcessor extends SimpleApplication {
 						
 						else {
 							//z and y are switched on purpose.
-							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
-							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * NODE_SIZE));
+							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * NODE_SIZE));
+							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * NODE_SIZE));
 							
 							/*for (int l = 0; l < 6; l++) {
 								try {
@@ -164,54 +164,54 @@ public class RenderProcessor extends SimpleApplication {
 							 * Vertices start at the top left corner and go clockwise around the face.
 							 */
 							vertices.put(x).put(y).put(z); //FRONT
-							vertices.put(x + BLOCK_SIZE).put(y).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x + NODE_SIZE).put(y).put(z);
+							vertices.put(x + NODE_SIZE).put(y).put(z - NODE_SIZE);
+							vertices.put(x).put(y).put(z - NODE_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x).put(y + BLOCK_SIZE).put(z); //TOP
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z);
+							vertices.put(x).put(y + NODE_SIZE).put(z); //TOP
+							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z);
+							vertices.put(x + NODE_SIZE).put(y).put(z);
 							vertices.put(x).put(y).put(z);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);//BACK	
-							vertices.put(x).put(y + BLOCK_SIZE).put(z);
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z);//BACK	
+							vertices.put(x).put(y + NODE_SIZE).put(z);
+							vertices.put(x).put(y + NODE_SIZE).put(z - NODE_SIZE);
+							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z - NODE_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z - NODE_SIZE);
+							vertices.put(x).put(y + NODE_SIZE).put(z - NODE_SIZE);
+							vertices.put(x).put(y).put(z - NODE_SIZE);
+							vertices.put(x + NODE_SIZE).put(y).put(z - NODE_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x).put(y + BLOCK_SIZE).put(z); //LEFT
+							vertices.put(x).put(y + NODE_SIZE).put(z); //LEFT
 							vertices.put(x).put(y).put(z);
-							vertices.put(x).put(y).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+							vertices.put(x).put(y).put(z - NODE_SIZE);
+							vertices.put(x).put(y + NODE_SIZE).put(z - NODE_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
 							tex.put(1).put(0);
 							
-							vertices.put(x + BLOCK_SIZE).put(y).put(z); //RIGHT
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+							vertices.put(x + NODE_SIZE).put(y).put(z); //RIGHT
+							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z);
+							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z - NODE_SIZE);
+							vertices.put(x + NODE_SIZE).put(y).put(z - NODE_SIZE);
 							tex.put(0).put(0);
 							tex.put(0).put(1);
 							tex.put(1).put(1);
@@ -238,7 +238,7 @@ public class RenderProcessor extends SimpleApplication {
 							
 							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//right
 							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 23).put(vertexIndexCounter + 22);
-							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
+							//RenderNode geom = new RenderNode(mat, loc, NODE_SIZE, NodeManager.getNode((short)nVal)null);
 							//renderNodes[i][j][k] = geom;
 							vertexIndexCounter += 24;
 						}
@@ -258,12 +258,6 @@ public class RenderProcessor extends SimpleApplication {
 		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
 		//allChunks.put(pos, currentChunk);
     }
-	
-	private void createFace (FloatBuffer vBuffer, FloatBuffer tBuffer, FloatBuffer nBuffer, IntBuffer iBuffer,
-								int xPattern, int yPattern, int zPattern, int indexCounter) {
-		
-		
-	}
 	
 	private Material getMaterial(short nodeType) {
 		Material mat = null;
@@ -397,9 +391,9 @@ public class RenderProcessor extends SimpleApplication {
 		int xchk = (int)Math.floor(xpos / (CHUNK_SIZE));
 		int ychk = (int)Math.floor(ypos / (CHUNK_SIZE));
 		int zchk = (int)Math.floor(zpos / (CHUNK_SIZE));
-		double xoffset = (xpos % CHUNK_SIZE)/BLOCK_SIZE;
-		double yoffset = (ypos % CHUNK_SIZE)/BLOCK_SIZE;
-		double zoffset = (zpos % CHUNK_SIZE)/BLOCK_SIZE;
+		double xoffset = (xpos % CHUNK_SIZE)/NODE_SIZE;
+		double yoffset = (ypos % CHUNK_SIZE)/NODE_SIZE;
+		double zoffset = (zpos % CHUNK_SIZE)/NODE_SIZE;
 		
 		synchronized(player.antiCheatDataLock){
 			player.setChunkPosition (xchk, ychk, zchk);
