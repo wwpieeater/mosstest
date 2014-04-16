@@ -51,12 +51,13 @@ public class RenderProcessor extends SimpleApplication {
 	private float[] locChanges = { 0, 0, 0 };
 	private double lastTime;
 	private boolean invertY = false;
-	private Vector3f initialUpVec;
 	private Object renderKey;
 	private Node worldNode;
 	private SpotLight spot;
 	private PointLight lamp;
 	private DirectionalLight sun;
+	private ActivityListener activityListener;
+	private RotationListener rotationListener;
 	//private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
 	public INodeManager nManager;
 	public IRenderPreparator rPreparator;
@@ -86,7 +87,6 @@ public class RenderProcessor extends SimpleApplication {
 
 	private void initPreparator(IRenderPreparator prep) {
 		rPreparator = prep;
-		logger.info("The renderer is starting its preparator, which is of type "+prep.getClass().getSimpleName()+".");
 		rPreparator.setRenderProcessor(this);
 		rPreparator.start();
 	}
@@ -103,13 +103,13 @@ public class RenderProcessor extends SimpleApplication {
 		setupFlashlight();
 		setupSunlight();
 		setupLamplight();
-		setupAssetManager();
 		setupPlayer();
+		assetManager.registerLocator("scripts", LocalAssetLocator.class);
+		flyCam.setEnabled(false);
+		setupListeners(cam.getUp().clone());
+		initKeyBindings();
 		preparatorChunkTest();
 		//blankChunkTest();
-		flyCam.setEnabled(false);
-		initialUpVec = cam.getUp().clone();
-		initKeyBindings();
 	}
 
 	@Override
@@ -129,17 +129,10 @@ public class RenderProcessor extends SimpleApplication {
 			GeometryBatchFactory.optimize(worldNode);
 		}
 	}
-
-	public void getChunk (Position pos) {
-		MapChunk maybe = null;
-		try {maybe = rPreparator.requestChunk(pos);} 
-		catch (MapGeneratorException e) {e.printStackTrace();} 
-		catch (InterruptedException e) {e.printStackTrace();}
-		if (maybe != null) {renderChunk(maybe, pos);}
-	}
-	
+//
 	public void renderChunk(MapChunk chk, Position pos) {
 		int vertexIndexCounter = 0;
+		int[][][] nodes = chk.getNodes();
 		Mesh completeMesh = new Mesh ();
 		FloatBuffer vertices = getDirectFloatBuffer(950000);
         FloatBuffer tex = getDirectFloatBuffer(950000);
@@ -150,7 +143,6 @@ public class RenderProcessor extends SimpleApplication {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
 					if (isNodeVisible(chk.getNodes(), i, j, k)) {
-						
 						int nVal = chk.getNodeId(i, j, k);
 						//MapNode node = nManager.getNode((short) nVal);
 						//Material mat = getMaterial((short) nVal);
@@ -161,6 +153,12 @@ public class RenderProcessor extends SimpleApplication {
 							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
 							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
 							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
+							
+							/*for (int l = 0; l < 6; l++) {
+								try {
+									if ()
+								}
+							}*/
 							
 							/**
 							 * Vertices start at the top left corner and go clockwise around the face.
@@ -261,6 +259,12 @@ public class RenderProcessor extends SimpleApplication {
 		//allChunks.put(pos, currentChunk);
     }
 	
+	private void createFace (FloatBuffer vBuffer, FloatBuffer tBuffer, FloatBuffer nBuffer, IntBuffer iBuffer,
+								int xPattern, int yPattern, int zPattern, int indexCounter) {
+		
+		
+	}
+	
 	private Material getMaterial(short nodeType) {
 		Material mat = null;
 		switch (nodeType) {
@@ -271,6 +275,14 @@ public class RenderProcessor extends SimpleApplication {
 			mat.setTexture("DiffuseMap", tx);
 		}
 		return mat;
+	}
+	
+	public void getChunk (Position pos) {
+		MapChunk maybe = null;
+		try {maybe = rPreparator.requestChunk(pos);} 
+		catch (MapGeneratorException e) {e.printStackTrace();} 
+		catch (InterruptedException e) {e.printStackTrace();}
+		if (maybe != null) {renderChunk(maybe, pos);}
 	}
 	
 	private void preparatorChunkTest() {
@@ -366,10 +378,6 @@ public class RenderProcessor extends SimpleApplication {
 		cam.setLocation(new Vector3f(0, 0, 0));
 	}
 	
-	private void setupAssetManager () {
-		assetManager.registerLocator("scripts", LocalAssetLocator.class);
-	}
-	
 	private void move(float cx, float cy, float cz) {
 		 
 		Vector2f transVector = new Vector2f(cam.getDirection().x,
@@ -399,27 +407,9 @@ public class RenderProcessor extends SimpleApplication {
 		}
 	}
  
-	private void rotateCamera(float value, Vector3f axis) {
- 
-		Matrix3f mat = new Matrix3f();
-		mat.fromAngleNormalAxis(ROTATION_SPEED * value, axis);
- 
-		Vector3f up = cam.getUp();
-		Vector3f left = cam.getLeft();
-		Vector3f dir = cam.getDirection();
- 
-		mat.mult(up, up);
-		mat.mult(left, left);
-		mat.mult(dir, dir);
- 
-		Quaternion q = new Quaternion();
-		q.fromAxes(left, up, dir);
-		q.normalizeLocal();
-        if (up.angleBetween(Vector3f.UNIT_Y) <= FastMath.HALF_PI) {
-            cam.setAxes(q);
-        }
-		
-		spot.setDirection(cam.getDirection());
+	private void setupListeners (Vector3f initialUpVec) {
+		rotationListener = new RotationListener (initialUpVec, invertY, cam, ROTATION_SPEED);
+		activityListener = new ActivityListener (locChanges, SPEED);
 	}
 
 	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
@@ -459,79 +449,16 @@ public class RenderProcessor extends SimpleApplication {
 		inputManager.addMapping("CAM_Down", new MouseAxisTrigger(
 				MouseInput.AXIS_Y, true), new KeyTrigger(KeyInput.KEY_DOWN));
 
-		inputManager.addListener(actionListener, "Jump");
-		inputManager.addListener(actionListener, "Down");
-		inputManager.addListener(actionListener, "Left");
-		inputManager.addListener(actionListener, "Right");
-		inputManager.addListener(actionListener, "Forward");
-		inputManager.addListener(actionListener, "Back");
-		inputManager.addListener(analogListener, "CAM_Left");
-		inputManager.addListener(analogListener, "CAM_Right");
-		inputManager.addListener(analogListener, "CAM_Up");
-		inputManager.addListener(analogListener, "CAM_Down");
-		inputManager.addListener(actionListener, "TestFeature");
+		inputManager.addListener(activityListener, "Jump");
+		inputManager.addListener(activityListener, "Down");
+		inputManager.addListener(activityListener, "Left");
+		inputManager.addListener(activityListener, "Right");
+		inputManager.addListener(activityListener, "Forward");
+		inputManager.addListener(activityListener, "Back");
+		inputManager.addListener(rotationListener, "CAM_Left");
+		inputManager.addListener(rotationListener, "CAM_Right");
+		inputManager.addListener(rotationListener, "CAM_Up");
+		inputManager.addListener(rotationListener, "CAM_Down");
+		inputManager.addListener(activityListener, "TestFeature");
 	}
-
-	private AnalogListener analogListener = new AnalogListener() {
-
-		public void onAnalog(String name, float value, float tpf) {
-			if (name.equals("CAM_Left")) {
-				rotateCamera(value, initialUpVec);
-			} else if (name.equals("CAM_Right")) {
-				rotateCamera(-value, initialUpVec);
-			} else if (name.equals("CAM_Up")) {
-				rotateCamera(-value * (invertY ? -1 : 1), cam.getLeft());
-			} else if (name.equals("CAM_Down")) {
-				rotateCamera(value * (invertY ? -1 : 1), cam.getLeft());
-			}
-		}
-	};
-	
-	private ActionListener actionListener = new ActionListener() {
-		public void onAction(String name, boolean keyPressed, float tpf) {
-			if (name.equals("Jump") && keyPressed/* && jumpSPEED == 0 */) {
-				locChanges[1] = 2f;
-			} else if (name.equals("Jump") && !keyPressed) {
-				locChanges[1] = 0f;
-			}
-
-			if (name.equals("Down") && keyPressed) {
-				locChanges[1] = -2f;
-			} else if (name.equals("Down") && !keyPressed) {
-				locChanges[1] = 0f;
-			}
-
-			if (name.equals("Left") && keyPressed) {
-				locChanges[0] = SPEED;
-			} else if (name.equals("Left") && !keyPressed
-					&& locChanges[0] == SPEED) {
-				locChanges[0] = 0;
-			}
-
-			if (name.equals("Right") && keyPressed) {
-				locChanges[0] = -SPEED;
-			} else if (name.equals("Right") && !keyPressed
-					&& locChanges[0] == -SPEED) {
-				locChanges[0] = 0;
-			}
-
-			if (name.equals("Forward") && keyPressed) {
-				locChanges[2] = SPEED;
-			} else if (name.equals("Forward") && !keyPressed
-					&& locChanges[2] == SPEED) {
-				locChanges[2] = 0;
-			}
-
-			if (name.equals("Back") && keyPressed) {
-				locChanges[2] = -SPEED;
-			} else if (name.equals("Back") && !keyPressed
-					&& locChanges[2] == -SPEED) {
-				locChanges[2] = 0;
-			}
-			
-			if (name.equals("TestFeature") && keyPressed) {
-				System.err.println("\nDEBUGGING FEATURE\n");
-			}
-		}
-	};
 }
