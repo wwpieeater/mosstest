@@ -6,6 +6,7 @@ import java.nio.IntBuffer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 
+import com.jme3.material.RenderState;
 import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Player;
@@ -256,6 +257,7 @@ public class RenderProcessor extends SimpleApplication {
 		completeMesh.updateBound();
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
 		geom.setMaterial(mat);
+        geom.setQueueBucket(RenderQueue.Bucket.Transparent);
 		worldNode.attachChild(geom);
 		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
 		//allChunks.put(pos, currentChunk);
@@ -266,9 +268,13 @@ public class RenderProcessor extends SimpleApplication {
 		switch (nodeType) {
 		case 1:
 			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-			Texture tx = assetManager.loadTexture("default/grass.png");
+            Texture tx = assetManager.loadTexture("default/grass.png");
+			//Texture tx = assetManager.loadTexture("default/item_torch.png");
 			tx.setMagFilter(Texture.MagFilter.Nearest);
 			mat.setTexture("DiffuseMap", tx);
+            mat.setBoolean("UseAlpha", true);
+            mat.getAdditionalRenderState().setAlphaTest(true);
+            mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
 		}
 		return mat;
 	}
@@ -529,7 +535,8 @@ public class RenderProcessor extends SimpleApplication {
 			}
 			
 			if (name.equals("TestFeature") && keyPressed) {
-				System.err.println("\nDEBUGGING FEATURE\n");
+                Position p = new Position(0,2,0,0);
+				getChunk(p);
 			}
 		}
 	};
