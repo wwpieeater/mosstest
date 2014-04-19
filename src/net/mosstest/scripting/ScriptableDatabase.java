@@ -1,13 +1,13 @@
 package net.mosstest.scripting;
 
-import static org.fusesource.leveldbjni.JniDBFactory.asString;
-import static org.fusesource.leveldbjni.JniDBFactory.bytes;
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
-import org.apache.commons.lang.ArrayUtils;
+import net.mosstest.servercore.serialization.IByteArrayWriteable;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 
@@ -67,4 +67,18 @@ public class ScriptableDatabase {
 
 
 	}
+
+    public static class DBKey implements IByteArrayWriteable {
+        private List<IByteArrayWriteable> qualifiers;
+
+        @Override
+        public byte[] toBytes() {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            return null;
+        }
+
+
+
+
+    }
 }

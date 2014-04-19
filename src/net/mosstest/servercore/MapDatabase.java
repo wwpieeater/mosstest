@@ -14,6 +14,7 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
 //import static org.iq80.leveldb.impl.Iq80DBFactory.factory;
 
 // TODO: Auto-generated Javadoc
+
 /**
  * The Class MapDatabase.
  */
@@ -24,47 +25,59 @@ public class MapDatabase {
      */
     DB map;
 
-    /** The entities. */
-	DB entities;
-	
-	/** The metadata. */
-	DB metadata;
-	
-	/** The map heavies. */
-	DB mapHeavies;
-	
-	/** The landclaims. */
-	DB landclaims;
-	
-	/** The players. */
-	DB players;
-	
-	/** The nodes. */
-	public DB nodes;
+    /**
+     * The entities.
+     */
+    DB entities;
 
-	/**
-	 * Instantiates a new map database.
-	 *
-	 * @param basedir the basedir
-	 * @throws MapDatabaseException the map database exception
-	 * @throws MossWorldLoadException the moss world load exception
-	 */
-	@SuppressWarnings("nls")
-	public MapDatabase(File basedir) throws MapDatabaseException,
-			MossWorldLoadException {
-		File dbDir = new File(basedir, "db"); //$NON-NLS-1$
-		dbDir.mkdirs();
-		try {
+    /**
+     * The metadata.
+     */
+    DB metadata;
 
-			Options options = new Options();
-			options.comparator(null);
-			this.map = factory.open(new File(dbDir, "map"), options); //$NON-NLS-1$
-			this.mapHeavies = factory.open(new File(dbDir, "mapHeavies"), //$NON-NLS-1$
-					options);
-			this.entities = factory.open(new File(dbDir, "entities"), options); //$NON-NLS-1$
-			this.metadata = factory.open(new File(dbDir, "metadata"), options); //$NON-NLS-1$
-			this.players = factory.open(new File(dbDir, "players"), options); //$NON-NLS-1$
-			this.nodes = factory.open(new File(dbDir, "nodes"), options); //$NON-NLS-1$
+    /**
+     * The map heavies.
+     */
+    DB mapHeavies;
+
+    /**
+     * The landclaims.
+     */
+    DB landclaims;
+
+    /**
+     * The players.
+     */
+    DB players;
+
+    /**
+     * The nodes.
+     */
+    public DB nodes;
+
+    /**
+     * Instantiates a new map database.
+     *
+     * @param basedir the basedir
+     * @throws MapDatabaseException   the map database exception
+     * @throws MossWorldLoadException the moss world load exception
+     */
+    @SuppressWarnings("nls")
+    public MapDatabase(File basedir) throws MapDatabaseException,
+            MossWorldLoadException {
+        File dbDir = new File(basedir, "db"); //$NON-NLS-1$
+        dbDir.mkdirs();
+        try {
+
+            Options options = new Options();
+            options.comparator(null);
+            this.map = factory.open(new File(dbDir, "map"), options); //$NON-NLS-1$
+            this.mapHeavies = factory.open(new File(dbDir, "mapHeavies"), //$NON-NLS-1$
+                    options);
+            this.entities = factory.open(new File(dbDir, "entities"), options); //$NON-NLS-1$
+            this.metadata = factory.open(new File(dbDir, "metadata"), options); //$NON-NLS-1$
+            this.players = factory.open(new File(dbDir, "players"), options); //$NON-NLS-1$
+            this.nodes = factory.open(new File(dbDir, "nodes"), options); //$NON-NLS-1$
         } catch (IOException e) {
             logger.error("IOException in database loading: " + e.toString());
             throw new MossWorldLoadException(Messages.getString("MapDatabase.ERR_DB_FAIL"), e); //$NON-NLS-1$
@@ -74,19 +87,19 @@ public class MapDatabase {
 
     }
 
-	/**
-	 * Close.
-	 *
-	 * @throws MapDatabaseException the map database exception
-	 */
-	public void close() throws MapDatabaseException {
+    /**
+     * Close.
+     *
+     * @throws MapDatabaseException the map database exception
+     */
+    public void close() throws MapDatabaseException {
 
         logger.info("Database shutting down (normally)");
-		try {
-			this.map.close();
-			this.entities.close();
-			this.metadata.close();
-		} catch (IOException e) {
+        try {
+            this.map.close();
+            this.entities.close();
+            this.metadata.close();
+        } catch (IOException e) {
             throw new MapDatabaseException("Database shutdown failed!", e,
                     MapDatabaseException.SEVERITY_UNKNOWN
                             | MapDatabaseException.SEVERITY_FATAL_TRANSIENT); //$NON-NLS-1$
@@ -103,39 +116,47 @@ public class MapDatabase {
     public MapChunk getChunk(final Position pos) throws MapGeneratorException {
 
         byte[] chunk = this.map.get(pos.toBytes());
-        if(chunk == null){
+        if (chunk == null) {
             return null;
         }
         try {
             return new MapChunk(chunk);
-        } catch (IOException e) {
-            logger.error("IOException loading a chunk from byte[]");
-            ExceptionHandler.registerException(e);
-            return null;
+        } catch (MosstestFatalDeathException e) {
+            logger.warn("Map database performed emergency shutdown after catching MosstestFatalDeathException");
+            try {
+                this.close();
+            } catch (MapDatabaseException e1) {
+                logger.error("Map database failed emergency shutdown: " + e1.toString());
+                throw new MosstestFatalDeathException(e1);
+            }
+            logger.warn("Map database performed emergency shutdown after catching MosstestFatalDeathException");
+
+            // MUST rethrow
+            throw e;
         }
 
     }
 
-	/**
-	 * Adds the map chunk.
-	 *
-	 * @param pos the pos
-	 * @param mapChunk the map chunk
-	 */
+    /**
+     * Adds the map chunk.
+     *
+     * @param pos      the pos
+     * @param mapChunk the map chunk
+     */
 
-	void addMapChunk(Position pos, MapChunk mapChunk) {
-		this.map.put(pos.toBytes(), mapChunk.writeLight(true));
+    void addMapChunk(Position pos, MapChunk mapChunk) {
+        this.map.put(pos.toBytes(), mapChunk.writeLight(true));
 
-	}
+    }
 
-	/**
-	 * Gets the heavy.
-	 *
-	 * @param pos the pos
-	 * @return the heavy
-	 */
-	public byte[] getHeavy(Position pos) {
-		return this.mapHeavies.get(pos.toBytes());
-	}
+    /**
+     * Gets the heavy.
+     *
+     * @param pos the pos
+     * @return the heavy
+     */
+    public byte[] getHeavy(Position pos) {
+        return this.mapHeavies.get(pos.toBytes());
+    }
 
 }

@@ -1,13 +1,13 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.AbstractByteArrayStorable;
+import net.mosstest.servercore.serialization.IByteArrayWriteable;
 
 import java.io.IOException;
 
 /**
  * The Class Position.
  */
-public class Position extends AbstractByteArrayStorable<Void>{
+public class Position implements IByteArrayWriteable{
     public static final int SERIALIZED_LENGTH = 16;
 	@Override
 	public String toString() {
@@ -48,14 +48,9 @@ public class Position extends AbstractByteArrayStorable<Void>{
 	 * @param bytes the bytes
 	 * @throws IOException Signals that an I/O exception has occurred.
 	 */
-	public Position(byte[] bytes) throws IllegalArgumentException {
-		// ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
-		// DataInputStream dis = new DataInputStream(bis);
-        loadBytes(bytes);
-	}
 
-    @Override
-    public void loadBytes(byte[] bytes) {
+
+    public Position(byte[] bytes) {
         if (bytes.length != 16)
             throw new IllegalArgumentException(
                     "Input array is not 16 elements long.");
@@ -73,11 +68,7 @@ public class Position extends AbstractByteArrayStorable<Void>{
         this.isValid = true;
     }
 
-    @Override
-    protected void setManager(Void manager) {
-        // no-op with Void
-        return;
-    }
+
 
 
     @Override

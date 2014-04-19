@@ -1,7 +1,9 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.AbstractByteArrayStorable;
 import net.mosstest.servercore.ItemManager;
+import net.mosstest.servercore.MosstestFatalDeathException;
+import net.mosstest.servercore.serialization.IByteArrayWriteable;
+import net.mosstest.servercore.serialization.IManaged;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -11,7 +13,7 @@ import java.io.*;
 /**
  * The Class MossInventory.
  */
-public class MossInventory extends AbstractByteArrayStorable<ItemManager> {
+public class MossInventory implements IByteArrayWriteable, IManaged<ItemManager> {
 
     private ItemManager im;
 
@@ -65,7 +67,8 @@ public class MossInventory extends AbstractByteArrayStorable<ItemManager> {
         bos.flush();
         } catch (IOException e) {
             // This should never happen in real life
-            logger.error("IOException serializing an inventory. This should not happen, if it does a bug should be filed");
+            logger.fatal("IOException serializing an inventory. THE WORLD IS GOING DOWN SHORTLY.");
+            throw new MosstestFatalDeathException(e);
         }
         return bos.toByteArray();
     }
@@ -94,7 +97,7 @@ public class MossInventory extends AbstractByteArrayStorable<ItemManager> {
     }
 
     @Override
-    protected void setManager(ItemManager manager) {
+    public void setManager(ItemManager manager) {
         this.im = manager;
     }
 
