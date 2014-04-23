@@ -23,7 +23,7 @@ public class LocalAssetLocator implements AssetLocator {
             return new LocalAssetInfo(manager, key,
                     this.lfm.getFile(key.getName()));
         } catch (IOException ex) {
-            throw new AssetLoadException(MessageFormat.format("Failed to open file: {0}",
+            throw new AssetLoadException(MessageFormat.format(Messages.getString("FILE_OPEN_FAILED"),
                     key.getName(), ex));
         }
 
@@ -49,7 +49,7 @@ public class LocalAssetLocator implements AssetLocator {
             try {
                 return this.file.getInputStream();
             } catch (IOException ex) {
-                throw new AssetLoadException(MessageFormat.format("Failed to open file: {0}", this.file.getFilename()), ex);
+                throw new AssetLoadException(MessageFormat.format(Messages.getString("FILE_OPEN_FAILED"), this.file.getFilename()), ex);
             }
         }
     }

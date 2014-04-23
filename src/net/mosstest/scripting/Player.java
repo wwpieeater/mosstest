@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import net.mosstest.servercore.PlayerCommunicator;
 import net.mosstest.servercore.RenderProcessor;
+import org.jetbrains.annotations.NonNls;
 
 // TODO: Auto-generated Javadoc
 
@@ -144,7 +145,7 @@ public class Player {
      * @param maxStack the max stack
      * @return the moss inventory
      */
-    public MossInventory getInventory(String name, int rows, int cols,
+    public MossInventory getInventory(@NonNls String name, int rows, int cols,
                                       int maxStack) {
         // todo inventory caching
         MossInventory inv = inventories.get(name);

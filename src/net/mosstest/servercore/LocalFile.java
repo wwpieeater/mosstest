@@ -48,9 +48,9 @@ public class LocalFile implements IMossFile {
 				/ ((double) IMossFile.CHUNK_SIZE));
 		try {
 			this.sha256 = LocalFileManager.getHash(f);
-			logger.info(MessageFormat.format("Hashed {0} as {1}", f.getAbsolutePath(), this.sha256));
+			logger.info(MessageFormat.format(Messages.getString("HASH_SUCCESS"), f.getAbsolutePath(), this.sha256));
 		} catch (NoSuchAlgorithmException e) {
-			logger.error(MessageFormat.format("Could not find algorithm SHA-256 while hashing {0}", f.getAbsolutePath()));
+			logger.error(MessageFormat.format(Messages.getString("ALGO_NOT_FOUND"), f.getAbsolutePath()));
             throw new IOException("Hashing failed while preparing file", e);
         }
     }

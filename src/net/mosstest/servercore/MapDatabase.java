@@ -80,11 +80,11 @@ public class MapDatabase {
             this.players = factory.open(new File(dbDir, "players"), options); //$NON-NLS-1$
             this.nodes = factory.open(new File(dbDir, "nodes"), options); //$NON-NLS-1$
         } catch (IOException e) {
-            logger.error(MessageFormat.format("IOException in database loading: {0}", e.getMessage()));
+            logger.error(MessageFormat.format(Messages.getString("DB_LOAD_IOEXCEPTION"), e.getMessage()));
             throw new MossWorldLoadException(Messages.getString("MapDatabase.ERR_DB_FAIL"), e); //$NON-NLS-1$
         }
 
-        logger.info("Database loaded normally.");
+        logger.info(Messages.getString("DB_NORMAL_LOAD"));
 
     }
 
@@ -95,7 +95,7 @@ public class MapDatabase {
      */
     public void close() throws MapDatabaseException {
 
-        logger.info("Database shutting down (normally)");
+        logger.info(Messages.getString("DB_SHUTDOWN_NORMAL"));
         try {
             this.map.close();
             this.entities.close();
@@ -123,14 +123,13 @@ public class MapDatabase {
         try {
             return new MapChunk(chunk);
         } catch (MosstestFatalDeathException e) {
-            logger.warn("Map database performed emergency shutdown after catching MosstestFatalDeathException");
             try {
                 this.close();
             } catch (MapDatabaseException e1) {
-                logger.error(MessageFormat.format("Map database failed emergency shutdown: {0}", e1.getMessage()));
+                logger.error(MessageFormat.format(Messages.getString("DB_EMERGENCY_SHUTDOWN_FAIL"), e1.getMessage()));
                 throw new MosstestFatalDeathException(e1);
             }
-            logger.warn("Map database performed emergency shutdown after catching MosstestFatalDeathException");
+            logger.warn(Messages.getString("DB_SHUTDOWN_EMERGENCY"));
 
             // MUST rethrow
             throw e;

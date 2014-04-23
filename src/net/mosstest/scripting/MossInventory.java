@@ -67,7 +67,7 @@ public class MossInventory implements IByteArrayWriteable, IManaged<ItemManager>
         bos.flush();
         } catch (IOException e) {
             // This should never happen in real life
-            logger.fatal("IOException serializing an inventory. THE WORLD IS GOING DOWN SHORTLY.");
+            logger.fatal(Messages.getString("INV_IOEXCEPTION_FATAL"));
             throw new MosstestFatalDeathException(e);
         }
         return bos.toByteArray();

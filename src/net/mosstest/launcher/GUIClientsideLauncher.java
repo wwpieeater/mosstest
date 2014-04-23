@@ -1,8 +1,8 @@
 package net.mosstest.launcher;
 
 import net.mosstest.servercore.*;
-import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NonNls;
 
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
@@ -90,7 +90,7 @@ public class GUIClientsideLauncher {
      * @throws InterruptedException      the interrupted exception
      */
     public static void main(String[] args) throws InvocationTargetException, InterruptedException {
-        logger.info("Mosstest client starting...");
+        logger.info(Messages.getString("MOSS_CLIENT_STARTING"));
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (ClassNotFoundException | InstantiationException
@@ -166,7 +166,7 @@ public class GUIClientsideLauncher {
                 int row = GUIClientsideLauncher.this.table.getSelectedRow();
                 if (row < 0) {
 
-                    logger.warn("An attempt was made to start gameplay without selecting a world.");
+                    logger.warn(Messages.getString("GAMEPLAY_NO_WORLD"));
                     JOptionPane.showMessageDialog(
                             null,
                             Messages.getString("GUIClientsideLauncher.ERR_NO_WORLD_SELECTED"), //$NON-NLS-1$
@@ -184,10 +184,10 @@ public class GUIClientsideLauncher {
 
                     MossWorld w = new MossWorld((String) GUIClientsideLauncher.this.table.getModel().getValueAt(row, 0), -16511);
                 } catch (MossWorldLoadException | MapDatabaseException | IOException e) {
-                    logger.error("Uncaught exception in game code, opening bug reporter.");
+                    logger.error(Messages.getString("GAME_UNCAUGHT_EXCEPT"));
 
                     String fname = MossDebugUtils.writeStracktrace(e);
-                    logger.error(MessageFormat.format("Stracktrace has been written to {0}", fname));
+                    logger.error(MessageFormat.format(Messages.getString("STACKTRACE_WRITTEN"), fname));
                     GUIBugReportDialog bg = new GUIBugReportDialog(
                             MossDebugUtils.getDebugInformation(e));
                     bg.setVisible(true);
@@ -208,7 +208,7 @@ public class GUIClientsideLauncher {
                     // TODO actually create world
 
                 } else
-                    logger.info("World creation cancelled");
+                    logger.info(Messages.getString("WORLD_CREATION_CXLD"));
             }
         });
 
@@ -225,7 +225,7 @@ public class GUIClientsideLauncher {
                 int row = GUIClientsideLauncher.this.table.getSelectedRow();
                 if (row < 0) {
 
-                    logger.warn("An attempt was made to delete a world, but none was selected.");
+                    logger.warn(Messages.getString("NO_WORLD_TO_DELETE"));
                     JOptionPane.showMessageDialog(
                             null,
                             Messages.getString("GUIClientsideLauncher.DLG_NO_WORLD_TO_DELETE"), //$NON-NLS-1$
@@ -286,7 +286,7 @@ public class GUIClientsideLauncher {
         btnVisitForums.setEnabled(false);
         communityToolsButtonPanel.add(btnVisitForums);
 
-        JTextArea textArea = new JTextArea();
+        @NonNls JTextArea textArea = new JTextArea();
         aboutTab.add(textArea);
         textArea.setText("  __  __  ____   _____ _____ _______ ______  _____ _______ \r\n"
                 + " |  \\/  |/ __ \\ / ____/ ____|__   __|  ____|/ ____|__   __|\r\n"

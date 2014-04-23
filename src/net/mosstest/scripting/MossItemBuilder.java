@@ -1,5 +1,7 @@
 package net.mosstest.scripting;
 
+import org.jetbrains.annotations.NonNls;
+
 public class MossItemBuilder {
     private String invTex;
     private String wieldTex;
@@ -13,7 +15,7 @@ public class MossItemBuilder {
         return this;
     }
 
-    public MossItemBuilder setWieldTex(String wieldTex) {
+    public MossItemBuilder setWieldTex(@NonNls String wieldTex) {
         this.wieldTex = wieldTex;
         return this;
     }
@@ -52,12 +54,12 @@ public class MossItemBuilder {
         return internalName;
     }
 
-    public MossItemBuilder setDisplayName(String displayName) {
+    public MossItemBuilder setDisplayName(@NonNls String displayName) {
         this.displayName = displayName;
         return this;
     }
 
-    public MossItemBuilder setInternalName(String internalName) {
+    public MossItemBuilder setInternalName(@NonNls String internalName) {
         this.internalName = internalName;
         return this;
     }

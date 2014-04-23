@@ -111,7 +111,7 @@ public class EventProcessor {
             }
             DefaultEventHandlers.processEvent(evt, this.ev);
         } catch (MossScriptException | IllegalArgumentException e) {
-            logger.warn(MessageFormat.format("Caught {0} upon processing an event of type {1}. The exception message was {2}.", e.getClass().getName(), evt.getClass().getName(), e.getLocalizedMessage()));
+            logger.warn(MessageFormat.format(Messages.getString("EVENT_PROCESS_EXCEPTION"), e.getClass().getName(), evt.getClass().getName(), e.getLocalizedMessage()));
 
         }
     }
@@ -226,35 +226,6 @@ public class EventProcessor {
 
     }
 
-    /**
-     * Tests the event processor
-     */
-    public static void main(String... args) throws ConfigurationException, MossWorldLoadException, MapDatabaseException, IOException, InterruptedException {
-        MossWorld mw = new MossWorld("test", -1);
-        EventProcessor evp = mw.getEvp();
-        MossNodeChangeHandler handler = new MossNodeChangeHandler() {
-            @Override
-            public boolean onAction(MossNodeChangeEvent evt) {
-                logger.info("Received test event " + evt.toString());
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                return false;
-            }
-        };
-        mw.getMossEnv().registerHandler(handler, MossNodeChangeEvent.class);
-        long s = 0;
-        while (true) {
-            logger.debug("Enqueueing!");
-            evp.eventQueue.put(new MossNodeChangeEvent(
-                    null,
-                    new NodePosition(0, 1, 2, 3, (byte) 4, (byte) 5, (byte) 6),
-                    s++, MossNodeChangeEvent.NodeActionType.NODE_ACTION_REPLACE,
-                    new MapNode("test", "Test", "test/test.png", 0), null));
-            //Thread.sleep(1000);
-        }
-    }
+
 
 }

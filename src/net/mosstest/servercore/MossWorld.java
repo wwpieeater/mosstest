@@ -9,6 +9,7 @@ import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NonNls;
 
 import java.io.File;
 import java.io.IOException;
@@ -69,7 +70,7 @@ public class MossWorld {
      * @throws ConfigurationException
      */
     @SuppressWarnings("nls")
-    public MossWorld(String name, int port) throws MossWorldLoadException,
+    public MossWorld(@NonNls String name, int port) throws MossWorldLoadException,
             MapDatabaseException, IOException {
         //Thread.currentThread().setContextClassLoader(
         //		MosstestSecurityManager.instance.getScriptClassLoader(Thread
@@ -91,7 +92,7 @@ public class MossWorld {
         try {
             this.worldCfg = new XMLConfiguration(this.cfgFile);
         } catch (ConfigurationException e) {
-            logger.fatal("The configuration data for the game could not be found, or is empty.");
+            logger.fatal(Messages.getString("GAME_CFG_DATA_GONE"));
         }
         if (!this.worldCfg.containsKey("gameid")) { //$NON-NLS-1$
             throw new MossWorldLoadException(

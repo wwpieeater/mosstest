@@ -22,11 +22,14 @@ import java.text.MessageFormat;
 import java.util.*;
 
 public class LocalFileManager implements IFileManager {
+    @NonNls
+    private static final String XML_DEPENDENCY_KEY = "dependencies.dependency";
     private HashSet<String> visitedScripts = new HashSet<>();
     protected HashSet<AbstractMossScript> executed = new HashSet<>();
     public static final LocalFileManager scriptsInstance;
     public static final int HASHING_BUFFER_SIZE = 8192;
     public static final int BYTE_CAST_MASK = 0xFF;
+    @NonNls
     @SuppressWarnings("StaticCollection")
     private static HashMap<String, LocalFileManager> managers = new HashMap<>();
 
@@ -38,7 +41,7 @@ public class LocalFileManager implements IFileManager {
     private HashMap<String, LocalFile> files = new HashMap<>();
     public static final IOFileFilter CVS_FILTER = FileFilterUtils.makeCVSAware(null);
 
-    public static LocalFileManager getFileManager(String key) {
+    public static LocalFileManager getFileManager(@NonNls String key) {
         return managers.get(key);
     }
 
@@ -47,15 +50,15 @@ public class LocalFileManager implements IFileManager {
     static Logger logger = Logger.getLogger(LocalFileManager.class);
 
     @Override
-    public LocalFile getFile(String name) throws IOException, FileNotFoundException {
+    public LocalFile getFile(@NonNls String name) throws IOException, FileNotFoundException {
         String normalized = FilenameUtils.normalize(name);
         if (normalized == null) {
-            logger.warn(MessageFormat.format("Failed to normalize game resource filename: {0}", name));
+            logger.warn(MessageFormat.format(Messages.getString("NORMALIZE_FAILED"), name));
 
-            throw new FileNotFoundException(MessageFormat.format("Failed to normalize game resource filename: {0}", name));
+            throw new FileNotFoundException(MessageFormat.format(Messages.getString("NORMALIZE_FAILED"), name));
         }
         File f = new File(this.basedir, normalized);
-        logger.info(MessageFormat.format("Got local file {0} as {1}", name, f.getAbsolutePath()));
+        logger.info(MessageFormat.format(Messages.getString("GOT_LOCAL_FILE"), name, f.getAbsolutePath()));
 
         return new LocalFile(name, f);
     }
@@ -94,7 +97,7 @@ public class LocalFileManager implements IFileManager {
             NoSuchAlgorithmException, FileNotFoundException {
 
 
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
+        MessageDigest md = MessageDigest.getInstance("SHA-256"); //NON-NLS
 
         try (FileInputStream fis = new FileInputStream(f)) {
             try (FileChannel fc = fis.getChannel()) {
@@ -145,7 +148,7 @@ public class LocalFileManager implements IFileManager {
             while ((line = idxR.readLine()) != null) {
                 String normalizedLine = FilenameUtils.normalize(line.trim());
                 if (normalizedLine == null) {
-                    logger.warn(MessageFormat.format("Failed to normalize game resource filename from index: {0}", line));
+                    logger.warn(MessageFormat.format(Messages.getString("INDEXED_NORMALIZE_FAILURE"), line));
 
                     continue;
                 }
@@ -155,12 +158,12 @@ public class LocalFileManager implements IFileManager {
                     final LocalFile file = getFile(filename);
                     this.registerFile(filename, file);
                 } catch (FileNotFoundException e) {
-                    logger.warn(MessageFormat.format("File was in index but not on disk: {0}", name));
+                    logger.warn(MessageFormat.format(Messages.getString("INDEXED_NOT_ON_DISK"), name));
 
                 }
             }
         } catch (FileNotFoundException e) {
-            logger.warn("No index file found; all files will be served to the client.");
+            logger.warn(Messages.getString("NO_INDEX"));
             File base = new File(basedir, normalized);
             Path basePath = Paths.get(basedir.getAbsolutePath());
             for (File f : FileUtils.listFiles(base, CVS_FILTER, CVS_FILTER)) {
@@ -168,11 +171,11 @@ public class LocalFileManager implements IFileManager {
                     Path path = Paths.get(f.getAbsolutePath());
                     final String resolvedName = basePath.relativize(path).toFile().getPath();
                     LocalFile file = this.getFile(resolvedName);
-                    logger.debug(MessageFormat.format("Got file via recursive directory listing: {0}", resolvedName));
+                    logger.debug(MessageFormat.format(Messages.getString("FOUND_RECURSIVELY"), resolvedName));
                     this.registerFile(resolvedName, file);
                 } catch (FileNotFoundException fnfe2) {
                     // should not happen
-                    logger.warn("Could not find file from recursive directory listing. This should never happen.");
+                    logger.warn(Messages.getString("RECURSIVE_LISTED_BUT_NOT_FOUND"));
                 }
             }
         }
@@ -182,23 +185,23 @@ public class LocalFileManager implements IFileManager {
 
 
             XMLConfiguration scriptCfg = new XMLConfiguration(scriptXml);
-            String[] scNames = scriptCfg.getStringArray("dependencies.dependency");
+            String[] scNames = scriptCfg.getStringArray(XML_DEPENDENCY_KEY);
             for (@NonNls String sc : scNames) {
                 if (sc.equals(name)) continue;
                 if (visitedScripts.contains(sc)) {
-                    logger.fatal(MessageFormat.format("A circular dependency was found. {0} depends on {1} but the latter depends directly or indirectly on the former", name, sc));
-                    throw new MossWorldLoadException(MessageFormat.format("A circular dependency was found. {0} depends on {1} but the latter depends directly or indirectly on the former", name, sc));
+                    logger.fatal(MessageFormat.format(Messages.getString("CIRCULAR_DEPENDENCY_ISSUE"), name, sc));
+                    throw new MossWorldLoadException(MessageFormat.format(Messages.getString("CIRCULAR_DEPENDENCY_ISSUE"), name, sc));
                 }
                 try {
                     dependencies.add(this.getScript(sc));
                 } catch (StackOverflowError e) {
                     // should never happen
-                    logger.fatal("FIXME The stack overflowed while resolving dependencies. Either there is an undetected dependency issue, or there is simply an extreme number of dependencies.");
+                    logger.fatal(Messages.getString("DEPFIND_STACK_OVERFLOW"));
                     throw new MossWorldLoadException("FIXME The stack overflowed while resolving dependencies. Either there is an undetected dependency issue, or there is simply an extreme number of dependencies.");
                 }
             }
         } catch (ConfigurationException | FileNotFoundException e) {
-            logger.warn("No script.xml has been given, assuming no dependencies and defaults for all other script settings.");
+            logger.warn(Messages.getString("SCRIPT_XML_MISSING"));
         }
 
         return new LocalScript(name, dependencies);
@@ -207,9 +210,9 @@ public class LocalFileManager implements IFileManager {
     public IMossFile getScriptInitFile(String scName) throws IOException, FileNotFoundException {
         String normalized = FilenameUtils.normalize(scName);
         if (normalized == null) {
-            logger.warn(MessageFormat.format("Failed to normalize game resource filename: {0}", scName));
+            logger.warn(MessageFormat.format(Messages.getString("FAILED_NORMALIZE_RSRC"), scName));
 
-            throw new FileNotFoundException(MessageFormat.format("Failed to normalize game resource filename: {0}", scName));
+            throw new FileNotFoundException(MessageFormat.format(Messages.getString("FAILED_NORMALIZE_RSRC"), scName));
         }
         @NonNls final String scriptName = normalized + "/init.js";
         LocalFile scriptFile = getFile(scriptName);

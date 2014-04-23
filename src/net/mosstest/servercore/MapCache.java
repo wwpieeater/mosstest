@@ -52,7 +52,7 @@ public class MapCache {
         try {
             chk = chunkCache.get(pos);
         } catch (ExecutionException e) {
-            logger.error(MessageFormat.format("Chunk loader threw ExecutionException with message {0}", e.getMessage()));
+            logger.error(MessageFormat.format(Messages.getString("CHUNK_LDR_EXECUTION_EXCEPTION"), e.getMessage()));
         }
         if (chk == null) {
             // loading from DB is still done if no chunk exists after an async load
@@ -128,12 +128,12 @@ public class MapCache {
         public void onRemoval(RemovalNotification<Position, MapChunk> notification) {
             switch (notification.getCause()) {
                 case COLLECTED:
-                    logger.warn(MessageFormat.format("Un-caching {0} due to garbage collection. Memory may be low.", notification.getKey().toString()));
+                    logger.warn(MessageFormat.format(Messages.getString("GC_EVICT"), notification.getKey().toString()));
                     break;
                 case EXPIRED:
-                    logger.info(MessageFormat.format("Un-caching {0} as it has expired.", notification.getKey().toString()));
+                    logger.info(MessageFormat.format(Messages.getString("UNCACHE_EXPIRE"), notification.getKey().toString()));
                 case SIZE:
-                    logger.warn(MessageFormat.format("Un-caching {0} due to a size constraint.", notification.getKey().toString()));
+                    logger.warn(MessageFormat.format(Messages.getString("EVICT_SIZE"), notification.getKey().toString()));
             }
 
         }
@@ -142,7 +142,7 @@ public class MapCache {
     private class PositionMapChunkCacheLoader extends CacheLoader<Position, MapChunk> {
         @Override
         public MapChunk load(Position position) throws Exception {
-            logger.info(MessageFormat.format("Re-loading {0} into cache.", position.toString()));
+            logger.info(MessageFormat.format(Messages.getString("RELOADING_INTO_CACHE"), position.toString()));
             MapChunk chk = MapCache.this.db.getChunk(position);
             if (chk == null) {
                 chk = MapGenerators.getDefaultMapgen().generateChunk(position);

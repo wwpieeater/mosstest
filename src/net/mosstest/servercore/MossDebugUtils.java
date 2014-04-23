@@ -53,7 +53,7 @@ public class MossDebugUtils {
                 writer.close();
             }
         } catch (IOException e1) {
-            logger.fatal(MessageFormat.format("{0} caught trying to write stacktrace of an existing exception. Message: {1}", e1.getClass().getName(), e1.getMessage()));
+            logger.fatal(MessageFormat.format(Messages.getString("CAUGHT_EXCEPTION_WRITING_STACKTRACE"), e1.getClass().getName(), e1.getMessage()));
         }
         return write.getAbsolutePath();
     }

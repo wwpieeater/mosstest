@@ -89,6 +89,7 @@ public class MossNodeChangeEvent implements IMossEvent{
 		this.wieldItem = wieldItem;
 	}
 
+    @SuppressWarnings("HardCodedStringLiteral")
     @Override
     public String toString() {
         return new ToStringBuilder(this)
