@@ -1,10 +1,12 @@
 package net.mosstest.servercore;
 
 import org.apache.log4j.Logger;
+import org.jetbrains.annotations.NonNls;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Properties;
 
 // TODO: Auto-generated Javadoc
@@ -40,7 +42,7 @@ public class MossDebugUtils {
      * @return the string
      */
     public static String writeStracktrace(Exception e) {
-        String fName = Integer.toString(System.identityHashCode(e), 16) + "@"
+        @NonNls String fName = Integer.toString(System.identityHashCode(e), 16) + "@"
                 + System.currentTimeMillis();
         File write = new File("stacktraces/" + fName + ".txt");
         try {
@@ -51,7 +53,7 @@ public class MossDebugUtils {
                 writer.close();
             }
         } catch (IOException e1) {
-            logger.fatal(e1.getClass().getName() + " caught trying to write stacktrace of an existing exception. Message: " + e1.getMessage());
+            logger.fatal(MessageFormat.format("{0} caught trying to write stacktrace of an existing exception. Message: {1}", e1.getClass().getName(), e1.getMessage()));
         }
         return write.getAbsolutePath();
     }
@@ -65,7 +67,7 @@ public class MossDebugUtils {
     public static String getDebugInformation(Exception e) {
         StringBuilder s = new StringBuilder(
                 MossDebugUtils.getGitConfig("git.commit.id") + " on " + MossDebugUtils.getGitConfig("git.branch") + "\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-        s.append(Messages.getString("MossDebugUtils.MSG_BUILT_ON")).append(MossDebugUtils.getGitConfig(Messages.getString("MossDebugUtils.27"))).append("\r\n\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        s.append(Messages.getString("MossDebugUtils.MSG_BUILT_ON")).append(MossDebugUtils.getGitConfig("git.build.time")).append("\r\n\r\n"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         s.append(Messages.getString("MossDebugUtils.MSG_EXCEPTION_CAUGHT")); //$NON-NLS-1$
         for (StackTraceElement ste : e.getStackTrace()) {
             s.append(ste.toString()).append("\r\n"); //$NON-NLS-1$

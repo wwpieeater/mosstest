@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.iq80.leveldb.*;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -58,13 +59,13 @@ public class LevelDBBackedMap<K extends IByteArrayWriteable, V extends IByteArra
         try {
             v = memoryBackingCache.get((K) key);
         } catch (ExecutionException e) {
-            logger.error("Loader threw ExecutionException: " + e);
+            logger.error(MessageFormat.format("Loader threw ExecutionException with message {0}", e.getMessage()));
         }
         if (v == null) {
             try {
                 v = loader.load((K) key);
             } catch (Exception e) {
-                logger.error("Loader threw exception: " + e);
+                logger.error(MessageFormat.format("Loader threw Exception with message {0}", e.getMessage()));
             }
 
 
@@ -187,12 +188,12 @@ public class LevelDBBackedMap<K extends IByteArrayWriteable, V extends IByteArra
         public void onRemoval(RemovalNotification<K, V> notification) {
             switch (notification.getCause()) {
                 case COLLECTED:
-                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to GC. Memory may be low.");
+                    logger.warn(MessageFormat.format("Un-caching {0} due to garbage collection. Memory may be low.", notification.getKey().toString()));
                     break;
                 case EXPIRED:
-                    logger.info("Un-cacahing " + notification.getKey().toString() + " as it expired");
+                    logger.info(MessageFormat.format("Un-caching {0} as it has expired.", notification.getKey().toString()));
                 case SIZE:
-                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to a size constraint");
+                    logger.warn(MessageFormat.format("Un-caching {0} due to a size constraint.", notification.getKey().toString()));
             }
 
         }

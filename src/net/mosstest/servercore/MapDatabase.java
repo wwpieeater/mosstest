@@ -8,6 +8,7 @@ import org.iq80.leveldb.Options;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.MessageFormat;
 
 import static org.fusesource.leveldbjni.JniDBFactory.factory;
 
@@ -79,7 +80,7 @@ public class MapDatabase {
             this.players = factory.open(new File(dbDir, "players"), options); //$NON-NLS-1$
             this.nodes = factory.open(new File(dbDir, "nodes"), options); //$NON-NLS-1$
         } catch (IOException e) {
-            logger.error("IOException in database loading: " + e.toString());
+            logger.error(MessageFormat.format("IOException in database loading: {0}", e.getMessage()));
             throw new MossWorldLoadException(Messages.getString("MapDatabase.ERR_DB_FAIL"), e); //$NON-NLS-1$
         }
 
@@ -126,7 +127,7 @@ public class MapDatabase {
             try {
                 this.close();
             } catch (MapDatabaseException e1) {
-                logger.error("Map database failed emergency shutdown: " + e1.toString());
+                logger.error(MessageFormat.format("Map database failed emergency shutdown: {0}", e1.getMessage()));
                 throw new MosstestFatalDeathException(e1);
             }
             logger.warn("Map database performed emergency shutdown after catching MosstestFatalDeathException");

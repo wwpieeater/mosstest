@@ -12,6 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 
 // TODO: Auto-generated Javadoc
@@ -125,6 +126,7 @@ public class GUIClientsideLauncher {
      *
      * @param singleplayerEntries the singleplayer entries
      */
+    @SuppressWarnings("StringConcatenation")
     private void initialize(ArrayList<SingleplayerListEntry> singleplayerEntries) {
         this.frmMosstestClientLauncher = new JDialog();
         this.frmMosstestClientLauncher.setModal(true);
@@ -153,7 +155,7 @@ public class GUIClientsideLauncher {
         this.table.getColumnModel().getColumn(2).setPreferredWidth(104);
         this.table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         JPanel singleplayerControlBtns = new JPanel();
-        singleplayerTab.add(singleplayerControlBtns, BorderLayout.SOUTH);
+        singleplayerTab.add(singleplayerControlBtns, BorderLayout.PAGE_END);
         singleplayerControlBtns.setLayout(new GridLayout(0, 4, 0, 0));
 
         JButton btnPlaySingleplayer = new JButton(
@@ -185,7 +187,7 @@ public class GUIClientsideLauncher {
                     logger.error("Uncaught exception in game code, opening bug reporter.");
 
                     String fname = MossDebugUtils.writeStracktrace(e);
-                    logger.error("Stracktrace has been written to " + fname);
+                    logger.error(MessageFormat.format("Stracktrace has been written to {0}", fname));
                     GUIBugReportDialog bg = new GUIBugReportDialog(
                             MossDebugUtils.getDebugInformation(e));
                     bg.setVisible(true);
@@ -203,13 +205,7 @@ public class GUIClientsideLauncher {
                 GUIWorldCreationDialog dlg = new GUIWorldCreationDialog();
                 dlg.setVisible(true);
                 if (dlg.dlgResult) {
-                    logger.debug("Got world: "
-                            + dlg.nameField.getText()
-                            + " with desc: "
-                            + dlg.inputDesc.getText()
-                            + " with game: "
-                            + dlg.comboBox.getItemAt(dlg.comboBox
-                            .getSelectedIndex())); //$NON-NLS-1$
+                    // TODO actually create world
 
                 } else
                     logger.info("World creation cancelled");

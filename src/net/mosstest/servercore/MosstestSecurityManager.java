@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.security.AccessController;
 import java.security.Permission;
 import java.security.SecureClassLoader;
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -54,7 +55,7 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkPermission(Permission perm) {
 
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            logger.fatal("Requested permssion " + perm);
+            logger.fatal(MessageFormat.format("Requested permssion ", perm));
             if (testMode && perm.getName().equals("setIO")) return;
             logger.warn("MosstestSecurityManager prevented the use of arbitrary permissions outside engine contexts.");
 

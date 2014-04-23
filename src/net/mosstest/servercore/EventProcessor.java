@@ -14,6 +14,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -110,8 +111,8 @@ public class EventProcessor {
             }
             DefaultEventHandlers.processEvent(evt, this.ev);
         } catch (MossScriptException | IllegalArgumentException e) {
-            logger.warn(e.getClass().getName() + " upon processing event: "
-                    + e.getMessage());
+            logger.warn(MessageFormat.format("Caught {0} upon processing an event of type {1}. The exception message was {2}.", e.getClass().getName(), evt.getClass().getName(), e.getLocalizedMessage()));
+
         }
     }
 
