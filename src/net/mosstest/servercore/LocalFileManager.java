@@ -75,7 +75,7 @@ public class LocalFileManager implements IFileManager {
     }
 
     @Override
-    public void receiveFileChunk(String sha512, int chunkId, ByteBuffer buf) throws IOException {
+    public void receiveFileChunk(String sha256, int chunkId, ByteBuffer buf) throws IOException {
         throw new IOException("This file is read-only due to its being in a non-cache directory.");
     }
 
@@ -87,45 +87,6 @@ public class LocalFileManager implements IFileManager {
     public LocalFileManager(File basedir) {
         this.basedir = basedir;
 
-    }
-
-    public static String getHash(File f) throws IOException,
-            NoSuchAlgorithmException, FileNotFoundException {
-
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-
-        try (FileInputStream fis = new FileInputStream(f)) {
-            try (FileChannel fc = fis.getChannel()) {
-                ByteBuffer bbf = ByteBuffer.allocateDirect(HASHING_BUFFER_SIZE);
-
-                int bytesRead;
-
-                bytesRead = fc.read(bbf);
-
-                while ((bytesRead != -1) && (bytesRead != 0)) {
-                    bbf.flip();
-
-
-                    md.update(bbf);
-
-                    bbf.clear();
-                    bytesRead = fc.read(bbf);
-                }
-
-                fis.close();
-
-                byte[] mdBytes = md.digest();
-
-                StringBuilder hexString = new StringBuilder();
-
-                for (byte b : mdBytes) {
-                    hexString.append(Integer.toHexString((BYTE_CAST_MASK & b)));
-                }
-
-                return hexString.toString();
-            }
-        }
     }
 
     @Override

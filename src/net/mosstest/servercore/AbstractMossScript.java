@@ -9,12 +9,12 @@ public abstract class AbstractMossScript {
         this.name = name;
     }
 
-    final String name;
-    abstract void exec(ScriptEnv sEnv) throws IOException, MossWorldLoadException;
+    protected final String name;
+    public abstract void exec(ScriptEnv sEnv) throws IOException, MossWorldLoadException;
 
-    abstract IMossFile getInitFile() throws IOException;
+    public abstract IMossFile getInitFile() throws IOException;
 
-    abstract List<AbstractMossScript> getDependencies();
+    public abstract List<AbstractMossScript> getDependencies();
 
     @Override
     public final boolean equals(Object o) {

@@ -33,6 +33,17 @@ public class LocalFile implements IMossFile {
         return name;
     }
 
+    @Override
+    public boolean isComplete() {
+        // local files are always complete
+        return true;
+    }
+
+    @Override
+    public long getSize() {
+        return f.length();
+    }
+
     private final String sha256;
 
     public LocalFile(String name, File f) throws IOException, FileNotFoundException {
@@ -46,7 +57,7 @@ public class LocalFile implements IMossFile {
 		this.numChunks = (int) Math.ceil(this.length
 				/ ((double) IMossFile.CHUNK_SIZE));
 		try {
-			this.sha256 = LocalFileManager.getHash(f);
+			this.sha256 = IFileManager.getHash(f);
 			logger.info("Hashed " + f.getAbsolutePath() + " as " + this.sha256);
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("Could not find algorithm SHA-256 while hashing " + f.getAbsolutePath());
