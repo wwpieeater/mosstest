@@ -1,5 +1,6 @@
 package net.mosstest.servercore;
 
+import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -10,16 +11,20 @@ public class FaceRenderer {
 	private static IntBuffer indices;
 	private static int vertexIndexCounter;
 	
-	public static void initialize (FloatBuffer verts, FloatBuffer tex,
-			FloatBuffer norms, IntBuffer inds) {
-		vertices = verts;
-		textures = tex;
-		normals = norms;
-		indices = inds;
+	public static void initialize () {
+		vertices = getDirectFloatBuffer(950000);
+        textures = getDirectFloatBuffer(950000);
+        normals = getDirectFloatBuffer(950000);
+		indices = getDirectIntBuffer(950000);
 		vertexIndexCounter = 0;
 	}
 	
-	
+	public static boolean isFaceVisible (Face f, int[][][] nodes, byte i, byte j, byte k) {
+		switch (f) {
+		case FRONT:
+		}
+		return true;
+	}
 	
 	public static void populateBuffers(Face f, float x, float y, float z, final float NODE_SIZE) {
 		/*Vertices start at the top left corner and go clockwise around the face.*/
@@ -74,20 +79,31 @@ public class FaceRenderer {
 	public enum Face {
 		FRONT, TOP, BACK, BOTTOM, LEFT, RIGHT
 	}
-
 	
+	private static FloatBuffer getDirectFloatBuffer (int size) {
+		ByteBuffer temp = ByteBuffer.allocateDirect(size);
+		return temp.asFloatBuffer();
+	}	
+
+	private static IntBuffer getDirectIntBuffer (int size) {
+		ByteBuffer temp = ByteBuffer.allocateDirect(size);
+		return temp.asIntBuffer();
+	}
 	
 	public static FloatBuffer getVertices () {
 		return vertices;
 	}
 	
+	
 	public static FloatBuffer getTextureCoordinates () {
 		return textures;
 	}
 	
+	
 	public static FloatBuffer getNormals () {
 		return normals;
 	}
+	
 	
 	public static IntBuffer getIndices () {
 		return indices;

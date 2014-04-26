@@ -128,20 +128,14 @@ public class RenderProcessor extends SimpleApplication {
 	}
 //
 	public void renderChunk(MapChunk chk, Position pos) {
-		//int vertexIndexCounter = 0;
 		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(950000);
-        FloatBuffer tex = getDirectFloatBuffer(950000);
-		FloatBuffer normals = getDirectFloatBuffer(950000);
-		IntBuffer indices = getDirectIntBuffer(950000);
-		FaceRenderer.initialize(vertices, tex, normals, indices);
+		FaceRenderer.initialize();
 		//RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
 					int[][][] nodes = chk.getNodes();
 					if (isNodeVisible(nodes, i, j, k)) {
-						
 						int nVal = chk.getNodeId(i, j, k);
 						//MapNode node = nManager.getNode((short) nVal);
 						//Material mat = getMaterial((short) nVal);
@@ -155,8 +149,9 @@ public class RenderProcessor extends SimpleApplication {
 							
 							
 							for (Face face : Face.values()) {
-								
-								FaceRenderer.populateBuffers(face, x, y, z, NODE_SIZE);
+								if (FaceRenderer.isFaceVisible(face, nodes, i, j, k)) {
+									FaceRenderer.populateBuffers(face, x, y, z, NODE_SIZE);
+								}
 							}
 							//RenderNode geom = new RenderNode(mat, loc, NODE_SIZE, NodeManager.getNode((short)nVal)null);
 							//renderNodes[i][j][k] = geom;
@@ -165,18 +160,17 @@ public class RenderProcessor extends SimpleApplication {
 				}
 			}
 		}
-		vertices = FaceRenderer.getVertices();
-		tex = FaceRenderer.getTextureCoordinates();
-		normals = FaceRenderer.getNormals();
-		indices = FaceRenderer.getIndices();
-		
-		Material mat = getMaterial((short) 1);
+		FloatBuffer vertices = FaceRenderer.getVertices();
+		FloatBuffer tex = FaceRenderer.getTextureCoordinates();
+		FloatBuffer normals = FaceRenderer.getNormals();
+		IntBuffer indices = FaceRenderer.getIndices();
 		completeMesh.setBuffer(Type.Position, 3, vertices);
 		completeMesh.setBuffer(Type.Normal, 3, normals);
 		completeMesh.setBuffer(Type.Index, 3, indices);
         completeMesh.setBuffer(Type.TexCoord, 2, tex);
 		completeMesh.updateBound();
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
+		Material mat = getMaterial((short) 1);
 		geom.setMaterial(mat);
         geom.setQueueBucket(RenderQueue.Bucket.Transparent);
 		worldNode.attachChild(geom);
@@ -247,16 +241,6 @@ public class RenderProcessor extends SimpleApplication {
 		renderEventQueue.add(e2);
 		//renderChunk(c2, p2);
 		
-	}
-	
-	private FloatBuffer getDirectFloatBuffer (int size) {
-		ByteBuffer temp = ByteBuffer.allocateDirect(size);
-		return temp.asFloatBuffer();
-	}	
-
-	private IntBuffer getDirectIntBuffer (int size) {
-		ByteBuffer temp = ByteBuffer.allocateDirect(size);
-		return temp.asIntBuffer();
 	}
 
 	private void setupFlashlight () {
