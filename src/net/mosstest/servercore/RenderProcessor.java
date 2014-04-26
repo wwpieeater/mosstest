@@ -10,14 +10,13 @@ import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
+import net.mosstest.servercore.FaceRenderer.Face;
 
 import org.apache.log4j.Logger;
 
 import com.jme3.app.SimpleApplication;
 import com.jme3.input.KeyInput;
 import com.jme3.input.MouseInput;
-import com.jme3.input.controls.ActionListener;
-import com.jme3.input.controls.AnalogListener;
 import com.jme3.input.controls.KeyTrigger;
 import com.jme3.input.controls.MouseAxisTrigger;
 import com.jme3.light.DirectionalLight;
@@ -26,8 +25,6 @@ import com.jme3.light.SpotLight;
 import com.jme3.material.Material;
 import com.jme3.math.ColorRGBA;
 import com.jme3.math.FastMath;
-import com.jme3.math.Matrix3f;
-import com.jme3.math.Quaternion;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
@@ -131,18 +128,20 @@ public class RenderProcessor extends SimpleApplication {
 	}
 //
 	public void renderChunk(MapChunk chk, Position pos) {
-		int vertexIndexCounter = 0;
-		int[][][] nodes = chk.getNodes();
+		//int vertexIndexCounter = 0;
 		Mesh completeMesh = new Mesh ();
 		FloatBuffer vertices = getDirectFloatBuffer(950000);
         FloatBuffer tex = getDirectFloatBuffer(950000);
 		FloatBuffer normals = getDirectFloatBuffer(950000);
 		IntBuffer indices = getDirectIntBuffer(950000);
+		FaceRenderer.initialize(vertices, tex, normals, indices);
 		//RenderNode[][][] renderNodes = new RenderNode[16][16][16];
 		for (byte i = 0; i < 16; i++) {
 			for (byte j = 0; j < 16; j++) {
 				for (byte k = 0; k < 16; k++) {
-					if (isNodeVisible(chk.getNodes(), i, j, k)) {
+					int[][][] nodes = chk.getNodes();
+					if (isNodeVisible(nodes, i, j, k)) {
+						
 						int nVal = chk.getNodeId(i, j, k);
 						//MapNode node = nManager.getNode((short) nVal);
 						//Material mat = getMaterial((short) nVal);
@@ -154,98 +153,23 @@ public class RenderProcessor extends SimpleApplication {
 							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * NODE_SIZE));
 							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * NODE_SIZE));
 							
-							/*for (int l = 0; l < 6; l++) {
-								try {
-									if ()
-								}
-							}*/
 							
-							/**
-							 * Vertices start at the top left corner and go clockwise around the face.
-							 */
-							vertices.put(x).put(y).put(z); //FRONT
-							vertices.put(x + NODE_SIZE).put(y).put(z);
-							vertices.put(x + NODE_SIZE).put(y).put(z - NODE_SIZE);
-							vertices.put(x).put(y).put(z - NODE_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x).put(y + NODE_SIZE).put(z); //TOP
-							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z);
-							vertices.put(x + NODE_SIZE).put(y).put(z);
-							vertices.put(x).put(y).put(z);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z);//BACK	
-							vertices.put(x).put(y + NODE_SIZE).put(z);
-							vertices.put(x).put(y + NODE_SIZE).put(z - NODE_SIZE);
-							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z - NODE_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z - NODE_SIZE);
-							vertices.put(x).put(y + NODE_SIZE).put(z - NODE_SIZE);
-							vertices.put(x).put(y).put(z - NODE_SIZE);
-							vertices.put(x + NODE_SIZE).put(y).put(z - NODE_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x).put(y + NODE_SIZE).put(z); //LEFT
-							vertices.put(x).put(y).put(z);
-							vertices.put(x).put(y).put(z - NODE_SIZE);
-							vertices.put(x).put(y + NODE_SIZE).put(z - NODE_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x + NODE_SIZE).put(y).put(z); //RIGHT
-							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z);
-							vertices.put(x + NODE_SIZE).put(y + NODE_SIZE).put(z - NODE_SIZE);
-							vertices.put(x + NODE_SIZE).put(y).put(z - NODE_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							for(int m=0; m<24; m++) {
-								normals.put(2).put(3).put(5);
+							for (Face face : Face.values()) {
+								
+								FaceRenderer.populateBuffers(face, x, y, z, NODE_SIZE);
 							}
-							
-							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 2).put(vertexIndexCounter + 1);//front
-							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 3).put(vertexIndexCounter + 2);
-							
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//top
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
-							
-							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 10).put(vertexIndexCounter + 9);//back
-							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 11).put(vertexIndexCounter + 10);
-							
-							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 14).put(vertexIndexCounter + 13);//bottom
-							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 15).put(vertexIndexCounter + 14);
-							
-							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 18).put(vertexIndexCounter + 17);//left
-							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 19).put(vertexIndexCounter + 18);
-							
-							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//right
-							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 23).put(vertexIndexCounter + 22);
 							//RenderNode geom = new RenderNode(mat, loc, NODE_SIZE, NodeManager.getNode((short)nVal)null);
 							//renderNodes[i][j][k] = geom;
-							vertexIndexCounter += 24;
 						}
 					}
 				}
 			}
 		}
+		vertices = FaceRenderer.getVertices();
+		tex = FaceRenderer.getTextureCoordinates();
+		normals = FaceRenderer.getNormals();
+		indices = FaceRenderer.getIndices();
+		
 		Material mat = getMaterial((short) 1);
 		completeMesh.setBuffer(Type.Position, 3, vertices);
 		completeMesh.setBuffer(Type.Normal, 3, normals);
@@ -254,6 +178,7 @@ public class RenderProcessor extends SimpleApplication {
 		completeMesh.updateBound();
 		Geometry geom = new Geometry("chunkMesh", completeMesh);
 		geom.setMaterial(mat);
+        geom.setQueueBucket(RenderQueue.Bucket.Transparent);
 		worldNode.attachChild(geom);
 		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
 		//allChunks.put(pos, currentChunk);
