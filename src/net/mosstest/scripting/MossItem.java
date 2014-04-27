@@ -4,6 +4,8 @@ package net.mosstest.scripting;
 // TODO: Auto-generated Javadoc
 
 
+import org.jetbrains.annotations.NonNls;
+
 /**
  * The Class MossItem.
  */
@@ -36,6 +38,7 @@ public class MossItem {
 
     final String displayName;
 
+    @NonNls
     final String internalName;
 
     /**

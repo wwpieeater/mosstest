@@ -1,5 +1,7 @@
 package net.mosstest.launcher;
 
+import org.jetbrains.annotations.NonNls;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -58,7 +60,7 @@ public class GUIBugReportDialog extends JDialog {
      *
      * @param traceback the traceback
      */
-    public GUIBugReportDialog(String traceback) {
+    public GUIBugReportDialog(@NonNls String traceback) {
         setModal(true);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setMinimumSize(new Dimension(640, 480));
@@ -69,7 +71,7 @@ public class GUIBugReportDialog extends JDialog {
         contentPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
         this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         getContentPane().add(this.contentPanel, BorderLayout.CENTER);
-        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
+        contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.PAGE_AXIS));
         {
             JPanel namePanel = new JPanel();
             namePanel.setMaximumSize(new Dimension(32767, 20));
@@ -78,7 +80,7 @@ public class GUIBugReportDialog extends JDialog {
 
             {
                 lblName = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_NAME")); //$NON-NLS-1$
-                namePanel.add(lblName, BorderLayout.WEST);
+                namePanel.add(lblName, BorderLayout.LINE_START);
                 lblName.setHorizontalTextPosition(SwingConstants.LEFT);
                 lblName.setHorizontalAlignment(SwingConstants.LEFT);
                 lblName.setAlignmentY(Component.TOP_ALIGNMENT);
@@ -99,7 +101,7 @@ public class GUIBugReportDialog extends JDialog {
             emailPanel.setLayout(new BorderLayout(0, 0));
             {
                 JLabel lblEmailoptional = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_EMAIL")); //$NON-NLS-1$
-                emailPanel.add(lblEmailoptional, BorderLayout.WEST);
+                emailPanel.add(lblEmailoptional, BorderLayout.LINE_START);
             }
             {
                 this.email = new JTextField();
@@ -115,7 +117,7 @@ public class GUIBugReportDialog extends JDialog {
             summaryPnl.setLayout(new BorderLayout(0, 0));
             {
                 JLabel lblProblemDescription = new JLabel(Messages.getString("GUIBugReportDialog.DLG_BUG_SUMMARY")); //$NON-NLS-1$
-                summaryPnl.add(lblProblemDescription, BorderLayout.WEST);
+                summaryPnl.add(lblProblemDescription, BorderLayout.LINE_START);
             }
             {
                 this.problemSummary = new JTextField();
@@ -132,7 +134,7 @@ public class GUIBugReportDialog extends JDialog {
                 JLabel lblDetailedProblemDescription = new JLabel(
                         Messages.getString("GUIBugReportDialog.DLG_BUG_DESC")); //$NON-NLS-1$
                 lblDetailedProblemDescription.setVerticalAlignment(SwingConstants.TOP);
-                descPanel.add(lblDetailedProblemDescription, BorderLayout.WEST);
+                descPanel.add(lblDetailedProblemDescription, BorderLayout.LINE_START);
             }
             {
                 JScrollPane scrollPane = new JScrollPane();
@@ -154,7 +156,7 @@ public class GUIBugReportDialog extends JDialog {
             {
                 chckbxIncludeTechnicalInformation = new JCheckBox(
                         Messages.getString("GUIBugReportDialog.DLG_CHECKBOX_INCLUDE_TECH_INFO")); //$NON-NLS-1$
-                techInfoPanel.add(chckbxIncludeTechnicalInformation, BorderLayout.WEST);
+                techInfoPanel.add(chckbxIncludeTechnicalInformation, BorderLayout.LINE_START);
                 chckbxIncludeTechnicalInformation.setLocation(new Point(2, 0));
                 chckbxIncludeTechnicalInformation.setVerticalAlignment(SwingConstants.TOP);
                 chckbxIncludeTechnicalInformation.setHorizontalTextPosition(SwingConstants.LEFT);
@@ -178,8 +180,8 @@ public class GUIBugReportDialog extends JDialog {
         }
         {
             JPanel buttonPane = new JPanel();
-            getContentPane().add(buttonPane, BorderLayout.SOUTH);
-            buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.X_AXIS));
+            getContentPane().add(buttonPane, BorderLayout.PAGE_END);
+            buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
             {
                 JProgressBar progressBar = new JProgressBar();
                 buttonPane.add(progressBar);

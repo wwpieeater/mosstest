@@ -1,7 +1,6 @@
 package net.mosstest.servercore;
 
 import net.mosstest.scripting.MossScriptEnv;
-import net.mosstest.scripting.ScriptDebugUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
@@ -11,9 +10,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.security.AccessController;
 import java.security.Permission;
-import java.security.SecureClassLoader;
-import java.util.Arrays;
-import java.util.List;
+import java.text.MessageFormat;
 
 // TODO: Auto-generated Javadoc
 
@@ -35,7 +32,7 @@ public class MosstestSecurityManager extends SecurityManager {
 
     public MosstestSecurityManager(boolean testMode) {
         this.testMode = testMode;
-        if (testMode) logger.warn("WARNING! The security manager is running in test mode. Security may be diminished.");
+        if (testMode) logger.warn(Messages.getString("SECURITY_MANAGER_TESTMODE"));
         File classDir = null;
         try {
             classDir = new File(MossScriptEnv.class.getProtectionDomain()
@@ -43,7 +40,7 @@ public class MosstestSecurityManager extends SecurityManager {
                     .getParentFile() // net.mosstest.scripting
                     .getCanonicalFile();
         } catch (IOException e) {
-            logger.warn("Failed to obtain a class directory for the security manager, spurious classloading failures may result.");
+            logger.warn(Messages.getString("NO_CLASSDIR"));
         } finally {
             this.classDirectory = classDir;
         }
@@ -54,12 +51,12 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkPermission(Permission perm) {
 
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            logger.fatal("Requested permssion " + perm);
-            if (testMode && perm.getName().equals("setIO")) return;
-            logger.warn("MosstestSecurityManager prevented the use of arbitrary permissions outside engine contexts.");
+            logger.fatal(MessageFormat.format(Messages.getString("PERMISSION_REQUESTED"), perm));
+            if (testMode && perm.getName().equals("setIO")) return; //NON-NLS
+            logger.warn(Messages.getString("ARBITRARY_PERMISSIONS"));
 
             throw new SecurityException(
-                    "MosstestSecurityManager prevented the use of arbitrary permissions outside engine contexts.");
+                    Messages.getString("ARBITRARY_PERMISSIONS"));
 
         }
     }
@@ -72,7 +69,6 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPermission(Permission perm, Object context) {
-        System.err.println(perm.toString() + ":" + context.toString());
         checkPermission(perm);
     }
 
@@ -101,8 +97,8 @@ public class MosstestSecurityManager extends SecurityManager {
     public void setTrustedBasedir(File basedir) throws SecurityException,
             IOException {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            logger.error("The security manager prevented an attempt to set the trusted base directory.");
-            throw new SecurityException("Cannot set base directory.");
+            logger.error(Messages.getString("SECURITY_TRUSTED_BASEDIR"));
+            throw new SecurityException(Messages.getString("NO_SET_BASEDIR"));
         }
         this.baseDirectory = basedir.getCanonicalFile();
     }
@@ -116,9 +112,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void lock(Object key, ThreadContext tc) {
         if ((this.lock.get() != null)
                 || this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            logger.error("The security manager prevented an attempt to lock it on an already-locked thread.");
+            logger.error(Messages.getString("THREAD_LOCKED"));
             throw new SecurityException(
-                    "The security manager is already locked for this thread.");
+                    Messages.getString("ALREADY_LOCKED"));
         }
         this.lock.set(key);
         this.threadContext.set(tc);
@@ -139,9 +135,9 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     public void unlock(Object key) {
         if (this.lock.get() != key) {
-            logger.error("The security manager prevented an attempt to unlock it using a mismatched key.");
+            logger.error(Messages.getString("SECURITY_MISMATCHED_KEY"));
             throw new SecurityException(
-                    "A mismatched key has been used to unlock this thread.");
+                    Messages.getString("SECURITY_BAD_KEY"));
         }
         this.threadContext.set(ThreadContext.CONTEXT_ENGINE);
     }
@@ -153,7 +149,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     public void setConnectedPeer(String connectedPeer) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            logger.warn("MosstestSecurityManager prevented a non-engine-context thread from changing the connected peer.");
+            logger.warn(Messages.getString("SECURITY_PEER_CHANGE"));
             throw new SecurityException(
                     "Attempted to set the connected peer from outside engine code");
         }
@@ -177,7 +173,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     public void setThreadContext(ThreadContext tc) {
         if (this.threadContext.get() == null) {
-            logger.warn("A thread has started without inheriting a thread context and has been elevated");
+            logger.warn(Messages.getString("THREAD_ELEVATED"));
             this.threadContext.set(tc);
 
             return;
@@ -187,9 +183,8 @@ public class MosstestSecurityManager extends SecurityManager {
             this.threadContext.set(tc);
         }
         if (old != ThreadContext.CONTEXT_ENGINE) {
-            logger.warn("Attempted to set the thread context type from non-engine code");
-            throw new SecurityException(
-                    "Attempted to set the thread context type from non-engine code");
+            logger.warn(Messages.getString("THREAD_CONTEXT_NON_ENGINE_CODE"));
+            throw new SecurityException(Messages.getString("THREAD_CONTEXT_NON_ENGINE_CODE"));
         }
     }
 
@@ -227,7 +222,7 @@ public class MosstestSecurityManager extends SecurityManager {
     private InheritableThreadLocal<ThreadContext> threadContext = new InheritableThreadLocal<MosstestSecurityManager.ThreadContext>() {
         @Override
         protected ThreadContext initialValue() {
-            logger.warn("A thread has started without inheriting a thread context and has been elevated");
+            logger.warn(Messages.getString("THREAD_ELEVATED"));
             return ThreadContext.CONTEXT_ENGINE;
         }
     };
@@ -246,9 +241,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkCreateClassLoader() {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to create a classloader");
+            logger.warn(Messages.getString("SECURITY_CLASSLOADER"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to create a classloader");
+                    Messages.getString("SECURITY_CLASSLOADER"));
 
         } else {
             super.checkCreateClassLoader();
@@ -263,12 +258,12 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkAccess(Thread t) {
-        if(testMode) return;
+        if (testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to stop or modify a thread");
+            logger.warn(Messages.getString("SECURITY_THREAD"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to stop or modify a thread");
+                    Messages.getString("SECURITY_THREAD"));
 
         } else {
         }
@@ -281,12 +276,12 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkAccess(ThreadGroup g) {
-        if(testMode) return;
+        if (testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to modify a ThreadGroup");
+            logger.warn(Messages.getString("SECURITY_THREADGROUP"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to modify a ThreadGroup");
+                    Messages.getString("SECURITY_THREADGROUP"));
 
         } else {
         }
@@ -302,9 +297,9 @@ public class MosstestSecurityManager extends SecurityManager {
         if (testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to exit Mosstest improperly from a script");
+            logger.warn(Messages.getString("SECURITY_EXIT"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to exit Mosstest improperly from a script");
+                    Messages.getString("SECURITY_EXIT"));
 
         }
         super.checkExit(status);
@@ -319,9 +314,9 @@ public class MosstestSecurityManager extends SecurityManager {
     @Override
     public void checkExec(String cmd) {
 
-        logger.warn("MosstestSecurityManager does not allow any script or portion of the engine to start a new process");
+        logger.warn(Messages.getString("SECURITY_SPAWN_PROC"));
         throw new SecurityException(
-                "MosstestSecurityManager does not allow any script or portion of the engine to start a new process");
+                Messages.getString("SECURITY_SPAWN_PROC"));
     }
 
     /*
@@ -333,9 +328,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkLink(String lib) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to link to a JN library from insecure code");
+            logger.warn(Messages.getString("SECURITY_LINK"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to link to a JN library from insecure code");
+                    Messages.getString("SECURITY_LINK"));
 
         }
 
@@ -350,10 +345,11 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkRead(FileDescriptor fd) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("1MosstestSecurityManager stopped an attempt to read a file from non-core code "
-                    + fd.toString());
+            logger.warn(MessageFormat.format(Messages.getString("SECURITY_READFILE")
+                    , fd.toString()));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to read a file from non-core code");
+                    MessageFormat.format(Messages.getString("SECURITY_READFILE"), fd.toString())
+            );
 
         }
     }
@@ -365,9 +361,7 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkRead(String file) {
-        if(file.contains("testtest")){
-            System.currentTimeMillis();
-        }
+
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 //            List<File> safeDirectories = Arrays.asList(this.baseDirectory, this.classDirectory);
             ThreadContext oldTc = MosstestSecurityManager.this
@@ -391,7 +385,7 @@ public class MosstestSecurityManager extends SecurityManager {
 //                tested = tested.getParentFile();
 //          } while (tested != null);
             try {
-                AccessController.checkPermission(new FilePermission(file, "read"));
+                AccessController.checkPermission(new FilePermission(file, "read")); //NON-NLS
             } catch (SecurityException e) {
                 // lock
                 this.lock(oldLock, oldTc);
@@ -415,10 +409,12 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkRead(String file, Object context) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("3MosstestSecurityManager stopped an attempt to read a file from non-core code: "
-                    + file);
+            logger.warn(MessageFormat.format(Messages.getString("SECURITY_READ")
+                    , file));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to read a file from non-core code");
+                    MessageFormat.format(Messages.getString("SECURITY_READ")
+                            , file)
+            );
 
         }
     }
@@ -432,9 +428,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkWrite(FileDescriptor fd) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to write to a file from non-core code");
+            logger.warn(Messages.getString("SECURITY_WRITE"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to write to a file from non-core code");
+                    Messages.getString("SECURITY_WRITE"));
 
         }
     }
@@ -448,9 +444,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkWrite(String file) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to write to a file from non-core code");
+            logger.warn(Messages.getString("SECURITY_WRITE"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to write to a file from non-core code");
+                    Messages.getString("SECURITY_WRITE"));
 
         }
     }
@@ -464,7 +460,7 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkDelete(String file) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager stopped an attempt to delete a file from non-core code");
+            logger.warn(Messages.getString("SECURITY_DELETE"));
             throw new SecurityException(
                     "MosstestSecurityManager stopped an attempt to delete a file from non-core code");
 
@@ -479,11 +475,9 @@ public class MosstestSecurityManager extends SecurityManager {
     @Override
     public void checkConnect(String host, int port) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
-            if ((port != PORT_HTTP && port != PORT_HTTPS) && (port > MIN_SCRIPT_PORT || port < MAX_SCRIPT_PORT))
 
-                logger.warn("MosstestSecurityManager stopped an attempt to connect to a network port other than 80, 443, or any port in the range 16512-16600");
-            throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to connect to a network port other than 80, 443, or any port in the range 16512-16600");
+            logger.warn(Messages.getString("SECURITY_CONNECT"));
+            throw new SecurityException(Messages.getString("SECURITY_CONNECT"));
 
         }
     }
@@ -497,22 +491,11 @@ public class MosstestSecurityManager extends SecurityManager {
     @Override
     public void checkConnect(String host, int port, Object context) {
         if (this.threadContext.get() == ThreadContext.CONTEXT_CLIENT) {
-            if ((port != PORT_HTTP && port != PORT_HTTPS) && (port > MIN_SCRIPT_PORT || port < MAX_SCRIPT_PORT)) {
 
-                logger.warn("MosstestSecurityManager stopped an attempt to connect to a network port other than 80, 443, or any port in the range 16512-16600");
-                throw new SecurityException(
-                        "MosstestSecurityManager stopped an attempt to connect to a network port other than 80, 443, or any port in the range 16512-16600");
-            }
-            if (!host.equals(this.connectedPeer)) {
 
-                throw new SecurityException(
-                        "MosstestSecurityManager stopped an attempt for the client to connect to a peer other than the server currently played");
-            }
-        } else if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
-
-            logger.warn("MosstestSecurityManager has denied a thread in lockdown to open a network connection");
+            logger.warn(Messages.getString("SECURITY_LISTEN"));
             throw new SecurityException(
-                    "MosstestSecurityManager has denied a thread in lockdown to open a network connection");
+                    "MosstestSecurityManager stopped an attempt to listen directly on a network port.");
         }
     }
 
@@ -524,18 +507,11 @@ public class MosstestSecurityManager extends SecurityManager {
     @Override
     public void checkListen(int port) {
         if (this.threadContext.get() == ThreadContext.CONTEXT_SCRIPT) {
-            if ((port > MIN_SCRIPT_PORT || port < MAX_SCRIPT_PORT))
 
-                logger.warn("MosstestSecurityManager stopped an attempt to listen on a port not in the range 16512-16600");
+
+            logger.warn(Messages.getString("SECURITY_LISTEN"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to listen on a port not in the range 16512-16600");
-
-        } else if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN
-                || this.threadContext.get() == ThreadContext.CONTEXT_CLIENT) {
-
-            logger.warn("MosstestSecurityManager has denied a thread in lockdown or running a client script to listen on a port");
-            throw new SecurityException(
-                    "MosstestSecurityManager has denied a thread in lockdown or running a client script to listen on a port");
+                    Messages.getString("SECURITY_LISTEN"));
         }
     }
 
@@ -547,18 +523,10 @@ public class MosstestSecurityManager extends SecurityManager {
     @Override
     public void checkAccept(String host, int port) {
         if (this.threadContext.get() == ThreadContext.CONTEXT_SCRIPT) {
-            if ((port > MIN_SCRIPT_PORT || port < MAX_SCRIPT_PORT))
 
-                logger.warn("MosstestSecurityManager stopped an attempt to listen on a port not in the range 16512-16600");
+            logger.warn(Messages.getString("SECURITY_LISTEN"));
             throw new SecurityException(
-                    "MosstestSecurityManager stopped an attempt to listen on a port not in the range 16512-16600");
-
-        } else if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN
-                || this.threadContext.get() == ThreadContext.CONTEXT_CLIENT) {
-
-            logger.warn("MosstestSecurityManager has denied a thread in lockdown or running a client script to listen on a port");
-            throw new SecurityException(
-                    "MosstestSecurityManager has denied a thread in lockdown or running a client script to listen on a port");
+                    Messages.getString("SECURITY_LISTEN"));
         }
     }
 
@@ -571,9 +539,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkMulticast(InetAddress maddr) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager has denied a script use of multicast directly without use of loadbalancing facilities");
+            logger.warn(Messages.getString("MULTICAST"));
             throw new SecurityException(
-                    "Scripts may not use mutlicast under any circumstances, except through the engine loadbalancing facilities");
+                    Messages.getString("MULTICAST2"));
 
         }
     }
@@ -587,9 +555,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkMulticast(InetAddress maddr, byte ttl) {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager has denied a script use of multicast directly without use of loadbalancing facilities");
+            logger.warn(Messages.getString("MULTICAST"));
             throw new SecurityException(
-                    "Scripts may not use mutlicast under any circumstances, except through the engine loadbalancing facilities");
+                    Messages.getString("MULTICAST2"));
 
         }
     }
@@ -601,12 +569,12 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPropertiesAccess() {
-        if(testMode) return;
+        if (testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager has denied a thread running outside the engine context the right to access system properties.");
+            logger.warn(Messages.getString("SYS_PROPERTIES"));
             throw new SecurityException(
-                    "Scripts may not access system properties");
+                    Messages.getString("SYS_PROPERTIES_SHORT"));
 
         }
     }
@@ -618,12 +586,12 @@ public class MosstestSecurityManager extends SecurityManager {
      */
     @Override
     public void checkPropertyAccess(String key) {
-        if(testMode) return;
+        if (testMode) return;
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager has denied a thread running outside the engine context the right to access system properties.");
+            logger.warn(Messages.getString("SYS_PROPERTIES"));
             throw new SecurityException(
-                   "Scripts may not access system properties. Attempt was to access "+key);
+                    MessageFormat.format(Messages.getString("SYS_PROPERTIES_SHORT_NAMED"), key));
 
         }
     }
@@ -637,9 +605,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public boolean checkTopLevelWindow(Object window) {
         if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
 
-            logger.warn("MosstestSecurityManager has blocked a thread running outside the engine context frop opening a top-level window.");
+            logger.warn(Messages.getString("TOP_LEVEL"));
             throw new SecurityException(
-                    "Threads in lockdown may not create top-level windows");
+                    Messages.getString("TOP_LEVEL_SHORT"));
         }
         return true;
     }
@@ -652,9 +620,9 @@ public class MosstestSecurityManager extends SecurityManager {
     @Override
     public void checkPrintJobAccess() {
 
-        logger.warn("MosstestSecurityManager has denied a thread running outside the engine context the right to access system print jobs.");
+        logger.warn(Messages.getString("PRINT"));
         throw new SecurityException(
-                "Print job access is not allowed for the engine or scripts");
+                Messages.getString("PRINT_SHORT"));
     }
 
     /*
@@ -666,9 +634,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkSystemClipboardAccess() {
         if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
 
-            logger.warn("MosstestSecurityManager has prevented a thread in lockdown from accessing the system clipboard.");
+            logger.warn(Messages.getString("CLIPBOARD"));
             throw new SecurityException(
-                    "Threads in lockdown may not access the system clipboard");
+                    Messages.getString("CLIPBOARD_SHORT"));
         }
     }
 
@@ -681,9 +649,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkAwtEventQueueAccess() {
         if (this.threadContext.get() == ThreadContext.CONTEXT_LOCKDOWN) {
 
-            logger.warn("MosstestSecurityManager has prevented a thread in lockdown from accessing the AWT queue.");
+            logger.warn(Messages.getString("AWT_QUEUE"));
             throw new SecurityException(
-                    "Threads in lockdown may not access the AWT queue");
+                    Messages.getString("AWT_QUEUE_SHORT"));
         }
     }
 
@@ -716,9 +684,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkSetFactory() {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager has prevented a thread in lockdown from setting a Java system factory.");
+            logger.warn(Messages.getString("SYS_FACTORY"));
             throw new SecurityException(
-                    "Non-engine threads may not set java system factories");
+                    Messages.getString("SYS_FACTORY_SHORT"));
         }
         super.checkSetFactory();
     }
@@ -759,9 +727,9 @@ public class MosstestSecurityManager extends SecurityManager {
     public void checkMosstestControl() {
         if (this.threadContext.get() != ThreadContext.CONTEXT_ENGINE) {
 
-            logger.warn("MosstestSecurityManager has prevented a plugin from controlling certain portions of the Mosstest engine.");
+            logger.warn(Messages.getString("PLUGIN_CTRL"));
             throw new SecurityException(
-                    "Non-engine threads may not control Mosstest execution");
+                    Messages.getString("CTRL_SHORT"));
         }
         super.checkSetFactory();
     }

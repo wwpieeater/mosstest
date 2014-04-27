@@ -3,6 +3,7 @@ package net.mosstest.servercore;
 import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.MossItem;
 import net.mosstest.scripting.MossItemBuilder;
+import org.jetbrains.annotations.NonNls;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ public class ItemManager {
     /**
      * The unknown fallback item.
      */
+    @NonNls
     private final MossItem unknownFallbackItem = new MossItemBuilder().setInvTex("item_unknown.png").setWieldTex("sys_hand.png").setInvWeight(1).setStackMode(MossItem.StackMode.STACK_UNIT).setDisplayName("An unidentifiable item").setInternalName("sys:unknown").createMossItem();
 
 
