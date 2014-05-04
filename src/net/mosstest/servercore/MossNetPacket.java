@@ -4,40 +4,19 @@ package net.mosstest.servercore;
 
 import java.util.Arrays;
 
-/**
- * The Class MossNetPacket.
- */
 public class MossNetPacket {
 
-    /**
-     * The command id.
-     */
-    int commandId;
+    public int commandId;
 
-    /**
-     * The payload.
-     */
-    byte[] payload;
+    public byte[] payload;
 
-    /**
-     * The needs fast.
-     */
-    boolean needsFast;
+    public boolean needsFast;
 
-    /**
-     * The needs ack.
-     */
-    boolean needsAck;
+    public boolean needsAck;
 
-    /**
-     * The is important.
-     */
-    boolean isImportant;
+    public boolean isImportant;
 
-    /**
-     * The sess.
-     */
-    ServerSession sess;
+    public ServerSession sess;
 
     /**
      * Constructs a packet, for either sending or from receiving.

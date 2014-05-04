@@ -38,9 +38,13 @@ public class RemoteFileManager implements IFileManager {
     private HashMap<String, RemoteFile> knownByName = new HashMap<>();
 
     private HashMap<String, RemoteFile> knownByHash = new HashMap<>();
-    private File cacheBasedir;
+    private File cacheBasedir = new File("cache");
     // used to request files
     private MossClient client;
+
+    public void setClient(MossClient client) {
+        this.client = client;
+    }
 
     @Override
     public RemoteFile getFile(String name) throws IOException {

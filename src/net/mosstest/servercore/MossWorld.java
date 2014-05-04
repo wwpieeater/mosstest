@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NonNls;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class MossWorld {
     static {
@@ -72,6 +73,7 @@ public class MossWorld {
     @SuppressWarnings("nls")
     public MossWorld(@NonNls String name, int port) throws MossWorldLoadException,
             MapDatabaseException, IOException {
+
         //Thread.currentThread().setContextClassLoader(
         //		MosstestSecurityManager.instance.getScriptClassLoader(Thread
         //				.currentThread().getContextClassLoader()));

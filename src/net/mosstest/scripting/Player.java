@@ -26,6 +26,8 @@ public class Player {
      */
     private HashMap<String, MossInventory> inventories = new HashMap<>();
 
+    public int playerId;
+
     /**
      * The name.
      */

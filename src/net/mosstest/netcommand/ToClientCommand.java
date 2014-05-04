@@ -1,4 +1,4 @@
-package net.mosstest.servercore.netcommand;
+package net.mosstest.netcommand;
 
 /**
  * The Class ToClientCommand.

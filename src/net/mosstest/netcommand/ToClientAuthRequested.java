@@ -1,5 +1,5 @@
 //just keep the same package and import lines
-package net.mosstest.servercore.netcommand;
+package net.mosstest.netcommand;
 
 import java.io.*;
 
@@ -26,7 +26,7 @@ public class ToClientAuthRequested extends ToClientCommand {
     /**
      * The Enum AuthType.
      */
-    enum AuthType {
+    public enum AuthType {
 
         /**
          * The auth nil.
@@ -143,5 +143,13 @@ public class ToClientAuthRequested extends ToClientCommand {
 
         //Use this line at the end to finish up
         return bos.toByteArray();
+    }
+
+    public AuthType getAuthType() {
+        return authType;
+    }
+
+    public byte[] getAuthParam() {
+        return authParam;
     }
 }
