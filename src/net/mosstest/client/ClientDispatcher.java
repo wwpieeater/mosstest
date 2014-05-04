@@ -82,6 +82,7 @@ public class ClientDispatcher {
                     logger.fatal(Messages.getString("AUTH_FAILED_CONN"));
                     break;
             }
+            throw new MosstestFatalDeathException(Messages.getString("AUTH_FAIL_EXCEPTION"));
         } catch (IOException e) {
             logger.fatal(Messages.getString("IOEXCEPTION_DESERIALIZE_AUTH_FAIL_PCKT"));
             throw new MosstestFatalDeathException(e);

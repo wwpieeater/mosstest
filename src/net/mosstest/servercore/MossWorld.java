@@ -19,6 +19,8 @@ import java.util.Locale;
 public class MossWorld {
     static {
         System.setSecurityManager(MosstestSecurityManager.instance);
+        Messages.changeLanguage(Locale.ITALIAN);
+        net.mosstest.scripting.Messages.changeLanguage(Locale.ITALIAN);
     }
 
     static Logger logger = Logger.getLogger(MossWorld.class);
@@ -73,7 +75,6 @@ public class MossWorld {
     @SuppressWarnings("nls")
     public MossWorld(@NonNls String name, int port) throws MossWorldLoadException,
             MapDatabaseException, IOException {
-
         //Thread.currentThread().setContextClassLoader(
         //		MosstestSecurityManager.instance.getScriptClassLoader(Thread
         //				.currentThread().getContextClassLoader()));
