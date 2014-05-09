@@ -1,0 +1,22 @@
+Source: mosstest
+Section: java
+Priority: optional
+Maintainer: Debian Java Maintainers <pkg-java-maintainers@lists.alioth.debian.org>
+Uploaders: hexafraction <hexafraction@gmail.com>
+Build-Depends: debhelper (>= 9), cdbs, default-jdk, maven-debian-helper (>= 1.5)
+Build-Depends-Indep: libmaven-shade-plugin-java, libcommons-cli-java, libcommons-codec-java,  
+ libcommons-collections3-java, libcommons-configuration-java, libcommons-io-java,  
+ libcommons-lang-java, libcommons-lang3-java, libcommons-math-java, libguava-java,  
+ liblog4j1.2-java (>= 1.2.17), librhino-java 
+Standards-Version: 3.9.5
+Vcs-Svn: svn://anonscm.debian.org/pkg-java/trunk/mosstest
+Vcs-Browser: http://anonscm.debian.org/viewvc/pkg-java/trunk/mosstest
+Homepage: https://github.com/mosstest/mosstest
+
+Package: mosstest-all
+Architecture: all
+Depends: ${misc:Depends}, ${maven:Depends}
+Recommends: ${maven:OptionalDepends}
+Description: Mosstest
+ Open-source voxel engine with some extra features
+

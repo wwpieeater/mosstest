@@ -1,0 +1,10 @@
+
+com.google.guava guava bundle s/.*/debian/ * *
+com.google.guava guava s/jar/bundle/ s/.*/debian/ * *
+commons-collections commons-collections jar s/3\..*/3.x/ * *
+mosstest mosstest jar * * *
+mosstest mosstest jar s/.*/debian/ * *
+org.apache.commons commons-lang3 jar s/3\..*/3.x/ * *
+log4j log4j * s/1\.2\..*/1.2.x/ * *
+s/com.google.code.google-collections/com.google.guava/ s/google-collect/guava/ s/jar/bundle/ s/.*/debian/ * *
+s/com.google.collections/com.google.guava/ s/google-collections/guava/ s/jar/bundle/ s/.*/debian/ * *

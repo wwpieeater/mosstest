@@ -1,0 +1,6 @@
+mosstest (0.1.0-SNAPSHOT-1) UNRELEASED; urgency=medium
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your
+    ITP>
+
+ -- hexafraction <hexafraction@gmail.com>  Thu, 08 May 2014 20:51:08 -0400
