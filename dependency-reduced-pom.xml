@@ -5,7 +5,7 @@
   <artifactId>mosstest</artifactId>
   <name>Mosstest</name>
   <version>0.1.0-SNAPSHOT</version>
-  <description>Open-source InfiniMiner remake</description>
+  <description>Open-source voxel engine with some extra features</description>
   <url>https://github.com/mosstest/mosstest</url>
   <issueManagement>
     <system>Launchpad</system>
@@ -26,6 +26,23 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>deb-maven-plugin</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+          </execution>
+        </executions>
+        <configuration>
+          <description>An open-source voxel game created in Java</description>
+          <maintainer>hexafraction &lt;hexafraction@gmail.com&gt;</maintainer>
+          <section>games</section>
+          <priority>optional</priority>
+          <architecture>all</architecture>
+        </configuration>
+      </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.1</version>
@@ -125,6 +142,13 @@
       <url>http://forum-mosstest.rhcloud.com/repository/</url>
     </repository>
   </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>codehaus-mojo-staging</id>
+      <name>codehaus-mojo-staging</name>
+      <url>https://nexus.codehaus.org/content/groups/snapshots-group/</url>
+    </pluginRepository>
+  </pluginRepositories>
   <dependencies>
     <dependency>
       <groupId>org.lwjgl.lwjgl</groupId>
