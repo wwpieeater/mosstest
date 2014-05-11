@@ -30,12 +30,24 @@ public class FaceRenderer {
 				return true;
 			}
 		case BACK:
+			if (k + 1 >= nodes[i][j].length || nodes[i][j][k + 1] == 0) {
+				return true;
+			}
 			break;
 		case BOTTOM:
+			if (j - 1 < 0 || nodes[i][j - 1][k] == 0) {
+				return true;
+			}
 			break;
 		case LEFT:
+			if (i + 1 <= nodes.length || nodes[i + 1][j][k] == 0) {
+				return true;
+			}
 			break;
 		case RIGHT:
+			/*if (i - 1 < 0 || nodes[i - 1][j][k] == 0) {
+				return true;
+			}*/
 			break;
 		}
 		return false;
