@@ -2,9 +2,8 @@ package net.mosstest.tests;
 
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Position;
-import net.mosstest.scripting.SimplexMapGenerator;
-import net.mosstest.servercore.AbstractByteArrayStorable;
-import net.mosstest.servercore.LevelDBBackedMap;
+import net.mosstest.servercore.serialization.IByteArrayWriteable;
+import net.mosstest.servercore.serialization.LevelDBBackedMap;
 import net.mosstest.servercore.MapGeneratorException;
 import org.junit.Test;
 import org.junit.Assert;
@@ -16,7 +15,7 @@ public class LevelDBBackedMapTest {
 
     @Test
     public void testBasicStore() throws MapGeneratorException, IOException {
-        LevelDBBackedMap<TestByteArrayStorable, TestByteArrayStorable, Void> map = new LevelDBBackedMap<>(new MockDB(), TestByteArrayStorable.class);
+        LevelDBBackedMap<TestByteArrayStorable, TestByteArrayStorable> map = new LevelDBBackedMap<>(new MockDB(), TestByteArrayStorable::new);
         TestByteArrayStorable testKey = new TestByteArrayStorable(new byte[]{1,2});
        TestByteArrayStorable testVal = new TestByteArrayStorable(new byte[]{3,4});
         map.put(testKey, testVal);
@@ -25,14 +24,14 @@ public class LevelDBBackedMapTest {
     }
     @Test
     public void testDbLookup() throws IOException {
-        LevelDBBackedMap<TestByteArrayStorable, TestByteArrayStorable, Void> map = new LevelDBBackedMap<>(new MockDB(), TestByteArrayStorable.class);
+        LevelDBBackedMap<TestByteArrayStorable, TestByteArrayStorable> map = new LevelDBBackedMap<>(new MockDB(), TestByteArrayStorable::new);
         TestByteArrayStorable vOut = map.get(new TestByteArrayStorable(new byte[]{1,2}));
         Assert.assertNotNull(vOut);
     }
 
     @Test(expected = ClassCastException.class)
     public void testUncheckedKey() throws MapGeneratorException {
-        LevelDBBackedMap<Position, MapChunk, Void> map = new LevelDBBackedMap<>(new MockDB(), MapChunk.class);
+        LevelDBBackedMap<Position, MapChunk> map = new LevelDBBackedMap<>(new MockDB(), MapChunk::new);
 
         Object notAPosition = new Object();
 
@@ -40,10 +39,10 @@ public class LevelDBBackedMapTest {
     }
 
 
-    public static class TestByteArrayStorable extends AbstractByteArrayStorable<Void>{
+    public static class TestByteArrayStorable implements IByteArrayWriteable{
         byte[] buf;
 
-        public TestByteArrayStorable(byte[] buf) throws IOException {
+        public TestByteArrayStorable(byte[] buf) {
 
             buf = buf;
         }
@@ -53,15 +52,8 @@ public class LevelDBBackedMapTest {
             return buf;
         }
 
-        @Override
-        public void setManager(Void manager) {
-            // noop
-        }
 
-        @Override
-        public void loadBytes(byte[] buf) throws IOException {
-            this.buf = buf;
-        }
+
 
         public TestByteArrayStorable() {
         }

@@ -1,19 +1,9 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.AbstractByteArrayStorable;
+import net.mosstest.servercore.serialization.IByteArrayWriteable;
 
-import java.io.IOException;
-
-public abstract class AbstractMapChunk extends AbstractByteArrayStorable<Void> {
+public abstract class AbstractMapChunk implements IByteArrayWriteable {
     int CHUNK_DIMENSION = 16;
-
-    public AbstractMapChunk(byte[] buf) throws IOException{
-        super(buf);
-    }
-
-    protected AbstractMapChunk() {
-        super();
-    }
 
     @Override
     public abstract boolean equals(Object o);

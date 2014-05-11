@@ -22,8 +22,23 @@ public class FaceRenderer {
 	public static boolean isFaceVisible (Face f, int[][][] nodes, byte i, byte j, byte k) {
 		switch (f) {
 		case FRONT:
+			if (k - 1 < 0 || nodes[i][j][k - 1] == 0) {
+				return true;
+			}
+		case TOP:
+			if (j + 1 >= nodes[i].length || nodes[i][j + 1][k] == 0) {
+				return true;
+			}
+		case BACK:
+			break;
+		case BOTTOM:
+			break;
+		case LEFT:
+			break;
+		case RIGHT:
+			break;
 		}
-		return true;
+		return false;
 	}
 	
 	public static void populateBuffers(Face f, float x, float y, float z, final float NODE_SIZE) {

@@ -16,4 +16,6 @@ public interface IFileManager {
     public Class<? extends AssetLocator> getAssetLocatorClass();
 
     public List<? extends IMossFile> getFiles();
+
+    public AbstractMossScript getScript(final String name) throws IOException, MossWorldLoadException;
 }

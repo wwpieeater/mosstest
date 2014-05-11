@@ -222,7 +222,7 @@ public class ClientNetworkingManager {
             }
 
         }
-    }, "ClientBulkRecv"); //$NON-NLS-1$
+    }, "ClientFastRecv"); //$NON-NLS-1$
 
     /**
      * The party quenched.
@@ -261,7 +261,7 @@ public class ClientNetworkingManager {
                     if (magic == CommonNetworking.magic)
                         sendAck(dos.readUnsignedShort());
                     if (!(magic == CommonNetworking.magic || magic == CommonNetworking.magicNoAck)) {
-                        logger.warn("A packet was received with an invalid magic number and has been dropped.");
+                        logger.warn(Messages.getString("PACKET_INVALID_MAGIC"));
                         continue recvLoop;
                     }
                     int length = dos.readUnsignedByte();
@@ -383,7 +383,7 @@ public class ClientNetworkingManager {
                                         Messages.getString("ClientNetworkingManager.ERR_NETWORK_TIMEOUT"), //$NON-NLS-1$
                                         Messages.getString("ClientNetworkingManager.DESC_NETWORK_TIMEOUT"), //$NON-NLS-1$
                                         true);
-                        logger.error("The connection to the server has timed out or otherwise failed.");
+                        logger.error(Messages.getString("SERVER_CONN_TIMEOUT"));
 
                     }
                     try {

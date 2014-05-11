@@ -1,10 +1,12 @@
-package net.mosstest.servercore;
+package net.mosstest.servercore.serialization;
 
 import com.google.common.cache.*;
+import net.mosstest.servercore.Messages;
 import org.apache.log4j.Logger;
 import org.iq80.leveldb.*;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -16,19 +18,23 @@ import java.util.concurrent.ExecutionException;
  * @param <K> Keys to be stored
  * @param <V> Values to be stored
  */
-public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends AbstractByteArrayStorable<M>, M> implements Map<K, V> {
-    private final Class<V> valueClass;
+// V need not extend any sort of marker interface, having a proper constructor passed in takes care of that.
+public class LevelDBBackedMap<K extends IByteArrayWriteable, V extends IByteArrayWriteable> implements Map<K, V> {
     // TODO a map backed by a levelDB datastore
 
+    // the in-memory cache
     private LoadingCache<K, V> memoryBackingCache;
 
+    // a method reference to the constructor to be used in instantiating V from disk. ManagedMap and other subtypes may need to use this constructor.
+    protected IByteArrayConstructor<V> constructor;
 
-    private DB diskBackingDatastore;
+    protected DB diskBackingDatastore;
     private static final Logger logger = Logger.getLogger(LevelDBBackedMap.class);
     private BackedMapCacheLoader loader = new BackedMapCacheLoader();
 
     @Override
     public int size() {
+        // memoryBackingCache.size() is a long
         if (memoryBackingCache.size() > Integer.MAX_VALUE) return Integer.MAX_VALUE;
         else return (int) memoryBackingCache.size();
     }
@@ -54,13 +60,13 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends 
         try {
             v = memoryBackingCache.get((K) key);
         } catch (ExecutionException e) {
-            logger.error("Loader threw ExecutionException: " + e);
+            logger.error(MessageFormat.format(Messages.getString("LDR_EXEC_EXCEPTION"), e.getMessage()));
         }
         if (v == null) {
             try {
                 v = loader.load((K) key);
             } catch (Exception e) {
-                logger.error("Loader threw exception: " + e);
+                logger.error(MessageFormat.format(Messages.getString("LDR_EXCEPTION"), e.getMessage()));
             }
 
 
@@ -87,8 +93,8 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends 
     public V remove(Object key) {
         this.memoryBackingCache.invalidate(key);
         this.memoryBackingCache.asMap().remove(key);
-        if (key instanceof AbstractByteArrayStorable)
-            this.diskBackingDatastore.delete(((AbstractByteArrayStorable) key).toBytes());
+        if (key instanceof IByteArrayWriteable)
+            this.diskBackingDatastore.delete(((IByteArrayWriteable) key).toBytes());
         return null;
     }
 
@@ -111,17 +117,22 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends 
 
     /**
      * Clears the entire cache and database. This will use a snapshot, so any new entries added on another thread will not be deleted.
+     *
      * @throws IOException
      */
     public void clearDb() throws IOException {
         this.clear();
         Snapshot s = diskBackingDatastore.getSnapshot();
-        for(DBIterator dbi = diskBackingDatastore.iterator(new ReadOptions().verifyChecksums(false).snapshot(s)); dbi.hasNext();){
+        for (DBIterator dbi = diskBackingDatastore.iterator(new ReadOptions().snapshot(s)); dbi.hasNext(); ) {
             Entry<byte[], byte[]> entry = dbi.next();
+            // try a remove
+            dbi.remove();
+            // this may cause a ConcurrentModificationException, testing needed
             diskBackingDatastore.delete(entry.getKey(), new WriteOptions().sync(false));
         }
         s.close();
     }
+
     @Override
     public Set<K> keySet() {
         return memoryBackingCache.asMap().keySet();
@@ -137,19 +148,21 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends 
         return memoryBackingCache.asMap().entrySet();
     }
 
-    private M manager;
-
-    public LevelDBBackedMap(DB diskBackingDatastore, Class<V> valueClass) {
-        this(diskBackingDatastore, valueClass, false);
+    public LevelDBBackedMap(DB diskBackingDatastore, IByteArrayConstructor<V> constructor) {
+        this(diskBackingDatastore, constructor, false);
     }
 
-    public LevelDBBackedMap(DB diskBackingDatastore, Class<V> valueClass, boolean soft) {
+    public LevelDBBackedMap(DB diskBackingDatastore, IByteArrayConstructor<V> constructor, boolean soft) {
+        this.constructor = constructor;
         this.diskBackingDatastore = diskBackingDatastore;
-        this.valueClass = valueClass;
-        this.initMap0(soft, valueClass);
+        this.initMap0(soft);
     }
 
-    private void initMap0(boolean soft, Class<V> valueClass) {
+    protected LevelDBBackedMap(DB diskBackingDatastore, IByteArrayConstructor<V> constructor, boolean soft, boolean override) {
+        this(diskBackingDatastore, constructor, soft);
+    }
+
+    private void initMap0(boolean soft) {
         CacheBuilder builder = CacheBuilder.newBuilder();
         if (soft) builder.softValues();
 
@@ -159,12 +172,16 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends 
         this.memoryBackingCache = checkedCacheBuilder.build(new BackedMapCacheLoader());
     }
 
-    public LevelDBBackedMap(M manager, DB diskBackingDatastore, Class<V> valueClass, boolean soft) {
-        this.manager = manager;
-        this.diskBackingDatastore = diskBackingDatastore;
-        this.valueClass = valueClass;
-        this.initMap0(soft, valueClass);
+    protected void initMap0(boolean soft, CacheLoader<K, V> loader) {
+        CacheBuilder builder = CacheBuilder.newBuilder();
+        if (soft) builder.softValues();
+
+        // need this odd assignment as per javadoc of CacheBuilder#removalListener()
+        CacheBuilder<K, V> checkedCacheBuilder = builder.removalListener(new BackedMapRemovalListener());
+
+        this.memoryBackingCache = checkedCacheBuilder.build(loader);
     }
+
 
     private class BackedMapRemovalListener implements RemovalListener<K, V> {
 
@@ -172,42 +189,55 @@ public class LevelDBBackedMap<K extends AbstractByteArrayStorable<?>, V extends 
         public void onRemoval(RemovalNotification<K, V> notification) {
             switch (notification.getCause()) {
                 case COLLECTED:
-                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to GC. Memory may be low.");
+                    logger.warn(MessageFormat.format(Messages.getString("GC_EVICT"), notification.getKey().toString()));
                     break;
                 case EXPIRED:
-                    logger.info("Un-cacahing " + notification.getKey().toString() + " as it expired");
+                    logger.info(MessageFormat.format(Messages.getString("UNCACHE_EXPIRE"), notification.getKey().toString()));
                 case SIZE:
-                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to a size constraint");
+                    logger.warn(MessageFormat.format(Messages.getString("EVICT_SIZE"), notification.getKey().toString()));
             }
 
         }
     }
 
     private class BackedMapCacheLoader extends CacheLoader<K, V> {
+
+
         @Override
         public V load(K k) throws Exception {
-            V v = null;
             byte[] buf = diskBackingDatastore.get(k.toBytes());
-            // nothing in the DB...
             if (buf == null) return null;
+            //now we can safely pass a not-null byte array
+            return LevelDBBackedMap.this.constructor.construct(diskBackingDatastore.get(k.toBytes()));
+        }
+    }
 
-            try {
-                if (manager == null) {
-                    v = (V) valueClass.newInstance();
-                } else {
-                    v = (V) valueClass.newInstance();
-                }
-                v.setManager(manager);
-                v.loadBytes(buf);
+    public static class ManagedMap<K extends IByteArrayWriteable, V extends IByteArrayWriteable & IManaged<M>, M> extends LevelDBBackedMap<K, V> {
+        protected M manager;
 
+        public ManagedMap(DB diskBackingDatastore, IByteArrayConstructor<V> constructor, M manager) {
+            super(diskBackingDatastore, constructor, false, true);
+            this.initMap0(false, new ManagedCacheLoader());
+            this.manager = manager;
+        }
 
-            } catch (InstantiationException | IllegalAccessException e) {
-                e.printStackTrace();
-                System.err.println(e.getMessage());
-            } catch (IOException e) {
-                e.printStackTrace();
+        public ManagedMap(DB diskBackingDatastore, IByteArrayConstructor<V> constructor, boolean soft, M manager) {
+            super(diskBackingDatastore, constructor, soft, true);
+            this.initMap0(soft, new ManagedCacheLoader());
+            this.manager = manager;
+        }
+
+        private class ManagedCacheLoader extends CacheLoader<K, V> {
+
+            @Override
+            public V load(K key) throws Exception {
+                byte[] buf = diskBackingDatastore.get(key.toBytes());
+                if (buf == null) return null;
+                //now we can safely pass a not-null byte array
+                V v = ManagedMap.this.constructor.construct(diskBackingDatastore.get(key.toBytes()));
+                v.setManager(ManagedMap.this.manager);
+                return v;
             }
-            return v;
         }
     }
 }

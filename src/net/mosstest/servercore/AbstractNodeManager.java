@@ -2,6 +2,7 @@ package net.mosstest.servercore;
 
 import com.google.common.collect.HashBiMap;
 import net.mosstest.scripting.MapNode;
+import org.jetbrains.annotations.NonNls;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,8 +39,14 @@ public abstract class AbstractNodeManager implements INodeManager {
      */
     public static final MapNode MAPNODE_UNKNOWN;
 
+    @NonNls
+    private static final String SYS_UNKNOWN = "sys:unknown";
+
+    @NonNls
+    private static final String BUILTIN_UNKNOWN_TEXTURE = "builtin/unknown.png";
+
     static {
-        MAPNODE_UNKNOWN = new MapNode("sys:unknown", Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), "builtin/unknown.png",
+        MAPNODE_UNKNOWN = new MapNode(SYS_UNKNOWN, Messages.getString("AbstractNodeManager.DESC_UNKNOWN_NODE"), BUILTIN_UNKNOWN_TEXTURE,
                 1); //$NON-NLS-1$ //$NON-NLS-2$
         MAPNODE_UNKNOWN.setNodeId((short) -1);
     }

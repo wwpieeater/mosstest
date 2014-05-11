@@ -54,22 +54,19 @@ public class MapChunk extends AbstractMapChunk {
     /**
      * Instantiates a new map chunk.
      *
-     *
-     *
      * @param light the primary data storage
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public MapChunk(byte[] light)
-            throws IOException {
-        loadBytes_(light);
+    public MapChunk(byte[] light) {
+        try {
+            loadBytes_(light);
+        } catch (IOException e){
+            logger.fatal(Messages.getString("FAIL_BUILD_MAPCHUNK_FATAL"));
+            throw new MosstestFatalDeathException(e);
+        }
 
     }
 
-    @Override
-    protected void setManager(Void manager) {
-        // This is a void here, ergo we can just return
-        return;
-    }
 
     public void loadBytes_(byte[] light) throws IOException {
         //Arrays.copyOf(light, light.length);
@@ -200,7 +197,7 @@ public class MapChunk extends AbstractMapChunk {
             bos.flush();
         } catch (IOException e) {
             // should never happen
-            logger.warn("IOException writing light chunk data");
+            logger.warn(Messages.getString("LIGHT_DATA_IOEXCEPTION"));
         }
 
         return bos.toByteArray();
@@ -216,9 +213,4 @@ public class MapChunk extends AbstractMapChunk {
         return this.writeLight(true);
     }
 
-    @Override
-    public void loadBytes(byte[] buf) throws IOException{
-        // delegate to internal implementation
-        this.loadBytes_(buf);
-    }
 }

@@ -4,9 +4,12 @@ import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.scripting.handlers.MossEventHandler;
 import net.mosstest.scripting.handlers.MossNodeChangeHandler;
 import net.mosstest.servercore.*;
+import org.jetbrains.annotations.NonNls;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * This class is used by scripts and script-facing portions of Mosstest. Methods
@@ -14,18 +17,18 @@ import java.util.HashMap;
  * {@link ScriptSandboxBorderToken}. Each event fired will run in the thread
  * pool. All requests via this API need not concern themselves with threading as
  * everything is handled by Mosstest itself.
- * <p/>
+ * <p>
  * The event handlers called are the ones defined via this class's registerOnFoo
  * methods, followed by any handlers defined in an instance of NodeParams via an
  * anonymous inner class, and finally with the default handler.
- * <p/>
+ * <p>
  * The order in which handlers registered here are called is undefined due to
  * the undefined order of scripts being loaded. Generally, this is planned to
  * occur in an order based on the SHA512 hash of the script. Comments with dummy
  * information may be used by the script author to attempt to set the position
  * of a script in the execution order via manipulating the hash. Handlers of the
  * same types within the same script are guaranteed to be called in order.
- * <p/>
+ * <p>
  * An event handler may interrupt handling of the event so that no further event
  * handlers nor the default are ever called, by returning the proper boolean value
  *
@@ -174,6 +177,7 @@ public class MossScriptEnv {
 
     /**
      * Registers a mapnode in the world, allowing it to be placed.
+     *
      * @param nd
      * @throws MossWorldLoadException
      */
@@ -192,7 +196,7 @@ public class MossScriptEnv {
      *                       detailing the action of the node. {@link LiquidSourceNodeParams} and
      *                       {@link LiquidFlowingNodeParams} are valid for liquid sources and flowing liquid nodes,
      *                       respectively.
-     * @param flowParams   the source params
+     * @param flowParams     the source params
      * @param textures       A string stating the filename of the textures image.
      * @param light          The amount of light from 0 to 255 to be emitted.
      * @return The MapNode object that has been created and added to the
@@ -200,7 +204,7 @@ public class MossScriptEnv {
      * @throws MossWorldLoadException If an exception occurs during the execution of the
      *                                registering.
      */
-    public LiquidNode registerLiquid(String sysname, String userFacingName,
+    public LiquidNode registerLiquid(@NonNls String sysname, String userFacingName,
                                      LiquidNodeParams params, LiquidNodeParams flowParams,
                                      String textures, int light) throws MossWorldLoadException {
         LiquidNode nd = new LiquidNode(params, textures, sysname,
@@ -311,10 +315,29 @@ public class MossScriptEnv {
         return this.fp;
     }
 
-    public ArrayList<MossEventHandler> getEventHandlers(
-            Class<? extends IMossEvent> class1) {
-        // TODO Auto-generated method stub
-        return null;
+    private HashMap<Class<? extends IMossEvent>, List<MossEventHandler>> handlers = new HashMap<>();
+
+    public List<MossEventHandler> getEventHandlers(
+            Class<? extends IMossEvent> clazz) {
+        List<MossEventHandler> l = Collections.unmodifiableList(handlers.get(clazz));
+        if (l == null) {
+            handlers.put(clazz, new ArrayList<MossEventHandler>());
+            return Collections.EMPTY_LIST;
+        }
+        return l;
+
+    }
+
+    public void registerHandler(MossEventHandler handler, Class<? extends IMossEvent> clazz) {
+        List<MossEventHandler> l = handlers.get(clazz);
+        if (l == null) {
+            l = new ArrayList<MossEventHandler>();
+            handlers.put(clazz, l);
+            l.add(handler);
+            return;
+        }
+        l.add(handler);
+
     }
 
 }

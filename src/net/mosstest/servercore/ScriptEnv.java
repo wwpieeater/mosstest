@@ -6,18 +6,19 @@ import org.apache.log4j.Logger;
 import org.mozilla.javascript.*;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 
 // TODO: Auto-generated Javadoc
 
 /**
- * Static environment for executing scripts. Call {@link ScriptEnv#runScript()}
+ * Static environment for executing scripts. Call {@link ScriptEnv#runScript(IMossFile)}
  * to call a script.
  *
  * @author rarkenin
  */
 public class ScriptEnv {
 
-    static Logger logger = Logger.getLogger(MossDebugUtils.class);
+    static Logger logger = Logger.getLogger(ScriptEnv.class);
 
     ImporterTopLevel globalScope;
 
@@ -71,19 +72,18 @@ public class ScriptEnv {
             Object lock = new Object();
             MosstestSecurityManager.instance.lock(lock,
                     ThreadContext.CONTEXT_SCRIPT);
-
             sc.exec(this.cx, this.globalScope);
-
             MosstestSecurityManager.instance.unlock(lock);
         } catch (IOException e) {
+            logger.fatal(MessageFormat.format(Messages.getString("SCRIPT_IOEXCEPTION"), script.getName(), e.getLocalizedMessage()));
             return ScriptResult.RESULT_ERROR;
         } catch (RhinoException e) {
-            logger.error("A script error has occured: " + e.getMessage());
+            logger.error(MessageFormat.format(Messages.getString("SCRIPT_ERR"), e.getMessage()));
             throw new MossWorldLoadException(
-                    Messages.getString("ScriptEnv.ERR_SCRIPT_ERR") + e.getMessage() + "\r\n" + e.getScriptStackTrace(), e); //$NON-NLS-1$ //$NON-NLS-2$
+                    MessageFormat.format(Messages.getString("ScriptEnv.ERR_SCRIPT_ERR"), e.getMessage()) + "\r\n" + e.getScriptStackTrace(), e); //$NON-NLS-1$ //$NON-NLS-2$
         } catch (Error e) {
             // We are really screwed with classloading if we reach this block
-            logger.fatal("Caught error of type " + e.getClass().getName() + " with toString() of: " + e.toString() + ". This should not happen and implies a severe classloading error.");
+            logger.fatal(MessageFormat.format(Messages.getString("CLASSLOADER_FAIL"), e.getClass().getName(), e.getLocalizedMessage()));
         }
         return ScriptResult.RESULT_EXECUTED;
     }

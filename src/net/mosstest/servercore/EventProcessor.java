@@ -1,16 +1,22 @@
 package net.mosstest.servercore;
 
+import net.mosstest.scripting.MapNode;
 import net.mosstest.scripting.MossScriptEnv;
 import net.mosstest.scripting.MossScriptException;
+import net.mosstest.scripting.NodePosition;
 import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.scripting.events.MossNodeChangeEvent;
 import net.mosstest.scripting.events.ThreadStopEvent;
 import net.mosstest.scripting.handlers.MossEventHandler;
 import net.mosstest.scripting.handlers.MossNodeChangeHandler;
 import net.mosstest.servercore.MosstestSecurityManager.ThreadContext;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.log4j.Logger;
 
+import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -21,9 +27,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The Class EventProcessor.
  *
  * @author rarkenin, hexafraction
- *         <p/>
+ *         <p>
  *         Blargh.
- *         <p/>
+ *         <p>
  *         This is a nasty thread pool. If you don't understand threading or
  *         Java well, you may want to stick to only accessing the queue as
  *         otherwise asphyxiation, drowning, or chlorine poisoning may occur.
@@ -79,7 +85,7 @@ public class EventProcessor {
                 {// Section for actually handling the events
                     if (myEvent instanceof ThreadStopEvent) {
                         this.currentThreads.decrementAndGet();
-                        return;
+                        break;
                     }
                     dispatchEvent(myEvent);
                 }
@@ -87,14 +93,15 @@ public class EventProcessor {
             } catch (InterruptedException e) {
                 // thread struck, shut down the operation.
             }
-            logger.info("A thread is shutting down."); //$NON-NLS-1$
-            this.currentThreads.decrementAndGet();
+
         }
+        logger.info("A thread is shutting down."); //$NON-NLS-1$
+        this.currentThreads.decrementAndGet();
 
     }
 
     private void dispatchEvent(IMossEvent evt) {
-        ArrayList<MossEventHandler> evtHandlerList = this.ev
+        List<MossEventHandler> evtHandlerList = this.ev
                 .getEventHandlers(evt.getClass());
         try {
             for (MossEventHandler ourHandler : evtHandlerList) {
@@ -104,8 +111,8 @@ public class EventProcessor {
             }
             DefaultEventHandlers.processEvent(evt, this.ev);
         } catch (MossScriptException | IllegalArgumentException e) {
-            logger.warn(e.getClass().getName() + " upon processing event: "
-                    + e.getMessage());
+            logger.warn(MessageFormat.format(Messages.getString("EVENT_PROCESS_EXCEPTION"), e.getClass().getName(), evt.getClass().getName(), e.getLocalizedMessage()));
+
         }
     }
 
@@ -218,5 +225,7 @@ public class EventProcessor {
         manager.start();
 
     }
+
+
 
 }

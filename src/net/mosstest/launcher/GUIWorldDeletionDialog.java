@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.MessageFormat;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -54,14 +55,14 @@ public class GUIWorldDeletionDialog extends JDialog {
 		getContentPane().setLayout(new BorderLayout());
 		this.contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		getContentPane().add(this.contentPanel, BorderLayout.CENTER);
-		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.X_AXIS));
+		contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.LINE_AXIS));
 		{
 			JPanel panel = new JPanel();
 			contentPanel.add(panel);
-			panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+			panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
 			
 			{
-				JLabel lblAreYouSure = new JLabel(Messages.getString("GUIWorldDeletionDialog.AREYOUSURE_TEXT")+worldName+Messages.getString("GUIWorldDeletionDialog.QUESTIONMARK_CANNOT_UNDO")); //$NON-NLS-1$ //$NON-NLS-2$
+				JLabel lblAreYouSure = new JLabel(MessageFormat.format(Messages.getString("GUIWorldDeletionDialog.AREYOUSURE_TEXT"),worldName));
 				panel.add(lblAreYouSure);
 				lblAreYouSure.setHorizontalTextPosition(SwingConstants.LEFT);
 				lblAreYouSure.setHorizontalAlignment(SwingConstants.LEFT);
@@ -69,8 +70,8 @@ public class GUIWorldDeletionDialog extends JDialog {
 		}
 		{
 			JPanel buttonPane = new JPanel();
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			buttonPane.setLayout(new FlowLayout(FlowLayout.TRAILING));
+			getContentPane().add(buttonPane, BorderLayout.PAGE_END);
 			{
 				JButton btnYes = new JButton(Messages.getString("GUIWorldDeletionDialog.YES")); //$NON-NLS-1$
 				btnYes.addActionListener(new ActionListener() {
