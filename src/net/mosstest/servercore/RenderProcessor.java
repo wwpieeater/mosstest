@@ -7,6 +7,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 
 import com.jme3.material.RenderState;
+import com.jme3.ui.Picture;
 import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Player;
@@ -103,13 +104,22 @@ public class RenderProcessor extends SimpleApplication {
 		setupLamplight();
 		setupPlayer();
 		assetManager.registerLocator("scripts", LocalAssetLocator.class);
+        setupHud();
 		flyCam.setEnabled(false);
 		setupListeners(cam.getUp().clone());
 		initKeyBindings();
 		preparatorChunkTest();
 		//blankChunkTest();
 	}
+    private void setupHud() {
+        Picture pic = new Picture("Crosshair");
+        pic.setImage(assetManager, "builtins/crosshair.png", true);
+        pic.setWidth(32);
+        pic.setHeight(32);
+        pic.setPosition(settings.getWidth()/2-16, settings.getHeight()/2-16);
+        guiNode.attachChild(pic);
 
+    }
 	@Override
 	public void simpleUpdate(float tpf) {
 		if (lastTime + 10 < System.currentTimeMillis()) {
