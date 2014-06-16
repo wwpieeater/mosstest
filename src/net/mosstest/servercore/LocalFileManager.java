@@ -93,45 +93,6 @@ public class LocalFileManager implements IFileManager {
 
     }
 
-    public static String getHash(File f) throws IOException,
-            NoSuchAlgorithmException, FileNotFoundException {
-
-
-        MessageDigest md = MessageDigest.getInstance("SHA-256"); //NON-NLS
-
-        try (FileInputStream fis = new FileInputStream(f)) {
-            try (FileChannel fc = fis.getChannel()) {
-                ByteBuffer bbf = ByteBuffer.allocateDirect(HASHING_BUFFER_SIZE);
-
-                int bytesRead;
-
-                bytesRead = fc.read(bbf);
-
-                while ((bytesRead != -1) && (bytesRead != 0)) {
-                    bbf.flip();
-
-
-                    md.update(bbf);
-
-                    bbf.clear();
-                    bytesRead = fc.read(bbf);
-                }
-
-                fis.close();
-
-                byte[] mdBytes = md.digest();
-
-                StringBuilder hexString = new StringBuilder();
-
-                for (byte b : mdBytes) {
-                    hexString.append(Integer.toHexString((BYTE_CAST_MASK & b)));
-                }
-
-                return hexString.toString();
-            }
-        }
-    }
-
     @Override
     public List<? extends IMossFile> getFiles() {
         return ImmutableList.copyOf(files.values());

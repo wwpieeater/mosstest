@@ -1,5 +1,9 @@
-package net.mosstest.servercore;
+package net.mosstest.client;
 
+import net.mosstest.servercore.ClientManager;
+import net.mosstest.servercore.CommonNetworking;
+import net.mosstest.servercore.Messages;
+import net.mosstest.servercore.MossNetPacket;
 import org.apache.log4j.Logger;
 
 import java.io.*;
@@ -24,6 +28,8 @@ public class ClientNetworkingManager {
     public static final int PACKET_QUEUE_CAPACITY = 1024;
     public static final int TIME_TO_KEEPALIVE = 4000;
     public static final byte[] EMPTY_PAYLOAD = new byte[]{};
+
+    public static final MossNetPacket QUENCH_PACKET = new MossNetPacket(CMD_QUENCH, EMPTY_PAYLOAD, true, true, true);
     /**
      * The logger.
      */
@@ -125,7 +131,7 @@ public class ClientNetworkingManager {
 	 * performance
 	 */
     /**
-     * The packets.
+     * The packet receive queue
      */
     public ArrayBlockingQueue<MossNetPacket> packets = new ArrayBlockingQueue<>(
             PACKET_QUEUE_CAPACITY);
@@ -351,7 +357,7 @@ public class ClientNetworkingManager {
         this.bulkReadHandler.start();
         this.fastReadHandler.start();
         this.dgramReadHandler.start();
-		/* The send queue thread. */
+        /* The send queue thread. */
         Thread sendQueueThread = new Thread(new Runnable() {
 
             @Override
@@ -433,7 +439,13 @@ public class ClientNetworkingManager {
                                                                         ClientNetworkingManager.this.lastUdpOut
                                                                                 .get(),
                                                                         ClientNetworkingManager.this.quenchedSince
-                                                                                .get())))))));
+                                                                                .get()
+                                                                )
+                                                        )
+                                                )
+                                        )
+                                )
+                        ));
                     } catch (InterruptedException e) {
                         // pass
                     }
@@ -451,25 +463,23 @@ public class ClientNetworkingManager {
      * @param seqnum the seqnum
      */
     protected void sendAck(int seqnum) {
-        // TODO Auto-generated method stub
-
+        logger.error("UDP acks are not supported at this time.");
     }
 
     /**
      * Send tos udp conn.
      */
     protected void sendTosUdpConn() {
-        // TODO Auto-generated method stub
-
+        logger.error("UDP connections are not supported at this time.");
     }
 
     /**
-     * Send quench.
+     * Send QUENCH_PACKET.
      */
-    protected void sendQuench() {
+    protected void sendQuench() throws IOException {
         // TODO Sends a request for the server to back off with data and skip
         // non-essential data.
-
+        this.sendPacket(QUENCH_PACKET);
     }
 
     /**

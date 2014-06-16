@@ -1,5 +1,7 @@
 package net.mosstest.servercore;
 
+import net.mosstest.client.ClientNetworkingManager;
+
 import java.io.IOException;
 
 

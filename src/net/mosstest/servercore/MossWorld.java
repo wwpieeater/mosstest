@@ -14,10 +14,13 @@ import org.jetbrains.annotations.NonNls;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class MossWorld {
     static {
         System.setSecurityManager(MosstestSecurityManager.instance);
+        Messages.changeLanguage(Locale.ITALIAN);
+        net.mosstest.scripting.Messages.changeLanguage(Locale.ITALIAN);
     }
 
     static Logger logger = Logger.getLogger(MossWorld.class);
