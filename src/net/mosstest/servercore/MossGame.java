@@ -7,6 +7,7 @@ import org.apache.commons.configuration.XMLConfiguration;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +48,7 @@ public class MossGame {
                         .getScript(scName)); //$NON-NLS-1$
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
-                throw new MossWorldLoadException(
-                        Messages.getString("MossGame.FILE_NOT_FOUND") + scName); //$NON-NLS-1$
+                throw new MossWorldLoadException(MessageFormat.format(Messages.getString("MossGame.FILE_NOT_FOUND"), scName)); //$NON-NLS-1$
             }
     }
 

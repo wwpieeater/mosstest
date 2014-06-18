@@ -5,6 +5,7 @@ import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
 import org.apache.log4j.Logger;
 
+import java.text.MessageFormat;
 import java.util.concurrent.ArrayBlockingQueue;
 
 // TODO: Auto-generated Javadoc
@@ -35,9 +36,8 @@ public class LocalRenderPreparator implements IRenderPreparator {
                     Position requested = LocalRenderPreparator.this.chunkRequests
                             .take();
                     System.out
-                            .println(Messages
-                                    .getString("LocalRenderPreparator.MSG_REQUESTED") + requested.x + "," //$NON-NLS-1$ //$NON-NLS-2$
-                                    + requested.y + "," + requested.z); //$NON-NLS-1$
+                            .println(MessageFormat.format(Messages
+                                    .getString("LocalRenderPreparator.MSG_REQUESTED"), requested.x, requested.y, requested.z)); //$NON-NLS-1$
                     MapChunk chk = LocalRenderPreparator.this.nc
                             .getChunk(requested);
                     chk.pos = requested;
@@ -99,7 +99,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
             InterruptedException {
         try {
             MapChunk chk = this.nc.getChunkFailFast(pos);
-            logger.trace(chk == null ? "Chunk is null" : "Chunk obtained is: " + chk //$NON-NLS-1$
+            logger.trace(chk == null ? "Chunk is null" : MessageFormat.format("Chunk obtained is {0}", chk) //$NON-NLS-1$
                     .toString());
             if (chk == null) {
                 this.chunkRequests.put(pos);

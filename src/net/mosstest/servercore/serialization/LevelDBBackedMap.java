@@ -1,10 +1,12 @@
 package net.mosstest.servercore.serialization;
 
 import com.google.common.cache.*;
+import net.mosstest.servercore.Messages;
 import org.apache.log4j.Logger;
 import org.iq80.leveldb.*;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -58,13 +60,13 @@ public class LevelDBBackedMap<K extends IByteArrayWritable, V extends IByteArray
         try {
             v = memoryBackingCache.get((K) key);
         } catch (ExecutionException e) {
-            logger.error("Loader threw ExecutionException: " + e);
+            logger.error(MessageFormat.format(Messages.getString("LDR_EXEC_EXCEPTION"), e.getMessage()));
         }
         if (v == null) {
             try {
                 v = loader.load((K) key);
             } catch (Exception e) {
-                logger.error("Loader threw exception: " + e);
+                logger.error(MessageFormat.format(Messages.getString("LDR_EXCEPTION"), e.getMessage()));
             }
 
 
@@ -187,12 +189,12 @@ public class LevelDBBackedMap<K extends IByteArrayWritable, V extends IByteArray
         public void onRemoval(RemovalNotification<K, V> notification) {
             switch (notification.getCause()) {
                 case COLLECTED:
-                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to GC. Memory may be low.");
+                    logger.warn(MessageFormat.format(Messages.getString("GC_EVICT"), notification.getKey().toString()));
                     break;
                 case EXPIRED:
-                    logger.info("Un-cacahing " + notification.getKey().toString() + " as it expired");
+                    logger.info(MessageFormat.format(Messages.getString("UNCACHE_EXPIRE"), notification.getKey().toString()));
                 case SIZE:
-                    logger.warn("Un-cacahing " + notification.getKey().toString() + " due to a size constraint");
+                    logger.warn(MessageFormat.format(Messages.getString("EVICT_SIZE"), notification.getKey().toString()));
             }
 
         }

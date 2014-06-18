@@ -38,7 +38,7 @@ public class FuturesProcessor {
             try {
                 task = queue.take();
             } catch (InterruptedException e) {
-                logger.error("InterruptedException in futures processor trying to take from queue.");
+                logger.error(Messages.getString("FUTURES_QUEUE_INTERRUPTED"));
                 Thread.currentThread().interrupt(); // in case caller requires detecting interrupts
                 continue rLoop;
             }

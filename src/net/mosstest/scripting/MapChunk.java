@@ -61,7 +61,7 @@ public class MapChunk extends AbstractMapChunk {
         try {
             loadBytes_(light);
         } catch (IOException e){
-            logger.fatal("IOException caught constructing a MapChunk, and being rethrown as a MosstestFatalDeathException. The world is GOING DOWN NOW.");
+            logger.fatal(Messages.getString("FAIL_BUILD_MAPCHUNK_FATAL"));
             throw new MosstestFatalDeathException(e);
         }
 
@@ -197,7 +197,7 @@ public class MapChunk extends AbstractMapChunk {
             bos.flush();
         } catch (IOException e) {
             // should never happen
-            logger.warn("IOException writing light chunk data");
+            logger.warn(Messages.getString("LIGHT_DATA_IOEXCEPTION"));
         }
 
         return bos.toByteArray();

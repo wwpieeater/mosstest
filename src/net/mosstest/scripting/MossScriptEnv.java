@@ -4,6 +4,7 @@ import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.scripting.handlers.MossEventHandler;
 import net.mosstest.scripting.handlers.MossNodeChangeHandler;
 import net.mosstest.servercore.*;
+import org.jetbrains.annotations.NonNls;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -203,7 +204,7 @@ public class MossScriptEnv {
      * @throws MossWorldLoadException If an exception occurs during the execution of the
      *                                registering.
      */
-    public LiquidNode registerLiquid(String sysname, String userFacingName,
+    public LiquidNode registerLiquid(@NonNls String sysname, String userFacingName,
                                      LiquidNodeParams params, LiquidNodeParams flowParams,
                                      String textures, int light) throws MossWorldLoadException {
         LiquidNode nd = new LiquidNode(params, textures, sysname,

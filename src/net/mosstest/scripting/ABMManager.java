@@ -20,7 +20,7 @@ public class ABMManager {
     }
 
     // It's acceptable to have multiple fp's running.
-    private final FuturesProcessor fp = new FuturesProcessor(EngineSettings.getInt("abmThreads", 2));
+    private final FuturesProcessor fp = new FuturesProcessor(EngineSettings.getInt("abmThreads", 2)); //NON-NLS
 
     // no references kept to map, only to the set
     private final Set<MapChunk> loadedChunks = Collections.newSetFromMap(new ConcurrentHashMap<MapChunk, Boolean>());

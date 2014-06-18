@@ -1,6 +1,7 @@
 package net.mosstest.launcher;
 
 
+import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -22,9 +23,9 @@ public class Messages {
 	 *
 	 * @param identifier the identifier
 	 */
-	public static void changeLanguage(String identifier) {
-		resBundle = ResourceBundle.getBundle(BUNDLE_NAME + "." + identifier);
-	}
+    public static void changeLanguage(Locale identifier) {
+        resBundle = ResourceBundle.getBundle(BUNDLE_NAME, identifier);
+    }
 
 	/**
 	 * Instantiates a new messages.

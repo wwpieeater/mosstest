@@ -2,6 +2,8 @@ package net.mosstest.scripting;
 
 // TODO: Auto-generated Javadoc
 
+import org.jetbrains.annotations.NonNls;
+
 import java.util.Arrays;
 
 /**
@@ -172,7 +174,7 @@ public class MapNode {
      * @param texture        the texture to use for each side
      * @param lightEmission  the light emission
      */
-    public MapNode(String nodeName, String userFacingName, String texture,
+    public MapNode(@NonNls String nodeName, String userFacingName, @NonNls String texture,
                    int lightEmission) {
         this.nodeparams = new DefaultNodeParams();
 

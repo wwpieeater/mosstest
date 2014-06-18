@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.security.NoSuchAlgorithmException;
+import java.text.MessageFormat;
 
 public class LocalFile implements IMossFile {
 
@@ -47,9 +48,9 @@ public class LocalFile implements IMossFile {
 				/ ((double) IMossFile.CHUNK_SIZE));
 		try {
 			this.sha256 = LocalFileManager.getHash(f);
-			logger.info("Hashed " + f.getAbsolutePath() + " as " + this.sha256);
+			logger.info(MessageFormat.format(Messages.getString("HASH_SUCCESS"), f.getAbsolutePath(), this.sha256));
 		} catch (NoSuchAlgorithmException e) {
-			logger.error("Could not find algorithm SHA-256 while hashing " + f.getAbsolutePath());
+			logger.error(MessageFormat.format(Messages.getString("ALGO_NOT_FOUND"), f.getAbsolutePath()));
             throw new IOException("Hashing failed while preparing file", e);
         }
     }

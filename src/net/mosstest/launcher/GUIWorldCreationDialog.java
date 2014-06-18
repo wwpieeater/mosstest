@@ -80,7 +80,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			
 			{
 				JLabel lblWorldName = new JLabel(Messages.getString("GUIWorldCreationDialog.WORLD_NAME")); //$NON-NLS-1$
-				namePanel.add(lblWorldName, BorderLayout.WEST);
+				namePanel.add(lblWorldName, BorderLayout.LINE_START);
 			}
 			{
 				this.nameField = new JTextField();
@@ -97,7 +97,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			descPnl.setLayout(new BorderLayout(0, 0));
 			{
 				JLabel lblDescription = new JLabel(Messages.getString("GUIWorldCreationDialog.WORLD_DESC")); //$NON-NLS-1$
-				descPnl.add(lblDescription, BorderLayout.WEST);
+				descPnl.add(lblDescription, BorderLayout.LINE_START);
 			}
 			{
 				this.inputDesc = new JTextField();
@@ -113,7 +113,7 @@ public class GUIWorldCreationDialog extends JDialog {
 			profPnl.setLayout(new BorderLayout(0, 0));
 			{
 				JLabel lblGameProfile = new JLabel(Messages.getString("GUIWorldCreationDialog.GAME_PROFILE")); //$NON-NLS-1$
-				profPnl.add(lblGameProfile, BorderLayout.WEST);
+				profPnl.add(lblGameProfile, BorderLayout.LINE_START);
 			}
 			{
 				this.comboBox = new JComboBox<String>();
@@ -124,8 +124,8 @@ public class GUIWorldCreationDialog extends JDialog {
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setMaximumSize(new Dimension(32767, 23));
-			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			buttonPane.setLayout(new FlowLayout(FlowLayout.TRAILING));
+			getContentPane().add(buttonPane, BorderLayout.PAGE_END);
 			{
 				JButton okButton = new JButton(Messages.getString("GUIWorldCreationDialog.OK")); //$NON-NLS-1$
 				okButton.addActionListener(new ActionListener() {

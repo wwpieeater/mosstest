@@ -9,6 +9,7 @@ public abstract class AbstractMossScript {
         this.name = name;
     }
 
+    @org.jetbrains.annotations.NonNls
     final String name;
     abstract void exec(ScriptEnv sEnv) throws IOException, MossWorldLoadException;
 

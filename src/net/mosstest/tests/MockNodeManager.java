@@ -16,7 +16,7 @@ public class MockNodeManager implements INodeManager {
      * The Constant MOCK_SOLID_MAPNODE.
      */
     private static final MapNode MOCK_SOLID_MAPNODE = new MapNode(
-            new DefaultNodeParams(), "mock.png", "!mock:mock", "Mock node", 1);
+            new DefaultNodeParams(), "mock.png", "!mock:mock", "Mock node", 1); //NON-NLS NON-NLS NON-NLS
 
     /* (non-Javadoc)
      * @see net.mosstest.servercore.INodeManager#getNode(short)
