@@ -1,13 +1,13 @@
 package net.mosstest.scripting;
 
-import net.mosstest.servercore.serialization.IByteArrayWriteable;
+import net.mosstest.servercore.serialization.IByteArrayWritable;
 
 import java.io.IOException;
 
 /**
  * The Class Position.
  */
-public class Position implements IByteArrayWriteable{
+public class Position implements IByteArrayWritable {
     public static final int SERIALIZED_LENGTH = 16;
 	@Override
 	public String toString() {

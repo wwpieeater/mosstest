@@ -88,13 +88,11 @@ public class MapDatabase {
     }
 
     /**
-     * Close.
-     *
-     * @throws MapDatabaseException the map database exception
+     * Closes the database, making it invalid to use for any stores or lookups.
      */
     public void close() throws MapDatabaseException {
 
-        logger.info("Database shutting down (normally)");
+        logger.info("Database shutting down.");
         try {
             this.map.close();
             this.entities.close();
