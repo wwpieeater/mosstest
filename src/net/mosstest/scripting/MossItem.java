@@ -140,8 +140,7 @@ public class MossItem {
         return result;
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#equals(java.lang.Object)
+    /* Compare size only
      */
     @Override
     public boolean equals(Object obj) {

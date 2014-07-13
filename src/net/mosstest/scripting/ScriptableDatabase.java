@@ -140,7 +140,20 @@ public class ScriptableDatabase {
         private List<IByteArrayWritable> qualifiers;
 
         @Override
+        public boolean equals(Object obj) {
+            if(obj==null) return false;
+            if (!(obj instanceof IByteArrayWritable)) return false;
+            if (obj instanceof DBKey) return this.qualifiers.equals(((DBKey) obj).qualifiers);
+            else return (qualifiers.size()==1&&qualifiers.get(0).equals(obj));
+        }
+
+        @Override
         public byte[] toBytes() {
+            // single qualifier = non-composite key
+            if (qualifiers.size() == 1) {
+                return qualifiers.get(0).toBytes();
+            }
+
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             DataOutputStream dOut = new DataOutputStream(out);
             try {

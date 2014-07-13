@@ -7,6 +7,7 @@ import net.mosstest.servercore.serialization.IManaged;
 import org.apache.log4j.Logger;
 
 import java.io.*;
+import java.util.Arrays;
 
 // TODO: Auto-generated Javadoc
 
@@ -25,6 +26,13 @@ public class MossInventory implements IByteArrayWritable, IManaged<ItemManager> 
      * The max stack size.
      */
     private int maxStackSize;
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj==null) return false;
+        if(!(obj instanceof  MossInventory)) return false;
+        return Arrays.deepEquals(this.stacks, ((MossInventory) obj).stacks);
+    }
 
     /**
      * The stacks.

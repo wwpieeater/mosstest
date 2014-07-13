@@ -8,10 +8,13 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import net.mosstest.servercore.MosstestFatalDeathException;
+import net.mosstest.servercore.serialization.IByteArrayWritable;
 import org.apache.commons.lang3.StringUtils;
 
 import net.mosstest.servercore.PlayerCommunicator;
 import net.mosstest.servercore.RenderProcessor;
+import org.apache.log4j.Logger;
 import org.jetbrains.annotations.NonNls;
 
 // TODO: Auto-generated Javadoc
@@ -19,8 +22,8 @@ import org.jetbrains.annotations.NonNls;
 /**
  * The Class Player.
  */
-public class Player {
-
+public class Player implements IByteArrayWritable{
+private static final Logger logger = Logger.getLogger(Player.class);
     /**
      * The inventories.
      */
@@ -260,10 +263,13 @@ public class Player {
      * @return the byte[]
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    public byte[] toByteArray() throws IOException {
+    @Override
+    public byte[] toBytes() {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         DataOutputStream dos = new DataOutputStream(bos);
-        dos.writeInt(this.xchk);
+        try {
+            dos.writeInt(this.xchk);
+
         dos.writeInt(this.ychk);
         dos.writeInt(this.zchk);
         dos.writeDouble(this.xoffset);
@@ -273,6 +279,10 @@ public class Player {
         dos.writeUTF(this.privsToString());
         dos.flush();
         bos.flush();
+        } catch (IOException e) {
+            logger.fatal("IOException serializing a player. Cannot continue.");
+            throw new MosstestFatalDeathException(e);
+        }
         return bos.toByteArray();
     }
 
@@ -300,5 +310,6 @@ public class Player {
         this.comm.forceSetPosition(this, this.xchk, this.ychk, this.zchk,
                 this.xoffset, this.yoffset, this.zoffset);
     }
+
 
 }
