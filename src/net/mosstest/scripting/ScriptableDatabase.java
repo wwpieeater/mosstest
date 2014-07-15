@@ -61,6 +61,8 @@ public class ScriptableDatabase {
 
     public class DBase {
         // this class will contain a database that scripts may access.
+        // ACHTUNG! Pending concerns of corruption, synchronize on innerDb to write.
+        // Refer to MapDatabase for more details.
         /**
          * The inner db.
          */

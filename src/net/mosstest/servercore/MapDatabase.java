@@ -3,6 +3,7 @@ package net.mosstest.servercore;
 import net.mosstest.scripting.MapChunk;
 import net.mosstest.scripting.Position;
 import org.apache.log4j.Logger;
+import org.iq80.leveldb.CompressionType;
 import org.iq80.leveldb.DB;
 import org.iq80.leveldb.Options;
 
@@ -20,12 +21,17 @@ import static org.fusesource.leveldbjni.JniDBFactory.factory;
  * The Class MapDatabase.
  */
 public class MapDatabase {
+
+    // DANGER!!! LevelDB has reports of corruption for concurrent writes,
+    // especially in paranoid mode. Lock for writing until
+    // this can be assessed to a better degree
+    // (which may not happen for a few Mosstest versions)
+
     private static final Logger logger = Logger.getLogger(MapDatabase.class);
     /**
      * The map.
      */
     DB map;
-
     /**
      * The entities.
      */
@@ -71,10 +77,16 @@ public class MapDatabase {
         try {
 
             Options options = new Options();
-            options.comparator(null);
+            options.paranoidChecks(false); // ACHTUNG! Corrption!
+            options.verifyChecksums(true); // for now to help control the corruption
+            options.blockSize(8192); // Chunks are kind of big
+            options.compressionType(CompressionType.SNAPPY);
+            //options.comparator(null);
             this.map = factory.open(new File(dbDir, "map"), options); //$NON-NLS-1$
+
             this.mapHeavies = factory.open(new File(dbDir, "mapHeavies"), //$NON-NLS-1$
                     options);
+            options.blockSize(4096); // Nothing is really big after this point.
             this.entities = factory.open(new File(dbDir, "entities"), options); //$NON-NLS-1$
             this.metadata = factory.open(new File(dbDir, "metadata"), options); //$NON-NLS-1$
             this.players = factory.open(new File(dbDir, "players"), options); //$NON-NLS-1$
@@ -103,7 +115,8 @@ public class MapDatabase {
         } catch (IOException e) {
             throw new MapDatabaseException("Database shutdown failed!", e,
                     MapDatabaseException.SEVERITY_UNKNOWN
-                            | MapDatabaseException.SEVERITY_FATAL_TRANSIENT); //$NON-NLS-1$
+                            | MapDatabaseException.SEVERITY_FATAL_TRANSIENT
+            ); //$NON-NLS-1$
         }
     }
 
@@ -145,8 +158,9 @@ public class MapDatabase {
      */
 
     void addMapChunk(Position pos, MapChunk mapChunk) {
-        this.map.put(pos.toBytes(), mapChunk.writeLight(true));
-
+        synchronized(this.map) {
+            this.map.put(pos.toBytes(), mapChunk.writeLight(true));
+        }
     }
 
     /**
