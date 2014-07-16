@@ -19,4 +19,8 @@ public interface IMossFile {
 	public String getSha256();
 
     public String getName();
+
+    public boolean isComplete();
+
+    public long getSize();
 }

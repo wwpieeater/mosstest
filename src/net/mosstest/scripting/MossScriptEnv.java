@@ -1,3 +1,4 @@
+
 package net.mosstest.scripting;
 
 import net.mosstest.scripting.events.IMossEvent;
@@ -37,11 +38,27 @@ import java.util.List;
  * @since 0.0
  */
 public class MossScriptEnv {
-
+    public static final short SCRIPT_API_VERSION = 1;
+    public static final short MIN_SCRIPT_API_VERSION = 1;
+    public static final short MAX_SCRIPT_API_VERSION = 1;
     public void registerNodeChangeHandler(MossNodeChangeHandler h) {
 
     }
 
+    private InheritableThreadLocal<Short> requestedScriptApiVer = new InheritableThreadLocal<Short>(){
+        @Override
+        protected Short initialValue() {
+            return MAX_SCRIPT_API_VERSION;
+        }
+    };
+
+    public void setRequestedScriptApiVer(short requestedScriptApiVer) {
+        if(requestedScriptApiVer >= MIN_SCRIPT_API_VERSION && requestedScriptApiVer <= MAX_SCRIPT_API_VERSION)
+            this.requestedScriptApiVer.set(requestedScriptApiVer);
+        else {
+            throw new MosstestFatalDeathException("A plugin requests an unsatisfiable script API version.");
+        }
+    }
 
     private HashMap<Class<? extends IMossEvent>, ArrayList<MossEventHandler>> eventHandlers;
 
@@ -315,13 +332,13 @@ public class MossScriptEnv {
         return this.fp;
     }
 
-    private HashMap<Class<? extends IMossEvent>, List<MossEventHandler>> handlers = new HashMap<>();
+    private HashMap<Class<? extends IMossEvent>, List<WrappedHandler>> handlers = new HashMap<>();
 
-    public List<MossEventHandler> getEventHandlers(
+    public List<WrappedHandler> getEventHandlers(
             Class<? extends IMossEvent> clazz) {
-        List<MossEventHandler> l = Collections.unmodifiableList(handlers.get(clazz));
+        List<WrappedHandler> l = Collections.unmodifiableList(handlers.get(clazz));
         if (l == null) {
-            handlers.put(clazz, new ArrayList<MossEventHandler>());
+            handlers.put(clazz, new ArrayList<WrappedHandler>());
             return Collections.EMPTY_LIST;
         }
         return l;
@@ -329,14 +346,12 @@ public class MossScriptEnv {
     }
 
     public void registerHandler(MossEventHandler handler, Class<? extends IMossEvent> clazz) {
-        List<MossEventHandler> l = handlers.get(clazz);
+        List<WrappedHandler> l = handlers.get(clazz);
         if (l == null) {
-            l = new ArrayList<MossEventHandler>();
+            l = new ArrayList<WrappedHandler>();
             handlers.put(clazz, l);
-            l.add(handler);
-            return;
         }
-        l.add(handler);
+        l.add(new WrappedHandler(handler, this.requestedScriptApiVer.get()));
 
     }
 

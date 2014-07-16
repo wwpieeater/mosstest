@@ -29,6 +29,8 @@ private static final Logger logger = Logger.getLogger(Player.class);
      */
     private HashMap<String, MossInventory> inventories = new HashMap<>();
 
+    public int playerId;
+
     /**
      * The name.
      */

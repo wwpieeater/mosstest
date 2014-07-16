@@ -1,9 +1,6 @@
 package net.mosstest.servercore;
 
-import net.mosstest.scripting.MapNode;
-import net.mosstest.scripting.MossScriptEnv;
-import net.mosstest.scripting.MossScriptException;
-import net.mosstest.scripting.NodePosition;
+import net.mosstest.scripting.*;
 import net.mosstest.scripting.events.IMossEvent;
 import net.mosstest.scripting.events.MossNodeChangeEvent;
 import net.mosstest.scripting.events.ThreadStopEvent;
@@ -27,9 +24,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  * The Class EventProcessor.
  *
  * @author rarkenin, hexafraction
- *         <p>
+ *         <p/>
  *         Blargh.
- *         <p>
+ *         <p/>
  *         This is a nasty thread pool. If you don't understand threading or
  *         Java well, you may want to stick to only accessing the queue as
  *         otherwise asphyxiation, drowning, or chlorine poisoning may occur.
@@ -101,10 +98,10 @@ public class EventProcessor {
     }
 
     private void dispatchEvent(IMossEvent evt) {
-        List<MossEventHandler> evtHandlerList = this.ev
+        List<WrappedHandler> evtHandlerList = this.ev
                 .getEventHandlers(evt.getClass());
         try {
-            for (MossEventHandler ourHandler : evtHandlerList) {
+            for (WrappedHandler ourHandler : evtHandlerList) {
                 if (dispatchEventInner(ourHandler, evt)) {
                     return;
                 }
@@ -116,13 +113,16 @@ public class EventProcessor {
         }
     }
 
-    private boolean dispatchEventInner(MossEventHandler ourHandler,
+    private boolean dispatchEventInner(WrappedHandler wrappedHandler,
                                        IMossEvent evt) throws IllegalArgumentException {
+        MossEventHandler ourHandler = wrappedHandler.getHandler();
         try {
             if (evt instanceof MossNodeChangeEvent) {
-
-                return ((MossNodeChangeHandler) ourHandler)
-                        .onAction((MossNodeChangeEvent) evt);
+                {
+                    this.ev.setRequestedScriptApiVer(wrappedHandler.getRequestedApiVer());
+                    return ((MossNodeChangeHandler) ourHandler)
+                            .onAction((MossNodeChangeEvent) evt);
+                }
 
             } else
                 throw new IllegalArgumentException(
@@ -174,7 +174,8 @@ public class EventProcessor {
                                             processEvents();
                                         }
 
-                                    });
+                                    }
+                            );
                             threads[c].start();
 
                             EventProcessor.this.currentThreads.incrementAndGet();
@@ -199,7 +200,8 @@ public class EventProcessor {
                                                     processEvents();
                                                 }
 
-                                            }).run();
+                                            }
+                                    ).run();
                                     EventProcessor.this.currentThreads
                                             .incrementAndGet();
 
@@ -221,11 +223,11 @@ public class EventProcessor {
                             }
                         }
                     }
-                }, Messages.getString("EventProcessor.THREAD_NAME_MGR"));
+                }, Messages.getString("EventProcessor.THREAD_NAME_MGR")
+        );
         manager.start();
 
     }
-
 
 
 }

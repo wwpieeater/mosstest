@@ -1,3 +1,4 @@
+
 package net.mosstest.servercore;
 
 import java.io.IOException;
@@ -10,12 +11,12 @@ public abstract class AbstractMossScript {
     }
 
     @org.jetbrains.annotations.NonNls
-    final String name;
-    abstract void exec(ScriptEnv sEnv) throws IOException, MossWorldLoadException;
+    protected final String name;
+    public abstract void exec(ScriptEnv sEnv) throws IOException, MossWorldLoadException;
 
-    abstract IMossFile getInitFile() throws IOException;
+    public abstract IMossFile getInitFile() throws IOException;
 
-    abstract List<AbstractMossScript> getDependencies();
+    public abstract List<AbstractMossScript> getDependencies();
 
     @Override
     public final boolean equals(Object o) {
@@ -34,3 +35,4 @@ public abstract class AbstractMossScript {
         return name.hashCode();
     }
 }
+
