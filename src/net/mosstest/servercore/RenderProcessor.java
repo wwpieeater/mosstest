@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import com.jme3.material.RenderState;
 import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.MapChunk;
+import net.mosstest.scripting.NodePosition;
 import net.mosstest.scripting.Player;
 import net.mosstest.scripting.Position;
 
@@ -42,502 +43,647 @@ import com.jme3.texture.Texture;
 
 public class RenderProcessor extends SimpleApplication {
 
-	static Logger logger = Logger.getLogger(RenderProcessor.class);
-	private final float SPEED = 3f;
-	private final float BLOCK_SIZE = 20f;
-	private final float CHUNK_SIZE = 16*BLOCK_SIZE;
-	private final float ROTATION_SPEED = 1f;
-	private final double BLOCK_OFFSET_FROM_CENTER = 8 * BLOCK_SIZE;
-	private final double CHUNK_OFFSET = 8 * BLOCK_SIZE;
-	private float[] locChanges = { 0, 0, 0 };
-	private double lastTime;
-	private boolean invertY = false;
-	private Vector3f initialUpVec;
-	private Object renderKey;
-	private Node worldNode;
-	private SpotLight spot;
-	private PointLight lamp;
-	private DirectionalLight sun;
-	//private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
-	public INodeManager nManager;
-	public IRenderPreparator rPreparator;
-	public Player player;
-	public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
-			24000, false);
+    static Logger logger = Logger.getLogger(RenderProcessor.class);
+    private final float SPEED = 3f;
+    private final float BLOCK_SIZE = 20f;
+    private final float CHUNK_SIZE = 16 * BLOCK_SIZE;
+    private final float ROTATION_SPEED = 1f;
+    private final double BLOCK_OFFSET_FROM_CENTER = 8 * BLOCK_SIZE;
+    private final double CHUNK_OFFSET = 8 * BLOCK_SIZE;
+    private float[] locChanges = {0, 0, 0};
+    private double lastTime;
+    private boolean invertY = false;
+    private Vector3f initialUpVec;
+    private Object renderKey;
+    private Node worldNode;
+    private SpotLight spot;
+    private PointLight lamp;
+    private DirectionalLight sun;
+    //private HashMap<Position, RenderMapChunk> allChunks = new HashMap<Position, RenderMapChunk>();
+    public INodeManager nManager;
+    public IRenderPreparator rPreparator;
+    public Player player;
+    public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
+            24000, false);
 
-	public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
-		java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
-		RenderProcessor app = new RenderProcessor();
-		AppSettings settings = new AppSettings(true);
-		settings.setResolution(800, 600);
-		settings.setSamples(2);
-		settings.setFullscreen(false);
-		app.setSettings(settings);
-		app.setShowSettings(false);
-		app.initNodeManager(manager);
-		app.initPreparator(preparator);
-		app.initSecurityLock();
-		app.start();
-		return app;
-	}
-	
-	private void initNodeManager (INodeManager manager) {
-		nManager = manager;
-	}
-
-	private void initPreparator(IRenderPreparator prep) {
-		rPreparator = prep;
-		logger.info("The renderer is starting its preparator, which is of type "+prep.getClass().getSimpleName()+".");
-		rPreparator.setRenderProcessor(this);
-		rPreparator.start();
-	}
-
-	private void initSecurityLock () {
-		renderKey = new Object();
-	}
-
-	@Override
-	public void simpleInitApp() {
-		lastTime = 0;
-		//acquireLock();
-		setupWorldNode ();
-		setupFlashlight();
-		setupSunlight();
-		setupLamplight();
-		setupAssetManager();
-		setupPlayer();
-		preparatorChunkTest();
-		//blankChunkTest();
-		flyCam.setEnabled(false);
-		initialUpVec = cam.getUp().clone();
-		initKeyBindings();
-	}
-
-	@Override
-	public void simpleUpdate(float tpf) {
-		if (lastTime + 10 < System.currentTimeMillis()) {
-			move(locChanges[0], locChanges[1], locChanges[2]);
-			lastTime = System.currentTimeMillis();
-		}
-		inputManager.setCursorVisible(false);
-		MossRenderEvent myEvent = renderEventQueue.poll();
-		if (myEvent instanceof MossRenderStopEvent) {
-			logger.info("The renderer thread is shutting down.");
-		}
-		else if (myEvent instanceof MossRenderChunkEvent) {
-			renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
-					((MossRenderChunkEvent) myEvent).getPos());
-			GeometryBatchFactory.optimize(worldNode);
-		}
-	}
-
-	public void getChunk (Position pos) {
-		MapChunk maybe = null;
-		try {maybe = rPreparator.requestChunk(pos);} 
-		catch (MapGeneratorException e) {e.printStackTrace();} 
-		catch (InterruptedException e) {e.printStackTrace();}
-		if (maybe != null) {renderChunk(maybe, pos);}
-	}
-	
-	public void renderChunk(MapChunk chk, Position pos) {
-		int vertexIndexCounter = 0;
-		Mesh completeMesh = new Mesh ();
-		FloatBuffer vertices = getDirectFloatBuffer(950000);
-        FloatBuffer tex = getDirectFloatBuffer(950000);
-		FloatBuffer normals = getDirectFloatBuffer(950000);
-		IntBuffer indices = getDirectIntBuffer(950000);
-		//RenderNode[][][] renderNodes = new RenderNode[16][16][16];
-		for (byte i = 0; i < 16; i++) {
-			for (byte j = 0; j < 16; j++) {
-				for (byte k = 0; k < 16; k++) {
-					if (isNodeVisible(chk.getNodes(), i, j, k)) {
-						
-						int nVal = chk.getNodeId(i, j, k);
-						//MapNode node = nManager.getNode((short) nVal);
-						//Material mat = getMaterial((short) nVal);
-						if (nVal == 0) {}
-						
-						else {
-							//z and y are switched on purpose.
-							float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
-							float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
-							float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
-							
-							/**
-							 * Vertices start at the top left corner and go clockwise around the face.
-							 */
-							vertices.put(x).put(y).put(z); //FRONT
-							vertices.put(x + BLOCK_SIZE).put(y).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y).put(z - BLOCK_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x).put(y + BLOCK_SIZE).put(z); //TOP
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z);
-							vertices.put(x).put(y).put(z);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);//BACK	
-							vertices.put(x).put(y + BLOCK_SIZE).put(z);
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x).put(y + BLOCK_SIZE).put(z); //LEFT
-							vertices.put(x).put(y).put(z);
-							vertices.put(x).put(y).put(z - BLOCK_SIZE);
-							vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							vertices.put(x + BLOCK_SIZE).put(y).put(z); //RIGHT
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
-							vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
-							vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
-							tex.put(0).put(0);
-							tex.put(0).put(1);
-							tex.put(1).put(1);
-							tex.put(1).put(0);
-							
-							for(int m=0; m<24; m++) {
-								normals.put(2).put(3).put(5);
-							}
-							
-							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 2).put(vertexIndexCounter + 1);//front
-							indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 3).put(vertexIndexCounter + 2);
-							
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//top
-							indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
-							
-							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 10).put(vertexIndexCounter + 9);//back
-							indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 11).put(vertexIndexCounter + 10);
-							
-							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 14).put(vertexIndexCounter + 13);//bottom
-							indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 15).put(vertexIndexCounter + 14);
-							
-							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 18).put(vertexIndexCounter + 17);//left
-							indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 19).put(vertexIndexCounter + 18);
-							
-							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//right
-							indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 23).put(vertexIndexCounter + 22);
-							//RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
-							//renderNodes[i][j][k] = geom;
-							vertexIndexCounter += 24;
-						}
-					}
-				}
-			}
-		}
-		Material mat = getMaterial((short) 1);
-		completeMesh.setBuffer(Type.Position, 3, vertices);
-		completeMesh.setBuffer(Type.Normal, 3, normals);
-		completeMesh.setBuffer(Type.Index, 3, indices);
-        completeMesh.setBuffer(Type.TexCoord, 2, tex);
-		completeMesh.updateBound();
-		Geometry geom = new Geometry("chunkMesh", completeMesh);
-		geom.setMaterial(mat);
-        geom.setQueueBucket(RenderQueue.Bucket.Transparent);
-		worldNode.attachChild(geom);
-		//RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
-		//allChunks.put(pos, currentChunk);
+    public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
+        java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
+        RenderProcessor app = new RenderProcessor();
+        AppSettings settings = new AppSettings(true);
+        settings.setResolution(800, 600);
+        settings.setSamples(2);
+        settings.setFullscreen(false);
+        app.setSettings(settings);
+        app.setShowSettings(false);
+        app.initNodeManager(manager);
+        app.initPreparator(preparator);
+        app.initSecurityLock();
+        app.start();
+        return app;
     }
-	
-	private Material getMaterial(short nodeType) {
-		Material mat = null;
-		switch (nodeType) {
-		case 1:
-			mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
-            Texture tx = assetManager.loadTexture("default/grass.png");
-			//Texture tx = assetManager.loadTexture("default/item_torch.png");
-			tx.setMagFilter(Texture.MagFilter.Nearest);
-			mat.setTexture("DiffuseMap", tx);
-            mat.setBoolean("UseAlpha", true);
-            mat.getAdditionalRenderState().setAlphaTest(true);
-            mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
-		}
-		return mat;
-	}
-	
-	private void preparatorChunkTest() {
-		Position p1 = new Position(0, 0, 0, 0);
-		Position p2 = new Position(1, 0, 0, 0);
-		Position p3 = new Position(0, 1, 0, 0);
-		Position p4 = new Position(1, 1, 0, 0);
-		Position p5 = new Position(-1,0,0,0);
-		Position p6 = new Position(0,-1,0,0);
-		Position p7 = new Position(-1,-1,0,0);
 
-		getChunk(p1);
-		getChunk(p2);
-		getChunk(p3);
-		getChunk(p4);
-		getChunk(p5);
-		getChunk(p6);
-		getChunk(p7);
-	}	
-	
-	private void blankChunkTest () {
-		Position p1 = new Position(0, 0, 0, 0);
-		Position p2 = new Position(1, 1, 1, 0);
-		
-		int[][][] n1 = new int[16][16][16];
-		int[][][] n2 = new int[16][16][16];
-		for (int i = 0; i < n1.length; i++) {
-			for (int j = 0; j < n1[i].length; j++) {
-				for (int k = 0; k < n1[i][j].length; k++) {
-					n1[i][j][k] = 1;
-					n2[i][j][k] = 1;
-				}
-			}
-		}
-		
-		MapChunk c1 = new MapChunk(p1, n1);
-		MapChunk c2 = new MapChunk(p2, n2);
-		
-		MossRenderEvent e1 = new MossRenderChunkEvent(c1);
-		MossRenderEvent e2 = new MossRenderChunkEvent(c2);
-		
-		renderEventQueue.add(e1);
-		renderEventQueue.add(e2);
-		//renderChunk(c2, p2);
-		
-	}
-	
-	private FloatBuffer getDirectFloatBuffer (int size) {
-		ByteBuffer temp = ByteBuffer.allocateDirect(size);
-		return temp.asFloatBuffer();
-	}	
+    private void initNodeManager(INodeManager manager) {
+        nManager = manager;
+    }
 
-	private IntBuffer getDirectIntBuffer (int size) {
-		ByteBuffer temp = ByteBuffer.allocateDirect(size);
-		return temp.asIntBuffer();
-	}
+    private void initPreparator(IRenderPreparator prep) {
+        rPreparator = prep;
+        logger.info("The renderer is starting its preparator, which is of type " + prep.getClass().getSimpleName() + ".");
+        rPreparator.setRenderProcessor(this);
+        rPreparator.start();
+    }
 
-	private void setupFlashlight () {
-		spot = new SpotLight();
-		spot.setSpotRange(300f);
-		spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
-		spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
-		spot.setColor(ColorRGBA.White.mult(3f));
-		spot.setPosition(cam.getLocation());
-		spot.setDirection(cam.getDirection());
-		rootNode.addLight(spot);
-	}
-	
-	private void setupSunlight () {
-		sun = new DirectionalLight();
-		sun.setColor(ColorRGBA.White);
-		sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
-		rootNode.addLight(sun);
-	}
-	
-	private void setupLamplight () {
-		lamp = new PointLight();
-		lamp.setColor(ColorRGBA.Yellow);
-		lamp.setRadius(4f);
-		lamp.setPosition(cam.getLocation());
-		rootNode.addLight(lamp);
-	}
-	
-	private void setupWorldNode () {
-		worldNode = new Node("world");
-		rootNode.attachChild(worldNode);
-	}
+    private void initSecurityLock() {
+        renderKey = new Object();
+    }
 
-	private void setupPlayer () {
-		player = new Player ("Test Guy");
-		player.setPositionOffsets (0,5,0);
-		player.setChunkPosition(0,0,0);
-		cam.setLocation(new Vector3f(0, 0, 0));
-	}
-	
-	private void setupAssetManager () {
-		assetManager.registerLocator("scripts", LocalAssetLocator.class);
-	}
-	
-	private void move(float cx, float cy, float cz) {
+    @Override
+    public void simpleInitApp() {
+        lastTime = 0;
+        //acquireLock();
+        setupWorldNode();
+        setupFlashlight();
+        setupSunlight();
+        setupLamplight();
+        setupAssetManager();
+        setupPlayer();
+        preparatorChunkTest();
+        //blankChunkTest();
+        flyCam.setEnabled(false);
+        initialUpVec = cam.getUp().clone();
+        initKeyBindings();
+    }
 
-		Vector2f transVector = new Vector2f(cam.getDirection().x,
-				cam.getDirection().z);
+    @Override
+    public void simpleUpdate(float tpf) {
+        if (lastTime + 10 < System.currentTimeMillis()) {
+            move(locChanges[0], locChanges[1], locChanges[2]);
+            lastTime = System.currentTimeMillis();
+        }
+        inputManager.setCursorVisible(false);
+        MossRenderEvent myEvent = renderEventQueue.poll();
+        if (myEvent instanceof MossRenderStopEvent) {
+            logger.info("The renderer thread is shutting down.");
+        } else if (myEvent instanceof MossRenderChunkEvent) {
+            renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
+                    ((MossRenderChunkEvent) myEvent).getPos());
+            GeometryBatchFactory.optimize(worldNode);
+        }
+    }
 
-		worldNode.setLocalTranslation(worldNode
-				.getLocalTranslation()
-				.addLocal(
-						new Vector3f(-cz * transVector.x, 0f, -cz
-								* transVector.y))
-				.addLocal(-cx * transVector.y, 0f, cx * transVector.x)
-				.addLocal(0f, -cy, 0f));
-		
-		double xpos = -(worldNode.getLocalTranslation().x);
-		double ypos = -(worldNode.getLocalTranslation().y);
-		double zpos = -(worldNode.getLocalTranslation().z);
-		int xchk = (int)Math.floor(xpos / (CHUNK_SIZE));
-		int ychk = (int)Math.floor(ypos / (CHUNK_SIZE));
-		int zchk = (int)Math.floor(zpos / (CHUNK_SIZE));
-		double xoffset = (xpos % CHUNK_SIZE)/BLOCK_SIZE;
-		double yoffset = (ypos % CHUNK_SIZE)/BLOCK_SIZE;
-		double zoffset = (zpos % CHUNK_SIZE)/BLOCK_SIZE;
-		
-		synchronized(player.antiCheatDataLock){
-			player.setChunkPosition (xchk, ychk, zchk);
-			player.setPositionOffsets (xoffset, yoffset, zoffset);
-		}
-	}
+    public void getChunk(Position pos) {
+        MapChunk maybe = null;
+        try {
+            maybe = rPreparator.requestChunk(pos);
+        } catch (MapGeneratorException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (maybe != null) {
+            renderChunk(maybe, pos);
+        }
+    }
 
-	private void rotateCamera(float value, Vector3f axis) {
+    private static double intbound(double s, double ds) {
+        // Find the smallest positive t such that s+t*ds is an integer.
+        if (ds < 0) {
+            return intbound(-s, -ds);
+        } else {
+            s = raycasterMod(s, 1);
+            // problem is now s+t*ds = 1
+            return (1 - s) / ds;
+        }
+    }
 
-		Matrix3f mat = new Matrix3f();
-		mat.fromAngleNormalAxis(ROTATION_SPEED * value, axis);
 
-		Vector3f up = cam.getUp();
-		Vector3f left = cam.getLeft();
-		Vector3f dir = cam.getDirection();
+    static double raycasterMod(double value, double modulus) {
+        return ((value % modulus) + modulus) % modulus;
+    }
 
-		mat.mult(up, up);
-		mat.mult(left, left);
-		mat.mult(dir, dir);
+    static NodePosition raycast(NodePosition worldPos, Vector3f traceOrigin, Vector3f camDirection, int radius) {
+        // From "A Fast Voxel Traversal Algorithm for Ray Tracing"
+        // by John Amanatides and Andrew Woo, 1987
+        // <http://www.cse.yorku.ca/~amana/research/grid.pdf>
+        // <http://citeseer.ist.psu.edu/viewdoc/summary?doi=10.1.1.42.3443>
+        // Extensions to the described algorithm:
+        //   • Imposed a distance limit.
+        //   • The face passed through to reach the current cube is provided to
+        //     the callback.
 
-		Quaternion q = new Quaternion();
-		q.fromAxes(left, up, dir);
-		q.normalizeLocal();
+        // The foundation of this algorithm is a parameterized representation of
+        // the provided ray,
+        //                    origin + t * direction,
+        // except that t is not actually stored; rather, at any given point in the
+        // traversal, we keep track of the *greater* t values which we would have
+        // if we took a step sufficient to cross a cube boundary along that axis
+        // (i.e. change the integer part of the coordinate) in the variables
+        // tMaxX, tMaxY, and tMaxZ.
 
-		cam.setAxes(q);
-		
-		spot.setDirection(cam.getDirection());
-	}
+        // Cube containing origin point.
+        double x = Math.floor(traceOrigin.getX());
+        double y = Math.floor(traceOrigin.getY());
+        double z = Math.floor(traceOrigin.getZ());
+        Vector3f direction = camDirection.normalize();
+        // Break out direction vector.
+        double dx = direction.getX();
+        double dy = direction.getY();
+        double dz = direction.getZ();
+        // Direction to increment x,y,z when stepping.
+        double stepX = Math.signum(dx);
+        double stepY = Math.signum(dy);
+        double stepZ = Math.signum(dz);
+        // See description above. The initial values depend on the fractional
+        // part of the origin.
+        double tMaxX = intbound(x, dx);
+        double tMaxY = intbound(y, dy);
+        double tMaxZ = intbound(z, dz);
+        // The change in t when taking a step (always positive).
+        double tDeltaX = stepX / dx;
+        double tDeltaY = stepY / dy;
+        double tDeltaZ = stepZ / dz;
 
-	private boolean isNodeVisible (int[][][] chunk, int i, int j, int k) {
-		if (i == 0 || j == 0 || k == 0 || i == chunk.length-1 || j == chunk[0].length-1 || k == chunk[0][0].length-1) {
-			return true;
-		}
-		return (chunk[i+1][j][k] == 0 || chunk[i][j+1][k] == 0 || chunk[i][j][k+1] == 0 ||
-			chunk[i-1][j][k] == 0 || chunk[i][j-1][k] == 0 || chunk[i][j][k-1] == 0);
-	}
-	
-	private void acquireLock () {
-		MosstestSecurityManager.instance.lock(renderKey, null);
-	}
-	
-	private void releaseLock () {
-		MosstestSecurityManager.instance.unlock(renderKey);
-	}
-	
-	private void initKeyBindings() {
-		inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
-		inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_LSHIFT));
-		inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
-		inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
-		inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
-		inputManager.addMapping("Back", new KeyTrigger(KeyInput.KEY_S));
-		inputManager.addMapping("TestFeature", new KeyTrigger(KeyInput.KEY_P));
+        Vector3f face = new Vector3f();
+        // Avoids an infinite loop.
+        if (dx == 0 && dy == 0 && dz == 0)
+            throw new IllegalArgumentException("Raycast in zero direction!");
 
-		inputManager.addMapping("CAM_Left", new MouseAxisTrigger(
-				MouseInput.AXIS_X, true), new KeyTrigger(KeyInput.KEY_LEFT));
+        // Rescale from units of 1 cube-edge to units of 'direction' so we can
+        // compare with 't'.
+        radius /= Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-		inputManager.addMapping("CAM_Right", new MouseAxisTrigger(
-				MouseInput.AXIS_X, false), new KeyTrigger(KeyInput.KEY_RIGHT));
+        for (int i = 0; i < 20; i++) {
 
-		inputManager.addMapping("CAM_Up", new MouseAxisTrigger(
-				MouseInput.AXIS_Y, false), new KeyTrigger(KeyInput.KEY_UP));
+            // Invoke the callback, unless we are not *yet* within the bounds of the
+            // world.
 
-		inputManager.addMapping("CAM_Down", new MouseAxisTrigger(
-				MouseInput.AXIS_Y, true), new KeyTrigger(KeyInput.KEY_DOWN));
+            if (nodeAcceptable(x, y, z, face)) {
+                long combinedX = ((long)x)+(worldPos.chunk.x*16+worldPos.xl);
+                long combinedY = ((long)y)+(worldPos.chunk.y*16+worldPos.yl);
+                long combinedZ = ((long)z)+(worldPos.chunk.z*16+worldPos.zl);
+                return new NodePosition(worldPos.chunk.realm,
+                        (int) (combinedX/16),
+                        (int) (combinedY/16),
+                        (int) (combinedZ/16),
+                        (byte)(combinedX%16),
+                        (byte)(combinedY%16),
+                        (byte)(combinedZ%16));
+            }
 
-		inputManager.addListener(actionListener, "Jump");
-		inputManager.addListener(actionListener, "Down");
-		inputManager.addListener(actionListener, "Left");
-		inputManager.addListener(actionListener, "Right");
-		inputManager.addListener(actionListener, "Forward");
-		inputManager.addListener(actionListener, "Back");
-		inputManager.addListener(analogListener, "CAM_Left");
-		inputManager.addListener(analogListener, "CAM_Right");
-		inputManager.addListener(analogListener, "CAM_Up");
-		inputManager.addListener(analogListener, "CAM_Down");
-		inputManager.addListener(actionListener, "TestFeature");
-	}
+            // tMaxX stores the t-value at which we cross a cube boundary along the
+            // X axis, and similarly for Y and Z. Therefore, choosing the least tMax
+            // chooses the closest cube boundary. Only the first case of the four
+            // has been commented in detail.
+            if (tMaxX < tMaxY) {
+                if (tMaxX < tMaxZ) {
+                    if (tMaxX > radius) break;
+                    // Update which cube we are now in.
+                    x += stepX;
+                    // Adjust tMaxX to the next X-oriented boundary crossing.
+                    tMaxX += tDeltaX;
+                    // Record the normal vector of the cube face we entered.
+                    face.setX((float) -stepX);
+                    face.setY(0);
+                    face.setZ(0);
+                } else {
+                    if (tMaxZ > radius) break;
+                    z += stepZ;
+                    tMaxZ += tDeltaZ;
+                    face.setX(0);
+                    face.setY(0);
+                    face.setZ((float) -stepZ);
+                }
+            } else {
+                if (tMaxY < tMaxZ) {
+                    if (tMaxY > radius) break;
+                    y += stepY;
+                    tMaxY += tDeltaY;
+                    face.setX(0);
+                    face.setY((float) -stepY);
+                    face.setZ(0);
+                } else {
+                    // Identical to the second case, repeated for simplicity in
+                    // the conditionals.
+                    if (tMaxZ > radius) break;
+                    z += stepZ;
+                    tMaxZ += tDeltaZ;
+                    face.setX(0);
+                    face.setY(0);
+                    face.setZ((float) -stepZ);
+                }
+            }
+        }
+        return null;
+    }
 
-	private AnalogListener analogListener = new AnalogListener() {
+    public static void main(String[] args) {
+        raycast(null, new Vector3f(3.1f, 8.5f, 2.0f), new Vector3f(0, 0.0f, 0), 8);
+    }
 
-		public void onAnalog(String name, float value, float tpf) {
-			if (name.equals("CAM_Left")) {
-				rotateCamera(value, initialUpVec);
-			} else if (name.equals("CAM_Right")) {
-				rotateCamera(-value, initialUpVec);
-			} else if (name.equals("CAM_Up")) {
-				rotateCamera(-value * (invertY ? -1 : 1), cam.getLeft());
-			} else if (name.equals("CAM_Down")) {
-				rotateCamera(value * (invertY ? -1 : 1), cam.getLeft());
-			}
-		}
-	};
-	
-	private ActionListener actionListener = new ActionListener() {
-		public void onAction(String name, boolean keyPressed, float tpf) {
-			if (name.equals("Jump") && keyPressed/* && jumpSPEED == 0 */) {
-				locChanges[1] = 2f;
-			} else if (name.equals("Jump") && !keyPressed) {
-				locChanges[1] = 0f;
-			}
+    private static boolean nodeAcceptable(double x, double y, double z, Vector3f face) {
+        System.out.println("x = [" + x + "], y = [" + y + "], z = [" + z + "], face = [" + face + "]");
+        return false;
+    }
 
-			if (name.equals("Down") && keyPressed) {
-				locChanges[1] = -2f;
-			} else if (name.equals("Down") && !keyPressed) {
-				locChanges[1] = 0f;
-			}
+    public void renderChunk(MapChunk chk, Position pos) {
+        int vertexIndexCounter = 0;
+        Mesh completeMesh = new Mesh();
+        FloatBuffer vertices = getDirectFloatBuffer(950000);
+        FloatBuffer tex = getDirectFloatBuffer(950000);
+        FloatBuffer normals = getDirectFloatBuffer(950000);
+        IntBuffer indices = getDirectIntBuffer(950000);
+        //RenderNode[][][] renderNodes = new RenderNode[16][16][16];
+        for (byte i = 0; i < 16; i++) {
+            for (byte j = 0; j < 16; j++) {
+                for (byte k = 0; k < 16; k++) {
+                    if (isNodeVisible(chk.getNodes(), i, j, k)) {
 
-			if (name.equals("Left") && keyPressed) {
-				locChanges[0] = SPEED;
-			} else if (name.equals("Left") && !keyPressed
-					&& locChanges[0] == SPEED) {
-				locChanges[0] = 0;
-			}
+                        int nVal = chk.getNodeId(i, j, k);
+                        //MapNode node = nManager.getNode((short) nVal);
+                        //Material mat = getMaterial((short) nVal);
+                        if (nVal == 0) {
+                        } else {
+                            //z and y are switched on purpose.
+                            float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (i * BLOCK_SIZE));
+                            float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (j * BLOCK_SIZE));
+                            float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - BLOCK_OFFSET_FROM_CENTER + CHUNK_OFFSET + (k * BLOCK_SIZE));
 
-			if (name.equals("Right") && keyPressed) {
-				locChanges[0] = -SPEED;
-			} else if (name.equals("Right") && !keyPressed
-					&& locChanges[0] == -SPEED) {
-				locChanges[0] = 0;
-			}
+                            /**
+                             * Vertices start at the top left corner and go clockwise around the face.
+                             */
+                            vertices.put(x).put(y).put(z); //FRONT
+                            vertices.put(x + BLOCK_SIZE).put(y).put(z);
+                            vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+                            vertices.put(x).put(y).put(z - BLOCK_SIZE);
+                            tex.put(0).put(0);
+                            tex.put(0).put(1);
+                            tex.put(1).put(1);
+                            tex.put(1).put(0);
 
-			if (name.equals("Forward") && keyPressed) {
-				locChanges[2] = SPEED;
-			} else if (name.equals("Forward") && !keyPressed
-					&& locChanges[2] == SPEED) {
-				locChanges[2] = 0;
-			}
+                            vertices.put(x).put(y + BLOCK_SIZE).put(z); //TOP
+                            vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
+                            vertices.put(x + BLOCK_SIZE).put(y).put(z);
+                            vertices.put(x).put(y).put(z);
+                            tex.put(0).put(0);
+                            tex.put(0).put(1);
+                            tex.put(1).put(1);
+                            tex.put(1).put(0);
 
-			if (name.equals("Back") && keyPressed) {
-				locChanges[2] = -SPEED;
-			} else if (name.equals("Back") && !keyPressed
-					&& locChanges[2] == -SPEED) {
-				locChanges[2] = 0;
-			}
-			
-			if (name.equals("TestFeature") && keyPressed) {
-                Position p = new Position(0,2,0,0);
-				getChunk(p);
-			}
-		}
-	};
+                            vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);//BACK
+                            vertices.put(x).put(y + BLOCK_SIZE).put(z);
+                            vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+                            vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+                            tex.put(0).put(0);
+                            tex.put(0).put(1);
+                            tex.put(1).put(1);
+                            tex.put(1).put(0);
+
+                            vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+                            vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+                            vertices.put(x).put(y).put(z - BLOCK_SIZE);
+                            vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+                            tex.put(0).put(0);
+                            tex.put(0).put(1);
+                            tex.put(1).put(1);
+                            tex.put(1).put(0);
+
+                            vertices.put(x).put(y + BLOCK_SIZE).put(z); //LEFT
+                            vertices.put(x).put(y).put(z);
+                            vertices.put(x).put(y).put(z - BLOCK_SIZE);
+                            vertices.put(x).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+                            tex.put(0).put(0);
+                            tex.put(0).put(1);
+                            tex.put(1).put(1);
+                            tex.put(1).put(0);
+
+                            vertices.put(x + BLOCK_SIZE).put(y).put(z); //RIGHT
+                            vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z);
+                            vertices.put(x + BLOCK_SIZE).put(y + BLOCK_SIZE).put(z - BLOCK_SIZE);
+                            vertices.put(x + BLOCK_SIZE).put(y).put(z - BLOCK_SIZE);
+                            tex.put(0).put(0);
+                            tex.put(0).put(1);
+                            tex.put(1).put(1);
+                            tex.put(1).put(0);
+
+                            for (int m = 0; m < 24; m++) {
+                                normals.put(2).put(3).put(5);
+                            }
+
+                            indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 2).put(vertexIndexCounter + 1);//front
+                            indices.put(vertexIndexCounter + 0).put(vertexIndexCounter + 3).put(vertexIndexCounter + 2);
+
+                            indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 6).put(vertexIndexCounter + 5);//top
+                            indices.put(vertexIndexCounter + 4).put(vertexIndexCounter + 7).put(vertexIndexCounter + 6);
+
+                            indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 10).put(vertexIndexCounter + 9);//back
+                            indices.put(vertexIndexCounter + 8).put(vertexIndexCounter + 11).put(vertexIndexCounter + 10);
+
+                            indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 14).put(vertexIndexCounter + 13);//bottom
+                            indices.put(vertexIndexCounter + 12).put(vertexIndexCounter + 15).put(vertexIndexCounter + 14);
+
+                            indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 18).put(vertexIndexCounter + 17);//left
+                            indices.put(vertexIndexCounter + 16).put(vertexIndexCounter + 19).put(vertexIndexCounter + 18);
+
+                            indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 22).put(vertexIndexCounter + 21);//right
+                            indices.put(vertexIndexCounter + 20).put(vertexIndexCounter + 23).put(vertexIndexCounter + 22);
+                            //RenderNode geom = new RenderNode(mat, loc, BLOCK_SIZE, NodeManager.getNode((short)nVal)null);
+                            //renderNodes[i][j][k] = geom;
+                            vertexIndexCounter += 24;
+                        }
+                    }
+                }
+            }
+        }
+        Material mat = getMaterial((short) 1);
+        completeMesh.setBuffer(Type.Position, 3, vertices);
+        completeMesh.setBuffer(Type.Normal, 3, normals);
+        completeMesh.setBuffer(Type.Index, 3, indices);
+        completeMesh.setBuffer(Type.TexCoord, 2, tex);
+        completeMesh.updateBound();
+        Geometry geom = new Geometry("chunkMesh", completeMesh);
+        geom.setMaterial(mat);
+        geom.setQueueBucket(RenderQueue.Bucket.Transparent);
+        worldNode.attachChild(geom);
+        //RenderMapChunk currentChunk = new RenderMapChunk(renderNodes);
+        //allChunks.put(pos, currentChunk);
+    }
+
+    private Material getMaterial(short nodeType) {
+        Material mat = null;
+        switch (nodeType) {
+            case 1:
+                mat = new Material(assetManager, "Common/MatDefs/Light/Lighting.j3md");
+                Texture tx = assetManager.loadTexture("default/grass.png");
+                //Texture tx = assetManager.loadTexture("default/item_torch.png");
+                tx.setMagFilter(Texture.MagFilter.Nearest);
+                mat.setTexture("DiffuseMap", tx);
+                mat.setBoolean("UseAlpha", true);
+                mat.getAdditionalRenderState().setAlphaTest(true);
+                mat.getAdditionalRenderState().setBlendMode(RenderState.BlendMode.Alpha);
+        }
+        return mat;
+    }
+
+    private void preparatorChunkTest() {
+        Position p1 = new Position(0, 0, 0, 0);
+        Position p2 = new Position(1, 0, 0, 0);
+        Position p3 = new Position(0, 1, 0, 0);
+        Position p4 = new Position(1, 1, 0, 0);
+        Position p5 = new Position(-1, 0, 0, 0);
+        Position p6 = new Position(0, -1, 0, 0);
+        Position p7 = new Position(-1, -1, 0, 0);
+
+        getChunk(p1);
+        getChunk(p2);
+        getChunk(p3);
+        getChunk(p4);
+        getChunk(p5);
+        getChunk(p6);
+        getChunk(p7);
+    }
+
+    private void blankChunkTest() {
+        Position p1 = new Position(0, 0, 0, 0);
+        Position p2 = new Position(1, 1, 1, 0);
+
+        int[][][] n1 = new int[16][16][16];
+        int[][][] n2 = new int[16][16][16];
+        for (int i = 0; i < n1.length; i++) {
+            for (int j = 0; j < n1[i].length; j++) {
+                for (int k = 0; k < n1[i][j].length; k++) {
+                    n1[i][j][k] = 1;
+                    n2[i][j][k] = 1;
+                }
+            }
+        }
+
+        MapChunk c1 = new MapChunk(p1, n1);
+        MapChunk c2 = new MapChunk(p2, n2);
+
+        MossRenderEvent e1 = new MossRenderChunkEvent(c1);
+        MossRenderEvent e2 = new MossRenderChunkEvent(c2);
+
+        renderEventQueue.add(e1);
+        renderEventQueue.add(e2);
+        //renderChunk(c2, p2);
+
+    }
+
+    private FloatBuffer getDirectFloatBuffer(int size) {
+        ByteBuffer temp = ByteBuffer.allocateDirect(size);
+        return temp.asFloatBuffer();
+    }
+
+    private IntBuffer getDirectIntBuffer(int size) {
+        ByteBuffer temp = ByteBuffer.allocateDirect(size);
+        return temp.asIntBuffer();
+    }
+
+    private void setupFlashlight() {
+        spot = new SpotLight();
+        spot.setSpotRange(300f);
+        spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
+        spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
+        spot.setColor(ColorRGBA.White.mult(3f));
+        spot.setPosition(cam.getLocation());
+        spot.setDirection(cam.getDirection());
+        rootNode.addLight(spot);
+    }
+
+    private void setupSunlight() {
+        sun = new DirectionalLight();
+        sun.setColor(ColorRGBA.White);
+        sun.setDirection(new Vector3f(-.5f, -.5f, -.5f).normalizeLocal());
+        rootNode.addLight(sun);
+    }
+
+    private void setupLamplight() {
+        lamp = new PointLight();
+        lamp.setColor(ColorRGBA.Yellow);
+        lamp.setRadius(4f);
+        lamp.setPosition(cam.getLocation());
+        rootNode.addLight(lamp);
+    }
+
+    private void setupWorldNode() {
+        worldNode = new Node("world");
+        rootNode.attachChild(worldNode);
+    }
+
+    private void setupPlayer() {
+        player = new Player("Test Guy");
+        player.setPositionOffsets(0, 5, 0);
+        player.setChunkPosition(0, 0, 0);
+        cam.setLocation(new Vector3f(0, 0, 0));
+    }
+
+    private void setupAssetManager() {
+        assetManager.registerLocator("scripts", LocalAssetLocator.class);
+    }
+
+    private void move(float cx, float cy, float cz) {
+
+        Vector2f transVector = new Vector2f(cam.getDirection().x,
+                cam.getDirection().z);
+
+        worldNode.setLocalTranslation(worldNode
+                .getLocalTranslation()
+                .addLocal(
+                        new Vector3f(-cz * transVector.x, 0f, -cz
+                                * transVector.y)
+                )
+                .addLocal(-cx * transVector.y, 0f, cx * transVector.x)
+                .addLocal(0f, -cy, 0f));
+
+        double xpos = -(worldNode.getLocalTranslation().x);
+        double ypos = -(worldNode.getLocalTranslation().y);
+        double zpos = -(worldNode.getLocalTranslation().z);
+        int xchk = (int) Math.floor(xpos / (CHUNK_SIZE));
+        int ychk = (int) Math.floor(ypos / (CHUNK_SIZE));
+        int zchk = (int) Math.floor(zpos / (CHUNK_SIZE));
+        double xoffset = (xpos % CHUNK_SIZE) / BLOCK_SIZE;
+        double yoffset = (ypos % CHUNK_SIZE) / BLOCK_SIZE;
+        double zoffset = (zpos % CHUNK_SIZE) / BLOCK_SIZE;
+
+        synchronized (player.antiCheatDataLock) {
+            player.setChunkPosition(xchk, ychk, zchk);
+            player.setPositionOffsets(xoffset, yoffset, zoffset);
+        }
+    }
+
+    private void rotateCamera(float value, Vector3f axis) {
+
+        Matrix3f mat = new Matrix3f();
+        mat.fromAngleNormalAxis(ROTATION_SPEED * value, axis);
+
+        Vector3f up = cam.getUp();
+        Vector3f left = cam.getLeft();
+        Vector3f dir = cam.getDirection();
+
+        mat.mult(up, up);
+        mat.mult(left, left);
+        mat.mult(dir, dir);
+
+        Quaternion q = new Quaternion();
+        q.fromAxes(left, up, dir);
+        q.normalizeLocal();
+
+        cam.setAxes(q);
+
+        spot.setDirection(cam.getDirection());
+    }
+
+    private boolean isNodeVisible(int[][][] chunk, int i, int j, int k) {
+        if (i == 0 || j == 0 || k == 0 || i == chunk.length - 1 || j == chunk[0].length - 1 || k == chunk[0][0].length - 1) {
+            return true;
+        }
+        return (chunk[i + 1][j][k] == 0 || chunk[i][j + 1][k] == 0 || chunk[i][j][k + 1] == 0 ||
+                chunk[i - 1][j][k] == 0 || chunk[i][j - 1][k] == 0 || chunk[i][j][k - 1] == 0);
+    }
+
+    private void acquireLock() {
+        MosstestSecurityManager.instance.lock(renderKey, null);
+    }
+
+    private void releaseLock() {
+        MosstestSecurityManager.instance.unlock(renderKey);
+    }
+
+    private void initKeyBindings() {
+        inputManager.addMapping("Jump", new KeyTrigger(KeyInput.KEY_SPACE));
+        inputManager.addMapping("Down", new KeyTrigger(KeyInput.KEY_LSHIFT));
+        inputManager.addMapping("Left", new KeyTrigger(KeyInput.KEY_A));
+        inputManager.addMapping("Right", new KeyTrigger(KeyInput.KEY_D));
+        inputManager.addMapping("Forward", new KeyTrigger(KeyInput.KEY_W));
+        inputManager.addMapping("Back", new KeyTrigger(KeyInput.KEY_S));
+        inputManager.addMapping("TestFeature", new KeyTrigger(KeyInput.KEY_P));
+
+        inputManager.addMapping("CAM_Left", new MouseAxisTrigger(
+                MouseInput.AXIS_X, true), new KeyTrigger(KeyInput.KEY_LEFT));
+
+        inputManager.addMapping("CAM_Right", new MouseAxisTrigger(
+                MouseInput.AXIS_X, false), new KeyTrigger(KeyInput.KEY_RIGHT));
+
+        inputManager.addMapping("CAM_Up", new MouseAxisTrigger(
+                MouseInput.AXIS_Y, false), new KeyTrigger(KeyInput.KEY_UP));
+
+        inputManager.addMapping("CAM_Down", new MouseAxisTrigger(
+                MouseInput.AXIS_Y, true), new KeyTrigger(KeyInput.KEY_DOWN));
+
+        inputManager.addListener(actionListener, "Jump");
+        inputManager.addListener(actionListener, "Down");
+        inputManager.addListener(actionListener, "Left");
+        inputManager.addListener(actionListener, "Right");
+        inputManager.addListener(actionListener, "Forward");
+        inputManager.addListener(actionListener, "Back");
+        inputManager.addListener(analogListener, "CAM_Left");
+        inputManager.addListener(analogListener, "CAM_Right");
+        inputManager.addListener(analogListener, "CAM_Up");
+        inputManager.addListener(analogListener, "CAM_Down");
+        inputManager.addListener(actionListener, "TestFeature");
+    }
+
+    private AnalogListener analogListener = new AnalogListener() {
+
+        public void onAnalog(String name, float value, float tpf) {
+            if (name.equals("CAM_Left")) {
+                rotateCamera(value, initialUpVec);
+            } else if (name.equals("CAM_Right")) {
+                rotateCamera(-value, initialUpVec);
+            } else if (name.equals("CAM_Up")) {
+                rotateCamera(-value * (invertY ? -1 : 1), cam.getLeft());
+            } else if (name.equals("CAM_Down")) {
+                rotateCamera(value * (invertY ? -1 : 1), cam.getLeft());
+            }
+        }
+    };
+
+    private ActionListener actionListener = new ActionListener() {
+        public void onAction(String name, boolean keyPressed, float tpf) {
+            if (name.equals("Jump") && keyPressed/* && jumpSPEED == 0 */) {
+                locChanges[1] = 2f;
+            } else if (name.equals("Jump") && !keyPressed) {
+                locChanges[1] = 0f;
+            }
+
+            if (name.equals("Down") && keyPressed) {
+                locChanges[1] = -2f;
+            } else if (name.equals("Down") && !keyPressed) {
+                locChanges[1] = 0f;
+            }
+
+            if (name.equals("Left") && keyPressed) {
+                locChanges[0] = SPEED;
+            } else if (name.equals("Left") && !keyPressed
+                    && locChanges[0] == SPEED) {
+                locChanges[0] = 0;
+            }
+
+            if (name.equals("Right") && keyPressed) {
+                locChanges[0] = -SPEED;
+            } else if (name.equals("Right") && !keyPressed
+                    && locChanges[0] == -SPEED) {
+                locChanges[0] = 0;
+            }
+
+            if (name.equals("Forward") && keyPressed) {
+                locChanges[2] = SPEED;
+            } else if (name.equals("Forward") && !keyPressed
+                    && locChanges[2] == SPEED) {
+                locChanges[2] = 0;
+            }
+
+            if (name.equals("Back") && keyPressed) {
+                locChanges[2] = -SPEED;
+            } else if (name.equals("Back") && !keyPressed
+                    && locChanges[2] == -SPEED) {
+                locChanges[2] = 0;
+            }
+
+            if (name.equals("TestFeature") && keyPressed) {
+                Position p = new Position(0, 2, 0, 0);
+                getChunk(p);
+            }
+        }
+    };
 }

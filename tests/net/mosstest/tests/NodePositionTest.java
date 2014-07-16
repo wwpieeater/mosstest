@@ -21,10 +21,10 @@ public class NodePositionTest {
                     for (byte x = 0; x < CHUNK_DIMENSION; x += 8) {
                         for (byte y = 0; y < CHUNK_DIMENSION; y += 8) {
                             for (byte z = 0; z < CHUNK_DIMENSION; z += 8) {
-                                NodePosition pos1 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
-                                NodePosition pos2 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                NodePosition pos1 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
+                                NodePosition pos2 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
                                 Assert.assertEquals(
                                         "Mismatched hashCodes for value-identical NodePosition objects",
                                         pos1.hashCode(), pos2.hashCode());
@@ -44,8 +44,8 @@ public class NodePositionTest {
                     for (byte x = 0; x < CHUNK_DIMENSION; x+=8) {
                         for (byte y = 0; y < CHUNK_DIMENSION; y+=8) {
                             for (byte z = 0; z < CHUNK_DIMENSION; z+=4) {
-                                NodePosition pos1 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                NodePosition pos1 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
                                 byte[] bytes = pos1.toBytes();
                                 NodePosition pos2;
                                 try {
@@ -73,10 +73,10 @@ public class NodePositionTest {
                     for (byte x = 0; x < CHUNK_DIMENSION; x+=8) {
                         for (byte y = 0; y < CHUNK_DIMENSION; y+=8) {
                             for (byte z = 0; z < CHUNK_DIMENSION; z+=4) {
-                                NodePosition pos1 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
-                                NodePosition pos2 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                NodePosition pos1 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
+                                NodePosition pos2 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
                                 Assert.assertTrue(
                                         "Value-equal objects fail equals() check",
                                         pos1.equals(pos2));
@@ -84,30 +84,30 @@ public class NodePositionTest {
                                         "Value-equal objects fail equals() check",
                                         pos2.equals(pos1));
                                 NodePosition pos3 = new NodePosition(
-                                        coords[i] + 1, coords[j], coords[k], 0,
+                                        0, coords[i] + 1, coords[j], coords[k],
                                         x, y, z);
-                                NodePosition pos4 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                NodePosition pos4 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
                                 Assert.assertFalse(
                                         "Value-unequal objects erroneously pass equals() check for x",
                                         pos3.equals(pos4));
                                 Assert.assertFalse(
                                         "Value-unequal objects erroneously pass equals() check for x",
                                         pos4.equals(pos3));
-                                NodePosition pos5 = new NodePosition(coords[i],
-                                        coords[j] + 1, coords[k], 0, x, y, z);
-                                NodePosition pos6 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                NodePosition pos5 = new NodePosition(0, coords[i],
+                                        coords[j] + 1, coords[k], x, y, z);
+                                NodePosition pos6 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
                                 Assert.assertFalse(
                                         "Value-unequal objects erroneously pass equals() check for y",
                                         pos5.equals(pos6));
                                 Assert.assertFalse(
                                         "Value-unequal objects erroneously pass equals() check for y",
                                         pos6.equals(pos5));
-                                NodePosition pos7 = new NodePosition(coords[i],
-                                        coords[j], coords[k] + 1, 0, x, y, z);
-                                NodePosition pos8 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, z);
+                                NodePosition pos7 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k] + 1, x, y, z);
+                                NodePosition pos8 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, z);
                                 Assert.assertFalse(
                                         "Value-unequal objects erroneously pass equals() check for z",
                                         pos7.equals(pos8));
@@ -130,10 +130,10 @@ public class NodePositionTest {
                     for (byte x = 0; x < CHUNK_DIMENSION; x+=4) {
                         for (byte y = 0; y < CHUNK_DIMENSION; y+=8) {
 
-                                NodePosition pos1 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, (byte)0);
-                                NodePosition pos2 = new NodePosition(coords[i],
-                                        coords[j], coords[k], 0, x, y, (byte)0);
+                                NodePosition pos1 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, (byte)0);
+                                NodePosition pos2 = new NodePosition(0, coords[i],
+                                        coords[j], coords[k], x, y, (byte)0);
                                 org.junit.Assert.assertArrayEquals(
                                         pos1.toBytes(), pos2.toBytes());
 

@@ -22,16 +22,15 @@ public class NodePosition {
 
     /**
      * Instantiates a new node position.
-     *
+     *  @param realm the realm
      * @param x     the x
      * @param y     the y
      * @param z     the z
-     * @param realm the realm
      * @param xl    the xl
      * @param yl    the yl
      * @param zl    the zl
      */
-    public NodePosition(int x, int y, int z, int realm, byte xl, byte yl,
+    public NodePosition(int realm, int x, int y, int z, byte xl, byte yl,
                         byte zl) {
         this.chunk = new Position(x, y, z, realm);
         this.xl = xl;
