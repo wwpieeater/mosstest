@@ -6,7 +6,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.logging.Level;
 
 import com.jme3.material.RenderState;
-import com.jme3.scene.Spatial;
+import com.jme3.scene.*;
 import com.jme3.ui.Picture;
 import jme3tools.optimize.GeometryBatchFactory;
 import net.mosstest.scripting.*;
@@ -28,9 +28,6 @@ import com.jme3.math.FastMath;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.renderer.queue.RenderQueue;
-import com.jme3.scene.Geometry;
-import com.jme3.scene.Mesh;
-import com.jme3.scene.Node;
 import com.jme3.scene.VertexBuffer.Type;
 import com.jme3.system.AppSettings;
 import com.jme3.texture.Texture;
@@ -61,6 +58,7 @@ public class RenderProcessor extends SimpleApplication {
     public Player player;
     public ArrayBlockingQueue<MossRenderEvent> renderEventQueue = new ArrayBlockingQueue<>(
             24000, false);
+    private Mesh completeMesh;
 
     public static RenderProcessor init(INodeManager manager, IRenderPreparator preparator) {
         java.util.logging.Logger.getLogger("").setLevel(Level.WARNING);
@@ -106,10 +104,13 @@ public class RenderProcessor extends SimpleApplication {
         flyCam.setEnabled(false);
         setupListeners(cam.getUp().clone());
         initKeyBindings();
+        //initMouseoverMesh();
         preparatorChunkTest();
+
         //blankChunkTest();
     }
 
+    Geometry geom;
     private void setupHud() {
         Picture pic = new Picture("Crosshair");
         pic.setImage(assetManager, "builtins/crosshair.png", true);
@@ -133,7 +134,7 @@ public class RenderProcessor extends SimpleApplication {
         } else if (myEvent instanceof MossRenderChunkEvent) {
             renderChunk(((MossRenderChunkEvent) myEvent).getChk(),
                     ((MossRenderChunkEvent) myEvent).getPos());
-            GeometryBatchFactory.optimize(worldNode);
+            //GeometryBatchFactory.optimize(worldNode);
         }
 
         drawMouseOver();
@@ -142,48 +143,55 @@ public class RenderProcessor extends SimpleApplication {
     }
 
     private Spatial mouseoverSpatial;
+    private NodePosition castNP;
 
     private void drawMouseOver() {
-        if (mouseoverSpatial != null)
-            worldNode.detachChild(mouseoverSpatial);
         NodePosition rough = new NodePosition(0, player.xchk,
                 player.ychk,
                 player.zchk,
                 (byte) 0, (byte) 0, (byte) 0);
         Vector3f origin = new Vector3f((float) player.xoffset, (float) player.yoffset, (float) player.zoffset);
         NodePosition np = raycast(rough, origin, cam.getDirection(), 8);
-        if(np==null) return;
-        Mesh completeMesh = new Mesh();
+        if (np == castNP) return;
+        if (np == null) return;
+        //geom.setLocalTranslation(new Vector3f(np.xl+16*np.chunk.x,np.yl+16*np.chunk.y,np.zl+16*np.chunk.z));
+        this.castNP = np;
+    }
+
+    private void initMouseoverMesh() {
+        Material mat;
+        mat = new Material(getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
+        {
+            mat.setColor("Color", ColorRGBA.White);
+            //mat.getAdditionalRenderState().setWireframe(true);
+        }
+        completeMesh = new Mesh();
         synchronized (FaceRenderer.class) {
             FaceRenderer.initialize();
-        }
-        Position pos = np.chunk;
-        float x = (float) ((pos.x + (CHUNK_SIZE * pos.x)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (np.xl * NODE_SIZE));
-        float z = (float) ((pos.y - (CHUNK_SIZE * pos.y)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (np.yl * NODE_SIZE));
-        float y = (float) ((pos.z + (CHUNK_SIZE * pos.z)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (np.zl * NODE_SIZE));
-        for (Face face : Face.values()) {
-            FaceRenderer.populateBuffers(face, x, y, z, NODE_SIZE);
+
+            float x = (float) ((0) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET);
+            float z = (float) ((0 - (CHUNK_SIZE * 0)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (0 * NODE_SIZE));
+            float y = (float) ((0 + (CHUNK_SIZE * 0)) - NODE_OFFSET_FROM_CENTER + CHUNK_OFFSET + (0 * NODE_SIZE));
+            for (Face face : Face.values()) {
+                FaceRenderer.populateBuffers(face, x, y, z, NODE_SIZE);
 
 
+            }
+            FloatBuffer vertices = FaceRenderer.getVertices();
+            FloatBuffer tex = FaceRenderer.getTextureCoordinates();
+            FloatBuffer normals = FaceRenderer.getNormals();
+            IntBuffer indices = FaceRenderer.getIndices();
+
+            completeMesh.setBuffer(Type.Position, 3, vertices);
+            completeMesh.setBuffer(Type.Normal, 3, normals);
+            completeMesh.setBuffer(Type.Index, 3, indices);
+            completeMesh.setBuffer(Type.TexCoord, 2, tex);
         }
-        FloatBuffer vertices = FaceRenderer.getVertices();
-        FloatBuffer tex = FaceRenderer.getTextureCoordinates();
-        FloatBuffer normals = FaceRenderer.getNormals();
-        IntBuffer indices = FaceRenderer.getIndices();
-        completeMesh.setBuffer(Type.Position, 3, vertices);
-        completeMesh.setBuffer(Type.Normal, 3, normals);
-        completeMesh.setBuffer(Type.Index, 3, indices);
-        completeMesh.setBuffer(Type.TexCoord, 2, tex);
         completeMesh.setLineWidth(8);
         completeMesh.updateBound();
-        Geometry geom = new Geometry("mouseoverMesh", completeMesh);
-        Material mat = new Material(getAssetManager(), "Common/MatDefs/Misc/Unshaded.j3md");
-        mat.setColor("Color", ColorRGBA.White);
-        mat.getAdditionalRenderState().setWireframe(true);
+        geom = new Geometry("mouseoverMesh", completeMesh);
         geom.setMaterial(mat);
-        mouseoverSpatial = geom;
-        worldNode.attachChild(geom);
-        System.out.println("Attached mouseover mesh at " + np);
+        //worldNode.attachChild(geom);
     }
 
     //
@@ -288,7 +296,7 @@ public class RenderProcessor extends SimpleApplication {
         }
         if (maybe != null) {
             renderChunk(maybe, pos);
-        }
+        } else System.out.println("NULL!");
     }
 
     private void preparatorChunkTest() {
@@ -338,7 +346,7 @@ public class RenderProcessor extends SimpleApplication {
 
     private void setupFlashlight() {
         spot = new SpotLight();
-        spot.setSpotRange(300f);
+        spot.setSpotRange(30000f);
         spot.setSpotInnerAngle(15f * FastMath.DEG_TO_RAD);
         spot.setSpotOuterAngle(35f * FastMath.DEG_TO_RAD);
         spot.setColor(ColorRGBA.White.mult(3f));
@@ -476,6 +484,7 @@ public class RenderProcessor extends SimpleApplication {
     }
 
     FaceNodePosition raycast(NodePosition worldPos, Vector3f traceOrigin, Vector3f camDirection, int radius) {
+       // System.out.println("worldPos = [" + worldPos + "], traceOrigin = [" + traceOrigin + "], camDirection = [" + camDirection + "], radius = [" + radius + "]");
         // From "A Fast Voxel Traversal Algorithm for Ray Tracing"
         // by John Amanatides and Andrew Woo, 1987
         // <http://www.cse.yorku.ca/~amana/research/grid.pdf>
@@ -597,7 +606,8 @@ public class RenderProcessor extends SimpleApplication {
         int yC = worldPos.chunk.y + (int) (y / 16);
         int zC = worldPos.chunk.z + (int) (z / 16);
         MapChunk chk = getChunk(new Position(worldPos.chunk.realm, xC, yC, zC));
-        if (chk==null) return false;
-        return chk.getNodeId((byte) (Math.abs(x % 16)), (byte) (Math.abs(y % 16)), (byte) Math.abs(z % 16)) != 0;
+        if (chk == null) return false;
+        //return chk.getNodeId((byte) (Math.abs(x % 16)), (byte) (Math.abs(y % 16)), (byte) Math.abs(z % 16)) != 0;
+        return true;
     }
 }

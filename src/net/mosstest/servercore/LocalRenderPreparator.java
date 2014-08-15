@@ -84,7 +84,7 @@ public class LocalRenderPreparator implements IRenderPreparator {
     /**
      * The lookup thread.
      */
-    private Thread lookupThread = new Thread(new ChunkLookupRunnable());
+    private Thread lookupThread = new Thread(new ChunkLookupRunnable(), "ChunkLookup");
 
     /**
      * The nm.

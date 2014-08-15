@@ -119,4 +119,13 @@ public class NodePosition {
         return new byte[]{};
     }
 
+    @Override
+    public String toString() {
+        return "NodePosition{" +
+                "xl=" + xl +
+                ", yl=" + yl +
+                ", zl=" + zl +
+                ", chunk=" + chunk +
+                '}';
+    }
 }
