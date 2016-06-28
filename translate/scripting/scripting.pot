@@ -1,0 +1,8 @@
+msgid "AntiCheatController.THREAD_NAME"
+msgstr "anticheat"
+
+msgid "MossEvent.MSG_CROSS_DMZ_SECURITY_WARNING"
+msgstr "Attempt to access controlled resources in the script DMZ."
+
+msgid "ScriptableDatabase.DB_NAME_INVALID"
+msgstr "Invalid database name."
